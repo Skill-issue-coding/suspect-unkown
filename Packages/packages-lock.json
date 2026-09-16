@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.kyrylokuzyk.primetween": {
+      "version": "file:../Packages/com.kyrylokuzyk.primetween.tgz",
+      "depth": 0,
+      "source": "local-tarball",
+      "dependencies": {}
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 1,
@@ -32,6 +38,25 @@
         "com.unity.modules.imageconversion": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "com.unity.ai.navigation": {
+      "version": "2.0.14",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.modules.ai": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.animation.rigging": {
+      "version": "6.6.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.burst": "1.4.1",
+        "com.unity.test-framework": "1.1.24",
+        "com.unity.modules.animation": "1.0.0"
+      }
     },
     "com.unity.bindings.openimageio": {
       "version": "1.0.2",
@@ -108,7 +133,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.26",
+      "version": "2.0.28",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -179,6 +204,18 @@
         "com.unity.modules.jsonserialize": "1.0.0",
         "com.unity.modules.screencapture": "1.0.0",
         "com.unity.nuget.newtonsoft-json": "3.0.2"
+      },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.probuilder": {
+      "version": "6.1.2",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.shadergraph": "17.0.3",
+        "com.unity.modules.imgui": "1.0.0",
+        "com.unity.modules.physics": "1.0.0",
+        "com.unity.settings-manager": "1.0.3"
       },
       "url": "https://packages.unity.com"
     },
