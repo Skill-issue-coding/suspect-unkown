@@ -407,9 +407,12 @@ public class NightLabWindow : EditorWindow
         material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
         material.SetColor("_BaseColor", new Color(0.2f, 0.2f, 0.2f));
         material.SetColor("_EmissionColor", Color.white * 4f);
-        material.EnableKeyword("_EMISSION");
-        material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None;
         AssetDatabase.CreateAsset(material, GlowMaterialPath);
+        // Set after CreateAsset: the keyword was lost when set before import.
+        material.EnableKeyword("_EMISSION");
+        material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+        EditorUtility.SetDirty(material);
+        AssetDatabase.SaveAssets();
         return material;
     }
 

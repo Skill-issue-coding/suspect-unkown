@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6501f1b09a213a478d86b26f4207a94, type: 3}
+  m_Name: 3_Noir
+  m_EditorClassIdentifier: Assembly-CSharp::NightPreset
+  skybox: {fileID: 2100000, guid: 18f00aef3238e2646b9bcdf79ff36f61, type: 2}
+  volumeProfile: {fileID: 11400000, guid: fb6da5f24b7a77847877245cb349ed64, type: 2}
+  ambientMode: 1
+  ambientSky: {r: 0.05, g: 0.055, b: 0.07, a: 1}
+  ambientEquator: {r: 0.03, g: 0.03, b: 0.04, a: 1}
+  ambientGround: {r: 0.01, g: 0.01, b: 0.01, a: 1}
+  ambientIntensity: 1
+  reflectionIntensity: 0.3
+  fog: 1
+  fogColor: {r: 0.015, g: 0.015, b: 0.02, a: 1}
+  fogDensity: 0.02
+  moonColor: {r: 0.85, g: 0.9, b: 1, a: 1}
+  moonIntensity: 0.2
+  moonRotation: {x: 35, y: -60, z: 0}
+  moonShadowStrength: 1
+  streetLightColor: {r: 1, g: 0.95, b: 0.85, a: 1}
+  streetLightIntensity: 16
+  interiorLightColor: {r: 1, g: 1, b: 1, a: 1}
+  interiorLightIntensity: 2.5
+  accentLightColor: {r: 1, g: 0.15, b: 0.1, a: 1}
+  accentLightIntensity: 1.5
