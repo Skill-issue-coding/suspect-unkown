@@ -28,6 +28,10 @@ public class PlayerMotor : MonoBehaviour
     public Vector3 Velocity => _horizontalVelocity + Vector3.up * _verticalVelocity;
     public bool IsGrounded => _controller.isGrounded;
 
+    public float WalkSpeed => _walkSpeed;
+    public float SprintSpeed => _sprintSpeed;
+    public float CrouchSpeed => _crouchSpeed;
+
     private Vector3 _horizontalVelocity;
     private float _verticalVelocity;
     private float _lastGroundedTime = float.NegativeInfinity;
