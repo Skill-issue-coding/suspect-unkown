@@ -28,6 +28,15 @@ public class PlayerMotor : MonoBehaviour
     public Vector3 Velocity => _horizontalVelocity + Vector3.up * _verticalVelocity;
     public bool IsGrounded => _controller.isGrounded;
 
+    // True once per launched jump, cleared by whoever reads it. A plain "jumped this frame" flag
+    // would depend on script order: the reader may run before this component does.
+    public bool ConsumeJump()
+    {
+        bool jumped = _jumpLaunched;
+        _jumpLaunched = false;
+        return jumped;
+    }
+
     public float WalkSpeed => _walkSpeed;
     public float SprintSpeed => _sprintSpeed;
     public float CrouchSpeed => _crouchSpeed;
@@ -35,6 +44,7 @@ public class PlayerMotor : MonoBehaviour
     private Vector3 _horizontalVelocity;
     private float _verticalVelocity;
     private float _lastGroundedTime = float.NegativeInfinity;
+    private bool _jumpLaunched;
 
     private CharacterController _controller;
     private PlayerStance _stance;
@@ -98,6 +108,7 @@ public class PlayerMotor : MonoBehaviour
             // v = sqrt(2 * g * h) gives the exact peak height.
             _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2.0f * _gravity);
             _lastGroundedTime = float.NegativeInfinity;
+            _jumpLaunched = true;
             // Consume the press so holding the key does not bunny hop.
             _input.jump = false;
         }

@@ -1,6 +1,6 @@
 # Suspect Unknown — Roadmap
 
-Companion to `heist-game-concept.md`. That document is *what* the game is; this one is *what order to build it in and what to do when you fall behind*.
+Companion to `heist-game-concept.md`. That document is _what_ the game is; this one is _what order to build it in and what to do when you fall behind_.
 
 **Emil Djurson** (emidj236) · **Marcus Skoglund** (marsk090)
 
@@ -201,14 +201,14 @@ Two people, so split by system boundary rather than by file, and agree interface
 
 **Suggested:**
 
-| Emil (systems) | Marcus (world and experience) |
-|---|---|
-| Perception, cones, multi-point rays | Camera, occlusion shader, character controller |
-| Suspicion, state machines, decision trees | Modular character rig, Mixamo retargeting |
-| Witness model and evidence merge | Witness Report and suspect lineup screens |
-| Markov model, placement optimizer | Level design in ProBuilder, lighting |
-| Save/load, job logging | Shop, wardrobe, skill UI |
-| AI course report | Audio, feel, polish pass |
+| Emil (systems)                            | Marcus (world and experience)                  |
+| ----------------------------------------- | ---------------------------------------------- |
+| Perception, cones, multi-point rays       | Camera, occlusion shader, character controller |
+| Suspicion, state machines, decision trees | Modular character rig, Mixamo retargeting      |
+| Witness model and evidence merge          | Witness Report and suspect lineup screens      |
+| Markov model, placement optimizer         | Level design in ProBuilder, lighting           |
+| Save/load, job logging                    | Shop, wardrobe, skill UI                       |
+| AI course report                          | Audio, feel, polish pass                       |
 
 Interfaces to agree up front:
 
@@ -233,17 +233,17 @@ Both of you will be blind to your own UI by week three, and the witness and adap
 
 ## Risk register
 
-| Risk | Mitigation |
-|---|---|
-| Camera occlusion makes the game unreadable | Phase 1 gate. Low walls plus dither fade, prototyped before content exists. |
-| 3D asset workload overruns the schedule | Asset packs and Mixamo from day one; greybox-first; three tiers instead of five |
-| Phase 4 is not fun | Find out in month one, not month three |
-| Modular character system fights the animation rig | Build outfits and retargeting together in Phase 6; one shared skeleton, no exceptions |
-| Adaptive security makes levels unwinnable | Solvability check after placement; cap changes per job |
-| Poisoning turns out to be pointless | Phase 9 gate, tuned against one level before content exists |
-| Witness system is invisible to players | Report and lineup screens are presentation work, not programming work. Budget them as such. |
-| Verticality doubles level cost | One floor until tier 2 |
-| Art inconsistency reads as unfinished | Fixed palette, one asset pack as the visual baseline, no mixing sources |
+| Risk                                              | Mitigation                                                                                  |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Camera occlusion makes the game unreadable        | Phase 1 gate. Low walls plus dither fade, prototyped before content exists.                 |
+| 3D asset workload overruns the schedule           | Asset packs and Mixamo from day one; greybox-first; three tiers instead of five             |
+| Phase 4 is not fun                                | Find out in month one, not month three                                                      |
+| Modular character system fights the animation rig | Build outfits and retargeting together in Phase 6; one shared skeleton, no exceptions       |
+| Adaptive security makes levels unwinnable         | Solvability check after placement; cap changes per job                                      |
+| Poisoning turns out to be pointless               | Phase 9 gate, tuned against one level before content exists                                 |
+| Witness system is invisible to players            | Report and lineup screens are presentation work, not programming work. Budget them as such. |
+| Verticality doubles level cost                    | One floor until tier 2                                                                      |
+| Art inconsistency reads as unfinished             | Fixed palette, one asset pack as the visual baseline, no mixing sources                     |
 
 ---
 

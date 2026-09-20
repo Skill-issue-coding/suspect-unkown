@@ -9,6 +9,7 @@ using UnityEngine;
 // OnAnimatorIK only to components sharing the Animator's GameObject.
 [RequireComponent(typeof(PlayerMotor))]
 [RequireComponent(typeof(PlayerStance))]
+[RequireComponent(typeof(PlayerAim))]
 public class PlayerAnimator : MonoBehaviour
 {
     // Positions on the locomotion blend tree's Speed axis.
@@ -24,19 +25,36 @@ public class PlayerAnimator : MonoBehaviour
     private static readonly int SpeedId = Animator.StringToHash("Speed");
     private static readonly int CrouchingId = Animator.StringToHash("Crouching");
     private static readonly int GroundedId = Animator.StringToHash("Grounded");
+    private static readonly int TurnId = Animator.StringToHash("Turn");
+    private static readonly int JumpId = Animator.StringToHash("Jump");
+
+    // Override layers holding the arm poses, one per stance. PlayerLocomotionBuilder names them.
+    private const string StandingArmsLayer = "Standing Arms";
+    private const string CrouchArmsLayer = "Crouch Arms";
 
     [Header("Damping")]
     [Tooltip("Seconds for the direction parameters to catch up. Smooths diagonal changes.")]
     [SerializeField] private float _directionDamping = 0.1f;
     [Tooltip("Seconds for the speed parameter to catch up.")]
     [SerializeField] private float _speedDamping = 0.1f;
+    [Tooltip("Seconds for the arm overrides to swap stance. Too fast and the arms snap pose as the " +
+             "character drops into the crouch.")]
+    [SerializeField] private float _armsDamping = 0.2f;
 
     private Animator _animator;
     private PlayerMotor _motor;
     private PlayerStance _stance;
+    private PlayerAim _aim;
 
     // Kept so the blend tree holds its last direction while idle instead of snapping to centre.
     private Vector2 _direction = Vector2.up;
+
+    // -1 when the controller has no such layer, which is the case for the crouch one if the crouch
+    // clips are missing and the builder skipped it.
+    private int _standingArmsLayer = -1;
+    private int _crouchArmsLayer = -1;
+    private float _crouchArmsWeight;
+    private float _crouchArmsVelocity;
 
     private void Awake()
     {
@@ -44,6 +62,7 @@ public class PlayerAnimator : MonoBehaviour
         _animator = GetComponentInChildren<Animator>();
         _motor = GetComponent<PlayerMotor>();
         _stance = GetComponent<PlayerStance>();
+        _aim = GetComponent<PlayerAim>();
 
         if (_animator == null)
         {
@@ -58,6 +77,9 @@ public class PlayerAnimator : MonoBehaviour
             enabled = false;
             return;
         }
+
+        _standingArmsLayer = _animator.GetLayerIndex(StandingArmsLayer);
+        _crouchArmsLayer = _animator.GetLayerIndex(CrouchArmsLayer);
 
         // PlayerMotor owns movement via the CharacterController. Leaving root motion on lets the
         // clips displace the rig as well, so the mesh drifts out of the capsule.
@@ -87,6 +109,32 @@ public class PlayerAnimator : MonoBehaviour
         _animator.SetFloat(SpeedId, ResolveSpeedBlend(speed), _speedDamping, Time.deltaTime);
         _animator.SetBool(CrouchingId, _stance.Current == Stance.Crouching);
         _animator.SetBool(GroundedId, _motor.IsGrounded);
+
+        // Undamped: the turn states switch on a threshold, so a ramp would only delay the step.
+        _animator.SetFloat(TurnId, _aim.TurnDirection);
+
+        // Set after Speed, so the standing/running choice is made against this frame's value.
+        if (_motor.ConsumeJump()) _animator.SetTrigger(JumpId);
+
+        UpdateArms();
+    }
+
+    // The strafe clips hold a torch, so masked layers replay the forward clips' arms over them,
+    // one layer per stance. The crossfade is a fade rather than a switch: swapping weight in one
+    // frame makes the arms jump pose as the character drops into the crouch.
+    private void UpdateArms()
+    {
+        float target = _stance.Current == Stance.Crouching ? 1.0f : 0.0f;
+        _crouchArmsWeight = Mathf.SmoothDamp(_crouchArmsWeight, target, ref _crouchArmsVelocity,
+            _armsDamping);
+
+        if (_crouchArmsLayer >= 0) _animator.SetLayerWeight(_crouchArmsLayer, _crouchArmsWeight);
+
+        // Complementary, so the arms are never driven from both stances at once. Without a crouch
+        // layer to hand over to, the standing one stays on and keeps the torch pose off the arms.
+        if (_standingArmsLayer >= 0)
+            _animator.SetLayerWeight(_standingArmsLayer,
+                _crouchArmsLayer >= 0 ? 1.0f - _crouchArmsWeight : 1.0f);
     }
 
     // Maps metres per second onto the blend tree's thresholds, so retuning the motor's
