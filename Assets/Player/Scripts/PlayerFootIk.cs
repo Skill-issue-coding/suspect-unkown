@@ -29,6 +29,15 @@ public class PlayerFootIk : MonoBehaviour
              "to the ground. Add those curves per clip in the FBX import settings first.")]
     [SerializeField] private bool _useFootPlantCurves = false;
 
+    // Live solver state, read by PlayerFootIkEditor to draw the scene view overlay.
+    public float HipOffset => _hipOffset;
+    public float LeftFootWeight { get; private set; }
+    public float RightFootWeight { get; private set; }
+    public LayerMask GroundLayers => _groundLayers;
+    public float ProbeHeight => _probeHeight;
+    public float ProbeDistance => _probeDistance;
+    public float AnkleHeight => _ankleHeight;
+
     private Animator _animator;
     private PlayerMotor _motor;
 
@@ -121,6 +130,9 @@ public class PlayerFootIk : MonoBehaviour
             float animatedY = _animator.GetIKPosition(goal).y + _hipOffset;
             weight = grounded && position.y > animatedY ? 1.0f : 0.0f;
         }
+
+        if (goal == AvatarIKGoal.LeftFoot) LeftFootWeight = weight;
+        else RightFootWeight = weight;
 
         _animator.SetIKPositionWeight(goal, weight);
         _animator.SetIKRotationWeight(goal, weight);

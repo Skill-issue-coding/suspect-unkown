@@ -8,30 +8,96 @@ using UnityEngine;
 // settings reviewable in git, and makes a bad experiment one menu click away from being undone.
 public static class PlayerLocomotionBuilder
 {
+    // One clip per compass direction, at one playback speed. A tier of the Speed axis is exactly
+    // this, so passing it around as a set keeps the eight-argument version of BuildLocomotion away.
+    private readonly struct StrafeSet
+    {
+        public readonly AnimationClip Forward;
+        public readonly AnimationClip Backward;
+        public readonly AnimationClip Left;
+        public readonly AnimationClip Right;
+        public readonly float Speed;
+
+        public StrafeSet(AnimationClip forward, AnimationClip backward, AnimationClip left,
+            AnimationClip right, float speed = 1.0f)
+        {
+            Forward = forward;
+            Backward = backward;
+            Left = left;
+            Right = right;
+            Speed = speed;
+        }
+
+        // A tier with a hole in it would blend toward an empty motion, freezing the character
+        // whenever it faced that way, so a partial set is treated as no set at all.
+        public bool IsComplete => Forward != null && Backward != null && Left != null && Right != null;
+
+        public StrafeSet AtSpeed(float speed) => new StrafeSet(Forward, Backward, Left, Right, speed);
+    }
+
     private const string ControllerPath = "Assets/Player/PlayerAnimationController.controller";
     private const string AnimationsRoot = "Assets/Player/Animations";
+    private const string ArmMaskPath = "Assets/Player/Animations/Crouching/CrouchArmsMask.mask";
+
+    // PlayerAnimator finds this layer by name to drive its weight. Renaming it here means
+    // renaming CrouchArmsLayer there.
+    private const string CrouchArmsLayer = "Crouch Arms";
 
     // Playback multiplier on the sprint tree until real sprint clips exist: reusing the walk
     // clips faster is the standard stopgap, and it keeps the graph shape final.
     private const float SprintClipSpeed = 1.45f;
 
+    // PlayerAim reads the length of whichever state carries this tag, and paces the body's
+    // rotation to it. Renaming the tag here means renaming TurnTag there.
+    private const string TurnTag = "Turn";
+
+    // Below this Speed the character counts as standing still, so turn-in-place is allowed.
+    private const float StandingSpeed = 0.1f;
+
+    // Speed above which a jump is treated as a running one. Half a step into the walk tier:
+    // anything with real forward motion reads wrong as a standing jump.
+    private const float RunningJumpSpeed = 0.5f;
+
+    // Blend lengths into the single jump clip. The running jump snaps in, because the character
+    // is already leaning. The standing jump eases in over a third of a second, which keeps the
+    // idle pose through the crouch and takeoff and takes most of the run out of the clip.
+    private const float RunningJumpBlend = 0.08f;
+    private const float StandingJumpBlend = 0.32f;
+
     [MenuItem("Animator/Rebuild Player Locomotion")]
     public static void Rebuild()
     {
-        AnimationClip idle = LoadClip("Idle/Idle.fbx");
+        AnimationClip idle = LoadClip("Standing/standing_idle.fbx");
         AnimationClip walkForward = LoadClip("Walking/walking_forward.fbx");
         AnimationClip walkBackward = LoadClip("Walking/walking_backward.fbx");
         AnimationClip walkLeft = LoadClip("Walking/walking_left.fbx");
         AnimationClip walkRight = LoadClip("Walking/walking_right.fbx");
-        AnimationClip crouchForward = LoadClip("Crouched/crouch_walking_forward.fbx");
+        AnimationClip crouchIdle = LoadClip("Crouching/crouching_idle.fbx");
+        AnimationClip crouchForward = LoadClip("Crouching/crouching_walk_forward.fbx");
+        AnimationClip crouchLeft = LoadClip("Crouching/crouching_walk_left.fbx");
+        AnimationClip crouchRight = LoadClip("Crouching/crouching_walk_right.fbx");
         AnimationClip toCrouch = LoadClip("Standing/standing_trans_crouch.fbx");
-        AnimationClip toStanding = LoadClip("Crouched/crouch_trans_standing.fbx");
+        AnimationClip toStanding = LoadClip("Crouching/crouching_trans_standing.fbx");
+        AnimationClip turnLeft = LoadClip("Standing/standing_left_turn.fbx");
+        AnimationClip turnRight = LoadClip("Standing/standing_right_turn.fbx");
+        AnimationClip jump = LoadClip("Running/running_jump.fbx");
 
-        if (idle == null || walkForward == null || walkBackward == null || walkLeft == null || walkRight == null)
+        StrafeSet walk = new StrafeSet(walkForward, walkBackward, walkLeft, walkRight);
+        StrafeSet run = new StrafeSet(
+            LoadClip("Running/running_forward.fbx"),
+            LoadClip("Running/running_backward.fbx"),
+            LoadClip("Running/running_left_strafe.fbx"),
+            LoadClip("Running/running_right_strafe.fbx"));
+
+        if (idle == null || !walk.IsComplete)
         {
             Debug.LogError("[PlayerLocomotionBuilder] Missing a required locomotion clip. Aborting.");
             return;
         }
+
+        if (!run.IsComplete)
+            Debug.LogWarning("[PlayerLocomotionBuilder] Incomplete run clip set; the sprint tier " +
+                             $"falls back to the walk clips at {SprintClipSpeed:0.00}x.");
 
         // Reset in place rather than delete and recreate: a new asset would get a new GUID and
         // silently unhook the Animator component on the player prefab.
@@ -44,10 +110,14 @@ public static class PlayerLocomotionBuilder
         controller.AddParameter("Speed", AnimatorControllerParameterType.Float);
         controller.AddParameter("Crouching", AnimatorControllerParameterType.Bool);
         controller.AddParameter("Grounded", AnimatorControllerParameterType.Bool);
+        // -1, 0 or 1, written by PlayerAnimator from PlayerAim.TurnDirection.
+        controller.AddParameter("Turn", AnimatorControllerParameterType.Float);
+        // Fired by PlayerAnimator on the frame PlayerMotor launches a jump.
+        controller.AddParameter("Jump", AnimatorControllerParameterType.Trigger);
 
         AnimatorStateMachine root = controller.layers[0].stateMachine;
 
-        AnimatorState locomotion = BuildLocomotion(controller, idle, walkForward, walkBackward, walkLeft, walkRight);
+        AnimatorState locomotion = BuildLocomotion(controller, idle, walk, run);
         locomotion.writeDefaultValues = false;
         root.defaultState = locomotion;
 
@@ -56,10 +126,12 @@ public static class PlayerLocomotionBuilder
         // character; staying in Locomotion is merely the wrong animation.
         if (crouchForward != null)
         {
-            AnimatorState crouch = BuildCrouch(controller, crouchForward);
+            StrafeSet crouchStrafe = new StrafeSet(crouchForward, crouchForward, crouchLeft, crouchRight);
+            AnimatorState crouch = BuildCrouch(controller, crouchIdle, crouchStrafe);
             crouch.writeDefaultValues = false;
             LayoutStates(root, locomotion, crouch);
             WireCrouchTransitions(root, locomotion, crouch, toCrouch, toStanding);
+            BuildCrouchArmsLayer(controller, crouchIdle, crouchForward);
         }
         else
         {
@@ -67,6 +139,15 @@ public static class PlayerLocomotionBuilder
                              "The player will keep using standing locomotion while crouched.");
             LayoutStates(root, locomotion, null);
         }
+
+        if (turnLeft != null && turnRight != null) BuildTurns(root, locomotion, turnLeft, turnRight);
+        else Debug.LogWarning("[PlayerLocomotionBuilder] Missing a standing turn clip; skipping " +
+                              "turn-in-place. PlayerAim will fall back to its own turn speed and " +
+                              "the feet will not step round.");
+
+        if (jump != null) BuildJump(root, locomotion, jump);
+        else Debug.LogWarning("[PlayerLocomotionBuilder] No jump clip; the character will keep " +
+                              "playing locomotion while airborne.");
 
         EnableIkPass(controller);
         RemoveStrayBlendParameter(controller);
@@ -94,15 +175,21 @@ public static class PlayerLocomotionBuilder
         foreach (ChildAnimatorStateMachine child in root.stateMachines.ToArray())
             root.RemoveStateMachine(child.stateMachine);
 
-        // Blend trees live as sub-assets and are not collected when their state goes away.
+        // Blend trees live as sub-assets and are not collected when their state goes away. The
+        // same is true of a removed layer's state machine, which is why the base one is kept back.
         foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(ControllerPath))
+        {
             if (asset is BlendTree tree) Object.DestroyImmediate(tree, true);
+            else if (asset is AnimatorStateMachine machine && machine != root) Object.DestroyImmediate(machine, true);
+            // Any state still in the file at this point belonged to a layer that has just gone.
+            else if (asset is AnimatorState orphan) Object.DestroyImmediate(orphan, true);
+        }
     }
 
     // Speed axis: 0 idle, 1 walk, 2 sprint. Each moving tier is its own 2D strafe tree, so the
     // four directional clips are authored once per tier and the parent handles the gear change.
     private static AnimatorState BuildLocomotion(AnimatorController controller, AnimationClip idle,
-        AnimationClip forward, AnimationClip backward, AnimationClip left, AnimationClip right)
+        StrafeSet walk, StrafeSet run)
     {
         AnimatorState state = controller.CreateBlendTreeInController("Locomotion", out BlendTree tree, 0);
         tree.blendType = BlendTreeType.Simple1D;
@@ -111,16 +198,18 @@ public static class PlayerLocomotionBuilder
 
         tree.AddChild(idle, 0.0f);
 
-        CreateStrafeTree(tree, "Walk", 1.0f, forward, backward, left, right, 1.0f);
-        CreateStrafeTree(tree, "Sprint", 2.0f, forward, backward, left, right, SprintClipSpeed);
+        CreateStrafeTree(tree, "Walk", 1.0f, walk);
+
+        // Real run clips when they exist; otherwise the walk clips played fast, which is the
+        // stopgap this project started with.
+        CreateStrafeTree(tree, "Sprint", 2.0f, run.IsComplete ? run : walk.AtSpeed(SprintClipSpeed));
 
         return state;
     }
 
     // 2D Simple Directional is the right blend type for exactly one clip per compass direction:
     // it blends the two clips either side of the requested heading instead of smearing all four.
-    private static void CreateStrafeTree(BlendTree parent, string name, float threshold,
-        AnimationClip forward, AnimationClip backward, AnimationClip left, AnimationClip right, float clipSpeed)
+    private static void CreateStrafeTree(BlendTree parent, string name, float threshold, StrafeSet clips)
     {
         BlendTree tree = parent.CreateBlendTreeChild(threshold);
         tree.name = name;
@@ -128,32 +217,138 @@ public static class PlayerLocomotionBuilder
         tree.blendParameter = "MoveX";
         tree.blendParameterY = "MoveY";
 
-        tree.AddChild(forward, new Vector2(0.0f, 1.0f));
-        tree.AddChild(backward, new Vector2(0.0f, -1.0f));
-        tree.AddChild(left, new Vector2(-1.0f, 0.0f));
-        tree.AddChild(right, new Vector2(1.0f, 0.0f));
+        tree.AddChild(clips.Forward, new Vector2(0.0f, 1.0f));
+        tree.AddChild(clips.Backward, new Vector2(0.0f, -1.0f));
+        tree.AddChild(clips.Left, new Vector2(-1.0f, 0.0f));
+        tree.AddChild(clips.Right, new Vector2(1.0f, 0.0f));
 
-        SetChildSpeeds(tree, clipSpeed);
+        SetChildSpeeds(tree, clips.Speed);
     }
 
-    private static AnimatorState BuildCrouch(AnimatorController controller, AnimationClip crouchForward)
+    // Same shape as the standing tier, one gear down: idle at 0, a strafe tree at 1. The crouch
+    // Speed axis is normalised against the crouch speed in PlayerAnimator, so it only runs 0..1.
+    private static AnimatorState BuildCrouch(AnimatorController controller, AnimationClip idle, StrafeSet clips)
     {
         AnimatorState state = controller.CreateBlendTreeInController("Crouch", out BlendTree tree, 0);
         tree.blendType = BlendTreeType.Simple1D;
         tree.blendParameter = "Speed";
         tree.useAutomaticThresholds = false;
 
-        // Only a forward crouch clip exists, so the same clip sits at both ends of the axis and
-        // is frozen at idle. Drop crouch_idle and crouch strafe clips in and extend this into a
-        // CreateStrafeTree call to match the standing tier.
-        tree.AddChild(crouchForward, 0.0f);
-        tree.AddChild(crouchForward, 1.0f);
+        // Falling back to the forward clip for idle keeps the tree valid; freezing it at time 0
+        // is what makes it read as standing still.
+        tree.AddChild(idle != null ? idle : clips.Forward, 0.0f);
 
-        ChildMotion[] children = tree.children;
-        children[0].timeScale = 0.0f;
-        tree.children = children;
+        if (idle == null)
+        {
+            ChildMotion[] children = tree.children;
+            children[0].timeScale = 0.0f;
+            tree.children = children;
+        }
+
+        // No crouching backward clip, so the forward one runs in reverse for that quadrant. It
+        // reads acceptably at crouch pace; swap in a real clip here when there is one.
+        if (clips.IsComplete)
+        {
+            CreateStrafeTree(tree, "CrouchWalk", 1.0f, clips);
+            ReverseBackwardChild(tree);
+        }
+        else
+        {
+            Debug.LogWarning("[PlayerLocomotionBuilder] Incomplete crouch strafe set; crouching " +
+                             "uses the forward clip in every direction.");
+            CreateStrafeTree(tree, "CrouchWalk", 1.0f,
+                new StrafeSet(clips.Forward, clips.Forward, clips.Forward, clips.Forward));
+        }
 
         return state;
+    }
+
+    // The strafe tree is the last child added, and its backward clip is the second child in it.
+    private static void ReverseBackwardChild(BlendTree parent)
+    {
+        ChildMotion[] tiers = parent.children;
+        if (tiers.Length == 0 || !(tiers[tiers.Length - 1].motion is BlendTree strafe)) return;
+
+        ChildMotion[] children = strafe.children;
+        if (children.Length < 2) return;
+
+        children[1].timeScale = -1.0f;
+        strafe.children = children;
+    }
+
+    // The crouch strafe clips were authored with the character holding a torch, so their arms are
+    // wrong for this game. This layer replays the forward clip's arms over the top of whichever
+    // crouch clip the base layer is blending, through a mask that lets nothing but the arms and
+    // fingers through. The legs, hips and spine keep coming from the base layer, so the strafe
+    // still reads as a strafe.
+    //
+    // PlayerAnimator owns the layer's weight: it is a crouch-only fix, and at weight 1 while
+    // standing the arms would be pinned to a crouch pose.
+    private static void BuildCrouchArmsLayer(AnimatorController controller, AnimationClip idle, AnimationClip forward)
+    {
+        AvatarMask mask = BuildArmMask();
+
+        AnimatorControllerLayer layer = new AnimatorControllerLayer
+        {
+            name = CrouchArmsLayer,
+            defaultWeight = 0.0f,
+            avatarMask = mask,
+            blendingMode = AnimatorLayerBlendingMode.Override,
+            stateMachine = new AnimatorStateMachine { name = CrouchArmsLayer, hideFlags = HideFlags.HideInHierarchy }
+        };
+
+        // The state machine is a sub-asset of the controller, like the ones AddLayer creates.
+        AssetDatabase.AddObjectToAsset(layer.stateMachine, controller);
+
+        // Built by hand rather than with CreateBlendTreeInController, which always builds into
+        // layer 0 and would have to be moved off it afterwards.
+        BlendTree tree = new BlendTree
+        {
+            name = "CrouchArms",
+            blendType = BlendTreeType.Simple1D,
+            blendParameter = "Speed",
+            useAutomaticThresholds = false,
+            hideFlags = HideFlags.HideInHierarchy
+        };
+        AssetDatabase.AddObjectToAsset(tree, controller);
+
+        // Arms follow the same Speed axis as the legs below them, so a crouching stop settles the
+        // arms and a crouching walk swings them.
+        tree.AddChild(idle != null ? idle : forward, 0.0f);
+        tree.AddChild(forward, 1.0f);
+
+        AnimatorState state = layer.stateMachine.AddState("CrouchArms", new Vector3(300.0f, 60.0f, 0.0f));
+        state.motion = tree;
+        state.writeDefaultValues = false;
+        layer.stateMachine.defaultState = state;
+
+        controller.AddLayer(layer);
+    }
+
+    // Arms and fingers only. Shoulders belong to the arm body parts in a humanoid mask, which is
+    // what carries the torch pose, and leaving the body out keeps PlayerAimTwist in charge of the
+    // spine.
+    private static AvatarMask BuildArmMask()
+    {
+        AvatarMask mask = AssetDatabase.LoadAssetAtPath<AvatarMask>(ArmMaskPath);
+        if (mask == null)
+        {
+            mask = new AvatarMask();
+            AssetDatabase.CreateAsset(mask, ArmMaskPath);
+        }
+
+        foreach (AvatarMaskBodyPart part in System.Enum.GetValues(typeof(AvatarMaskBodyPart)))
+        {
+            if (part == AvatarMaskBodyPart.LastBodyPart) continue;
+
+            bool active = part == AvatarMaskBodyPart.LeftArm || part == AvatarMaskBodyPart.RightArm
+                || part == AvatarMaskBodyPart.LeftFingers || part == AvatarMaskBodyPart.RightFingers;
+
+            mask.SetHumanoidBodyPartActive(part, active);
+        }
+
+        EditorUtility.SetDirty(mask);
+        return mask;
     }
 
     // Dedicated transition states rather than a plain crossfade: the standing/crouching poses are
@@ -187,6 +382,116 @@ public static class PlayerLocomotionBuilder
 
         Advance(standToCrouch, crouch);
         Advance(crouchToStand, locomotion);
+    }
+
+    // Turn-in-place: PlayerAim decides when the cursor has led the body too far, and these states
+    // supply the footwork for it. The clips carry their rotation as root motion, which the player
+    // discards, so the feet step while PlayerAim turns the transform by exactly the clip's angle.
+    // Without that split the turn would be applied twice.
+    private static void BuildTurns(AnimatorStateMachine root, AnimatorState locomotion,
+        AnimationClip left, AnimationClip right)
+    {
+        AnimatorState turnLeft = AddTurnState(root, "TurnLeft", left, new Vector3(300.0f, -120.0f, 0.0f));
+        AnimatorState turnRight = AddTurnState(root, "TurnRight", right, new Vector3(560.0f, -120.0f, 0.0f));
+
+        EnterTurn(locomotion, turnLeft, AnimatorConditionMode.Less, -0.5f);
+        EnterTurn(locomotion, turnRight, AnimatorConditionMode.Greater, 0.5f);
+
+        // Out the moment the turn finishes, so a short correction does not hold the whole clip.
+        ExitTurn(turnLeft, locomotion, AnimatorConditionMode.Greater, -0.5f);
+        ExitTurn(turnRight, locomotion, AnimatorConditionMode.Less, 0.5f);
+
+        // Walking off mid-turn hands the feet back to the blend tree.
+        ExitTurn(turnLeft, locomotion, AnimatorConditionMode.Greater, StandingSpeed, "Speed");
+        ExitTurn(turnRight, locomotion, AnimatorConditionMode.Greater, StandingSpeed, "Speed");
+
+        // A turn wider than one clip runs out of footage. Falling back to Locomotion re-arms the
+        // entry transition, so the character takes a second step instead of freezing mid-pose.
+        Advance(turnLeft, locomotion);
+        Advance(turnRight, locomotion);
+    }
+
+    private static AnimatorState AddTurnState(AnimatorStateMachine root, string name,
+        AnimationClip clip, Vector3 position)
+    {
+        AnimatorState state = root.AddState(name, position);
+        state.motion = clip;
+        state.tag = TurnTag;
+        state.writeDefaultValues = false;
+        return state;
+    }
+
+    private static void EnterTurn(AnimatorState from, AnimatorState to, AnimatorConditionMode mode, float threshold)
+    {
+        AnimatorStateTransition transition = from.AddTransition(to);
+        transition.AddCondition(mode, threshold, "Turn");
+        transition.AddCondition(AnimatorConditionMode.Less, StandingSpeed, "Speed");
+        transition.hasExitTime = false;
+        transition.hasFixedDuration = true;
+        transition.duration = 0.1f;
+        transition.canTransitionToSelf = false;
+    }
+
+    private static void ExitTurn(AnimatorState from, AnimatorState to, AnimatorConditionMode mode,
+        float threshold, string parameter = "Turn")
+    {
+        AnimatorStateTransition transition = from.AddTransition(to);
+        transition.AddCondition(mode, threshold, parameter);
+        transition.hasExitTime = false;
+        transition.hasFixedDuration = true;
+        transition.duration = 0.12f;
+        transition.canTransitionToSelf = false;
+    }
+
+    // One jump clip for both cases. The clip is a running jump, so a standing jump enters it over
+    // a long blend: the idle pose is held well into the takeoff and the clip's forward lean and
+    // arm swing arrive late and weak. A running jump gets the short blend, where that lean is
+    // wanted. Hiding the run in the blend length is what a second clip would otherwise pay for.
+    //
+    // Jumps hang off Any State: the character can leave the ground out of locomotion, out of a
+    // turn or mid-crouch-transition, and one trigger covers all of them without a transition per
+    // source state.
+    private static void BuildJump(AnimatorStateMachine root, AnimatorState locomotion, AnimationClip clip)
+    {
+        AnimatorState jump = root.AddState("Jump", new Vector3(560.0f, -260.0f, 0.0f));
+        jump.motion = clip;
+        jump.writeDefaultValues = false;
+
+        EnterJump(root, jump, AnimatorConditionMode.Greater, RunningJumpSpeed, RunningJumpBlend);
+        EnterJump(root, jump, AnimatorConditionMode.Less, RunningJumpSpeed, StandingJumpBlend);
+
+        ExitJump(jump, locomotion);
+    }
+
+    private static void EnterJump(AnimatorStateMachine root, AnimatorState to,
+        AnimatorConditionMode mode, float threshold, float duration)
+    {
+        AnimatorStateTransition transition = root.AddAnyStateTransition(to);
+        transition.AddCondition(AnimatorConditionMode.If, 0.0f, "Jump");
+        transition.AddCondition(mode, threshold, "Speed");
+        transition.hasExitTime = false;
+        transition.hasFixedDuration = true;
+        transition.duration = duration;
+        transition.canTransitionToSelf = false;
+    }
+
+    private static void ExitJump(AnimatorState from, AnimatorState to)
+    {
+        // Grounded ends the jump, but not before the clip has left the floor: the controller still
+        // reports grounded on the frame the jump launches, and an unguarded condition would bounce
+        // the state straight back into Locomotion.
+        AnimatorStateTransition landing = from.AddTransition(to);
+        landing.AddCondition(AnimatorConditionMode.If, 0.0f, "Grounded");
+        landing.hasExitTime = true;
+        landing.exitTime = 0.25f;
+        landing.hasFixedDuration = true;
+        // Long enough that the clip's run-out does not snap into idle on the landing frame.
+        landing.duration = 0.2f;
+
+        // There is no fall clip, so a jump that outlasts its own footage hands back to locomotion
+        // rather than holding the landing pose in mid-air. Add a fall state here when that clip
+        // exists; it is the right place for it.
+        Advance(from, to);
     }
 
     private static void Connect(AnimatorState from, AnimatorState to, string parameter, bool value, float duration)
