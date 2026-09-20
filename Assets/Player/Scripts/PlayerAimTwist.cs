@@ -32,8 +32,9 @@ public class PlayerAimTwist : MonoBehaviour
     [Tooltip("Point the head along the aim instead of leaving it where the clip put it. The crouch " +
              "clips look straight at the floor, which this fixes.")]
     [SerializeField] private bool _enableLook = true;
-    [Tooltip("How much of the head pose the look takes over while standing.")]
-    [SerializeField] private float _standingLookWeight = 0.5f;
+    [Tooltip("How much of the head pose the look takes over while standing. High, so the head reads " +
+             "the same whichever clip the base layer is playing.")]
+    [SerializeField] private float _standingLookWeight = 0.8f;
     [Tooltip("How much while crouching. The crouch clips need more, because their head is further off.")]
     [SerializeField] private float _crouchingLookWeight = 1.0f;
     [Tooltip("Share of the look given to the eyes. 0 on a rig with no eye bones.")]

@@ -39,8 +39,9 @@ public static class PlayerLocomotionBuilder
     private const string AnimationsRoot = "Assets/Player/Animations";
     private const string ArmMaskPath = "Assets/Player/Animations/Crouching/CrouchArmsMask.mask";
 
-    // PlayerAnimator finds this layer by name to drive its weight. Renaming it here means
-    // renaming CrouchArmsLayer there.
+    // PlayerAnimator finds these layers by name to drive their weights. Renaming them here means
+    // renaming StandingArmsLayer and CrouchArmsLayer there.
+    private const string StandingArmsLayer = "Standing Arms";
     private const string CrouchArmsLayer = "Crouch Arms";
 
     // Playback multiplier on the sprint tree until real sprint clips exist: reusing the walk
@@ -131,7 +132,6 @@ public static class PlayerLocomotionBuilder
             crouch.writeDefaultValues = false;
             LayoutStates(root, locomotion, crouch);
             WireCrouchTransitions(root, locomotion, crouch, toCrouch, toStanding);
-            BuildCrouchArmsLayer(controller, crouchIdle, crouchForward);
         }
         else
         {
@@ -148,6 +148,9 @@ public static class PlayerLocomotionBuilder
         if (jump != null) BuildJump(root, locomotion, jump);
         else Debug.LogWarning("[PlayerLocomotionBuilder] No jump clip; the character will keep " +
                               "playing locomotion while airborne.");
+
+        // Last, so the override layers sit above every base-layer state the graph can reach.
+        BuildArmLayers(controller, idle, walk, run, crouchIdle, crouchForward);
 
         EnableIkPass(controller);
         RemoveStrayBlendParameter(controller);
@@ -276,25 +279,47 @@ public static class PlayerLocomotionBuilder
         strafe.children = children;
     }
 
-    // The crouch strafe clips were authored with the character holding a torch, so their arms are
-    // wrong for this game. This layer replays the forward clip's arms over the top of whichever
-    // crouch clip the base layer is blending, through a mask that lets nothing but the arms and
-    // fingers through. The legs, hips and spine keep coming from the base layer, so the strafe
+    // The strafe clips were authored with the character holding a torch, so their arms are wrong
+    // for this game, crouched and standing alike. These layers replay the forward clips' arms over
+    // the top of whatever the base layer is blending, through a mask that lets nothing but the arms
+    // and fingers through. The legs, hips and spine keep coming from the base layer, so a strafe
     // still reads as a strafe.
     //
-    // PlayerAnimator owns the layer's weight: it is a crouch-only fix, and at weight 1 while
-    // standing the arms would be pinned to a crouch pose.
-    private static void BuildCrouchArmsLayer(AnimatorController controller, AnimationClip idle, AnimationClip forward)
+    // One layer per stance, because their clips differ. PlayerAnimator owns both weights and keeps
+    // them complementary, so the arms only ever come from the stance the character is in.
+    private static void BuildArmLayers(AnimatorController controller, AnimationClip standIdle,
+        StrafeSet walk, StrafeSet run, AnimationClip crouchIdle, AnimationClip crouchForward)
     {
-        AvatarMask mask = BuildArmMask();
+        // Same Speed axis as the legs below them: a stop settles the arms, a walk swings them, and
+        // a sprint swings them harder.
+        BuildArmLayer(controller, StandingArmsLayer, new (Motion, float)[]
+        {
+            (standIdle, 0.0f),
+            (walk.Forward, 1.0f),
+            (run.IsComplete ? run.Forward : walk.Forward, 2.0f)
+        });
 
+        if (crouchForward == null) return;
+
+        // A crouching stop takes the standing idle arms outright: the crouch idle clip carries the
+        // torch pose too, and nothing about holding still is stance-specific from the shoulders up.
+        BuildArmLayer(controller, CrouchArmsLayer, new (Motion, float)[]
+        {
+            (standIdle != null ? standIdle : crouchForward, 0.0f),
+            (crouchForward, 1.0f)
+        });
+    }
+
+    private static void BuildArmLayer(AnimatorController controller, string name,
+        (Motion Motion, float Threshold)[] children)
+    {
         AnimatorControllerLayer layer = new AnimatorControllerLayer
         {
-            name = CrouchArmsLayer,
+            name = name,
             defaultWeight = 0.0f,
-            avatarMask = mask,
+            avatarMask = BuildArmMask(),
             blendingMode = AnimatorLayerBlendingMode.Override,
-            stateMachine = new AnimatorStateMachine { name = CrouchArmsLayer, hideFlags = HideFlags.HideInHierarchy }
+            stateMachine = new AnimatorStateMachine { name = name, hideFlags = HideFlags.HideInHierarchy }
         };
 
         // The state machine is a sub-asset of the controller, like the ones AddLayer creates.
@@ -304,7 +329,7 @@ public static class PlayerLocomotionBuilder
         // layer 0 and would have to be moved off it afterwards.
         BlendTree tree = new BlendTree
         {
-            name = "CrouchArms",
+            name = name,
             blendType = BlendTreeType.Simple1D,
             blendParameter = "Speed",
             useAutomaticThresholds = false,
@@ -312,12 +337,10 @@ public static class PlayerLocomotionBuilder
         };
         AssetDatabase.AddObjectToAsset(tree, controller);
 
-        // Arms follow the same Speed axis as the legs below them, so a crouching stop settles the
-        // arms and a crouching walk swings them.
-        tree.AddChild(idle != null ? idle : forward, 0.0f);
-        tree.AddChild(forward, 1.0f);
+        foreach ((Motion motion, float threshold) in children)
+            if (motion != null) tree.AddChild(motion, threshold);
 
-        AnimatorState state = layer.stateMachine.AddState("CrouchArms", new Vector3(300.0f, 60.0f, 0.0f));
+        AnimatorState state = layer.stateMachine.AddState(name, new Vector3(300.0f, 60.0f, 0.0f));
         state.motion = tree;
         state.writeDefaultValues = false;
         layer.stateMachine.defaultState = state;
@@ -328,23 +351,23 @@ public static class PlayerLocomotionBuilder
     // Arms and fingers only. Shoulders belong to the arm body parts in a humanoid mask, which is
     // what carries the torch pose, and leaving the body out keeps PlayerAimTwist in charge of the
     // spine.
-    private static AvatarMask BuildArmMask()
+    private static AvatarMask BuildArmMask() => BuildMask(ArmMaskPath,
+        AvatarMaskBodyPart.LeftArm, AvatarMaskBodyPart.RightArm,
+        AvatarMaskBodyPart.LeftFingers, AvatarMaskBodyPart.RightFingers);
+
+    private static AvatarMask BuildMask(string path, params AvatarMaskBodyPart[] active)
     {
-        AvatarMask mask = AssetDatabase.LoadAssetAtPath<AvatarMask>(ArmMaskPath);
+        AvatarMask mask = AssetDatabase.LoadAssetAtPath<AvatarMask>(path);
         if (mask == null)
         {
             mask = new AvatarMask();
-            AssetDatabase.CreateAsset(mask, ArmMaskPath);
+            AssetDatabase.CreateAsset(mask, path);
         }
 
         foreach (AvatarMaskBodyPart part in System.Enum.GetValues(typeof(AvatarMaskBodyPart)))
         {
             if (part == AvatarMaskBodyPart.LastBodyPart) continue;
-
-            bool active = part == AvatarMaskBodyPart.LeftArm || part == AvatarMaskBodyPart.RightArm
-                || part == AvatarMaskBodyPart.LeftFingers || part == AvatarMaskBodyPart.RightFingers;
-
-            mask.SetHumanoidBodyPartActive(part, active);
+            mask.SetHumanoidBodyPartActive(part, System.Array.IndexOf(active, part) >= 0);
         }
 
         EditorUtility.SetDirty(mask);

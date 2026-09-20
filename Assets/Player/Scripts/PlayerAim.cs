@@ -130,7 +130,8 @@ public class PlayerAim : MonoBehaviour
     }
 
     // The clip sets the pace: its own angle over its own length. Rotating faster than the feet
-    // step is the skating this whole system exists to remove.
+    // step is the skating this whole system exists to remove. Crouching has no turn clips, so it
+    // falls through to the fallback speed and turns without stepping.
     private float TurnRate()
     {
         if (_animator == null) return _fallbackTurnSpeed;
