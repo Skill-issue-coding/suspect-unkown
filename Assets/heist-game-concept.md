@@ -73,15 +73,15 @@ The tension in the loop is greed versus exposure. Every extra thirty seconds ins
 
 ## 5. Progression tiers
 
-Each tier introduces exactly one new opposition concept so the player learns them one at a time. Verticality lets each tier also add a spatial dimension.
+Three tiers, reduced from five because 3D locations cost roughly double (see `roadmap.md` Phase 10). Each tier introduces exactly one new opposition concept so the player learns them one at a time. Verticality lets each tier also add a spatial dimension.
 
 | Tier | Target | New opposition | New space |
 |---|---|---|---|
-| 1 | Convenience store | One tired clerk. Poor memory, decays fast. | Single room, low shelving |
-| 2 | Pharmacy / liquor store | Multiple civilians, independent partial descriptions. | Back room, stockroom door |
-| 3 | Jewelry store | Patrolling guard. Trained observer, reads behaviour. | Mezzanine, security office above |
-| 4 | Bank branch | Cameras. Perfect retention, fixed arcs, visual features only. | Two floors, vault stairwell |
-| 5 | Bank vault | Alarm timers, locked zones, guards sharing information. | Roof access, vents, service shafts |
+| 1 | Convenience store | Civilians: a tired clerk (poor memory, decays fast) and a few customers giving independent partial descriptions. | Single room, low shelving, stockroom door |
+| 2 | Jewelry store | Patrolling guard. Trained observer, reads behaviour. | Mezzanine (first verticality), security office above |
+| 3 | Bank branch | Cameras, watched from a security monitor. Perfect retention, fixed arcs, visual features only. Locked zones. | Two floors, vault stairwell |
+
+Folded or cut from the five-tier plan: the pharmacy tier's civilians move into tier 1, and the vault tier's alarm timers and guards sharing information become stretch goals. Roof access, vents, and service shafts are no longer tied to a tier; add them where a level wants them, and note that they are third in the `roadmap.md` cut order.
 
 Value scales, but the real difficulty curve is the number of independent observers and the number of routes security has to cover.
 
@@ -104,8 +104,10 @@ Every NPC has:
 State machine:
 
 ```
-Idle → Curious → Investigating → Alerted → Reporting
+Idle → Curious → Investigating → Alerted
 ```
+
+Reporting — a guard radioing in, a civilian making a call — is something an NPC *does* once alerted, not a further level of suspicion, so it lives with the reactions in 6.8 rather than on this ladder.
 
 The **Curious** state is where the game lives. Detection must not be binary. A guard who pauses, turns, and walks toward where you were gives the player a chance to react, and that moment is the whole genre.
 
@@ -137,7 +139,7 @@ Observer types differ meaningfully:
 - **Tired clerk** — low base confidence, fast decay, obvious visual features only.
 - **Civilian** — moderate visual observation, no behavioural reading, observes poorly under stress.
 - **Security guard** — trained. Registers behavioural features civilians never notice, retains longer.
-- **Camera** — perfect retention, zero decay, visual features only, and only within its arc and at its mounted height.
+- **Camera** — perfect retention, zero decay, visual features only, and only within its arc and at its mounted height. A camera has no suspicion of its own: in-job alarms come from a guard watching the feed at a security monitor. With nobody at the monitor it still records evidence, but raises no alarm.
 
 #### Implementation: Bayesian evidence accumulation, not machine learning
 
@@ -385,7 +387,7 @@ Better fence contacts; intel purchases revealing patrol routes or camera arcs pr
 - **ScriptableObjects** for NPC archetypes, clothing, tools, skills, loot tables, reaction trees, and level configs. The highest-value architectural decision in the project.
 - **Newtonsoft JSON** (`com.unity.nuget.newtonsoft-json`) for saves: police profile, wardrobe, per-location security state, skills.
 - **Unity Input System.**
-- **Assembly definitions** to keep compile times sane once the codebase grows.
+- **Assembly definitions** from the start (Core, Player, NPC). They keep compile times sane, and they turn dependency direction (NPC → Player → Core) into a compiler error rather than a convention.
 
 ### Feel and polish
 - **Cinemachine** with a fixed-rotation virtual camera, a confiner, and a small amount of follow damping. Dolly slightly on alert state changes.
@@ -410,7 +412,7 @@ Better fence contacts; intel purchases revealing patrol routes or camera arcs pr
 
 **Detection must be recoverable.** Being seen should start a timer and a chase, not end the run. The loss condition is losing the take and burning the disguise.
 
-**Verticality is a trap if overused.** Every floor doubles level-design cost and complicates the camera. Tier 3 is the right place to introduce a second level, not tier 1.
+**Verticality is a trap if overused.** Every floor doubles level-design cost and complicates the camera. Tier 2's mezzanine is the first verticality; a full second floor waits for tier 3.
 
 **Feature-slot readability.** If the player cannot tell which wardrobe items are burned, the disguise economy becomes guesswork. That screen deserves as much care as the gameplay.
 
@@ -435,7 +437,7 @@ Better fence contacts; intel purchases revealing patrol routes or camera arcs pr
 
 - **Orthographic or narrow-FOV perspective?** Decide in Phase 1 with real art in frame.
 - **Camera rotation in 90° snaps?** Adds player agency, multiplies level-design cost. Default to no.
-- **How many floors per location?** Recommend one until tier 3.
+- **How many floors per location?** One at tier 1, a mezzanine at tier 2, two floors at tier 3.
 - **Time limit per job?** Consider starting the police timer only on first detection.
 - **Solo or crew?** Solo, for scope.
 - **How many feature slots?** Six to eight. More becomes bookkeeping.

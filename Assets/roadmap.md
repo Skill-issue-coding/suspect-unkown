@@ -12,7 +12,7 @@ Companion to `heist-game-concept.md`. That document is _what_ the game is; this 
 
 Phases are ordered by **dependency and risk**, not by how interesting they are. Percentages are shares of your total available time, not weeks. Map them onto your real deadline once you know it.
 
-Four phases are marked **GATE**. A gate means: do not start the next phase until it is honestly passed, even if the next phase is more fun to build. Each gate exists because failing it late is expensive and failing it early is free.
+Three phases are marked **GATE** (1, 4, and 9), and Phases 3 and 6 carry a lighter gate check. A gate means: do not start the next phase until it is honestly passed, even if the next phase is more fun to build. Each gate exists because failing it late is expensive and failing it early is free.
 
 **What changed from the 2D plan:** Phase 1 is now the highest-risk phase rather than a formality, because camera occlusion can sink the whole project. Art and animation get their own phase. Content shrinks from five tiers to three, because 3D content costs roughly double.
 
@@ -71,6 +71,8 @@ Four phases are marked **GATE**. A gate means: do not start the next phase until
 - Basic fail state
 
 **Done when:** you can enter, steal, and leave, and you can also get caught.
+
+The prototype job uses a guard. Tier 1's only opposition is civilians, whose behaviour does not exist until Phase 5, so tier 1 content is built after that.
 
 **Gate check:** play it ten times. Is there ever tension? If not, the Curious state is almost certainly too short. Lengthen it before doing anything else.
 
@@ -212,7 +214,7 @@ Two people, so split by system boundary rather than by file, and agree interface
 
 Interfaces to agree up front:
 
-- `IObserver` → what an observation event contains
+- `IPerceiver` → what an observation event (`Observation`) contains. Named to avoid colliding with `System.IObserver<T>`.
 - `JobLog` → what gets recorded per job
 - `SecurityPlan` → what the optimiser hands back to the level loader
 - `CharacterAppearance` → how outfit state maps to both the rendered mesh set and the witness feature vector. **Get this one right early**; it is the seam between the two of you and the seam between art and systems.
