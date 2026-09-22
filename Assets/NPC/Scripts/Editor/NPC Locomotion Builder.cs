@@ -65,7 +65,7 @@ public static class NPCLocomotionBuilder
     private const float RunningJumpBlend = 0.08f;
     private const float StandingJumpBlend = 0.32f;
 
-    [MenuItem("Animator/Rebuild NPC Locomotion")]
+    [MenuItem(MenuPaths.NpcRebuildLocomotion, false, MenuPaths.NpcPriority)]
     public static void Rebuild()
     {
         AnimationClip idle = LoadClip("Standing/standing_idle.fbx");

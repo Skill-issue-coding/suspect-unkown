@@ -1,16 +1,25 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PerceptionTargets : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    private readonly List<PerceptionPoint> points = new();
 
-    // Update is called once per frame
-    void Update()
+    public IReadOnlyList<PerceptionPoint> Points => points;
+
+    private void Awake()
     {
-        
+        PerceptionPoint[] all = GetComponentsInChildren<PerceptionPoint>(true);
+        Dictionary<BodyRegion, PerceptionPoint> best = new Dictionary<BodyRegion, PerceptionPoint>();
+
+        foreach (PerceptionPoint point in all)
+        {
+            if (!best.TryGetValue(point.Region, out PerceptionPoint current) || point.Priority > current.Priority)
+            {
+                best[point.Region] = point;
+            }
+        }
+
+        points.AddRange(best.Values);
     }
 }

@@ -22,7 +22,7 @@ public class NightLabWindow : EditorWindow
     float m_LampOutset = 1.5f;
     Vector2 m_Scroll;
 
-    [MenuItem("Tools/Suspect Unknown/Night Lab")]
+    [MenuItem(MenuPaths.NightLab, false, MenuPaths.WindowsPriority)]
     static void Open()
     {
         GetWindow<NightLabWindow>("Night Lab");

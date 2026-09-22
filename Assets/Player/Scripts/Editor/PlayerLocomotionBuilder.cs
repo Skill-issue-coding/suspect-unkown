@@ -65,7 +65,7 @@ public static class PlayerLocomotionBuilder
     private const float RunningJumpBlend = 0.08f;
     private const float StandingJumpBlend = 0.32f;
 
-    [MenuItem("Animator/Rebuild Player Locomotion")]
+    [MenuItem(MenuPaths.PlayerRebuildLocomotion, false, MenuPaths.PlayerPriority)]
     public static void Rebuild()
     {
         AnimationClip idle = LoadClip("Standing/standing_idle.fbx");
