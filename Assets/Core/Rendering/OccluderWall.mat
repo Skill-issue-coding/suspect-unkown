@@ -55,6 +55,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _Fade_Distance: 1.5
+    - _Fade_Distance_Softness: 0.5
     - _Fade_Radius: 2
     - _Fade_Softness: 0.4
     - _Fade_Transparency: 0.85
