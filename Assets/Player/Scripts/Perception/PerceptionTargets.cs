@@ -1,25 +1,34 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Exposes every PerceptionPoint on the player, flat and grouped by region. Lists are fixed
+// after Awake: NpcPerception indexes AllPoints by position.
 public class PerceptionTargets : MonoBehaviour
 {
-    private readonly List<PerceptionPoint> points = new();
+    private static readonly int RegionCount = Enum.GetValues(typeof(BodyRegion)).Length;
+    private readonly List<PerceptionPoint> all = new();
+    private List<PerceptionPoint>[] byRegion;
 
-    public IReadOnlyList<PerceptionPoint> Points => points;
+    public IReadOnlyList<PerceptionPoint> AllPoints => all;
+    public IReadOnlyList<PerceptionPoint> GetPoints(BodyRegion region) => byRegion[(int)region];
 
     private void Awake()
     {
-        PerceptionPoint[] all = GetComponentsInChildren<PerceptionPoint>(true);
-        Dictionary<BodyRegion, PerceptionPoint> best = new Dictionary<BodyRegion, PerceptionPoint>();
+        PerceptionPoint[] found = GetComponentsInChildren<PerceptionPoint>(true);
 
-        foreach (PerceptionPoint point in all)
+        byRegion = new List<PerceptionPoint>[RegionCount];
+        for (int r = 0; r < RegionCount; r++)
+            byRegion[r] = new List<PerceptionPoint>();
+
+        foreach (PerceptionPoint point in found)
         {
-            if (!best.TryGetValue(point.Region, out PerceptionPoint current) || point.Priority > current.Priority)
-            {
-                best[point.Region] = point;
-            }
+            all.Add(point);
+            byRegion[(int)point.Region].Add(point);
         }
 
-        points.AddRange(best.Values);
+        for (int r = 0; r < RegionCount; r++)
+            if (byRegion[r].Count == 0)
+                Debug.LogWarning($"{name} has no PerceptionPoint for {(BodyRegion)r}.", this);
     }
 }

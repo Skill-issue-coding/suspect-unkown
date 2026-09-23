@@ -4,60 +4,48 @@ using UnityEngine;
 
 // Adds a PerceptionPoint to every bone BoxCollider in Player.prefab via
 // Tools > Suspect Unknown > Player > Map Perception Points. Authoring it in code rather than by
-// hand keeps the region and priority assignments reviewable in git, and one click to reapply.
+// hand keeps the region assignments reviewable in git, and one click to reapply.
 // Edits the prefab asset directly, not a scene instance, so no scene gets prefab overrides.
 // There is no undo: commit or stash Player.prefab before running.
 public static class MapPlayerPerceptionPoints
 {
     private const string PlayerPrefabPath = "Assets/Player/Player.prefab";
 
-    // Bone name to region and priority. Priority 1 is the cast point for its region;
-    // PerceptionTargets keeps only the highest-priority point per region.
-    // Names must match the bone GameObjects in Player.prefab exactly.
-    private static readonly Dictionary<string, (BodyRegion region, int priority)> Bones = new()
+    // Bone name to body region. Every bone collider becomes a perception point; 
+    // archetypes decide which regions matter.
+    private static readonly Dictionary<string, BodyRegion> Bones = new()
     {
         // Head
-        { "Head",        (BodyRegion.Head, 1) },
-        { "Neck",        (BodyRegion.Head, 0) },
+        { "Head",        BodyRegion.Head },
+        { "Neck",        BodyRegion.Head },
 
         // Upper body
-        { "Spine_02",    (BodyRegion.UpperBody, 1) },
-        { "Spine_01",    (BodyRegion.UpperBody, 0) },
-        { "Spine_03",    (BodyRegion.UpperBody, 0) },
-        { "Shoulder_L",  (BodyRegion.UpperBody, 0) },
-        { "Shoulder_R",  (BodyRegion.UpperBody, 0) },
-        { "Elbow_L",     (BodyRegion.UpperBody, 0) },
-        { "Elbow_R",     (BodyRegion.UpperBody, 0) },
+        { "Spine_01",    BodyRegion.UpperBody },
+        { "Spine_02",    BodyRegion.UpperBody },
+        { "Spine_03",    BodyRegion.UpperBody },
+        { "Shoulder_L",  BodyRegion.UpperBody },
+        { "Shoulder_R",  BodyRegion.UpperBody },
+        { "Elbow_L",     BodyRegion.UpperBody },
+        { "Elbow_R",     BodyRegion.UpperBody },
 
         // Hands
-        { "Hand_R",      (BodyRegion.Hands, 1) },
-        { "Hand_L",      (BodyRegion.Hands, 0) },
+        { "Hand_L",      BodyRegion.Hands },
+        { "Hand_R",      BodyRegion.Hands },
 
         // Lower body
-        { "UpperLeg_L",  (BodyRegion.LowerBody, 1) },
-        { "UpperLeg_R",  (BodyRegion.LowerBody, 0) },
-        { "LowerLeg_L",  (BodyRegion.LowerBody, 0) },
-        { "LowerLeg_R",  (BodyRegion.LowerBody, 0) },
+        { "UpperLeg_L",  BodyRegion.LowerBody },
+        { "UpperLeg_R",  BodyRegion.LowerBody },
+        { "LowerLeg_L",  BodyRegion.LowerBody },
+        { "LowerLeg_R",  BodyRegion.LowerBody },
 
         // Feet
-        { "Ball_L",      (BodyRegion.Feet, 1) },
-        { "Ball_R",      (BodyRegion.Feet, 0) },
-    };
-
-    private static readonly Dictionary<BodyRegion, float> Weights = new()
-    {
-        { BodyRegion.Head,      1.0f },
-        { BodyRegion.UpperBody, 1.0f },
-        { BodyRegion.LowerBody, 0.8f },
-        { BodyRegion.Feet,      0.6f },
-        { BodyRegion.Hands,     0.4f },
+        { "Ball_L",      BodyRegion.Feet },
+        { "Ball_R",      BodyRegion.Feet },
     };
 
     // Serialized field names on PerceptionPoint. Renaming a field there means renaming it here,
     // or FindProperty returns null.
     private const string RegionField = "region";
-    private const string WeightField = "weight";
-    private const string PriorityField = "priority";
 
     [MenuItem(MenuPaths.PlayerMapPerceptionPoints, false, MenuPaths.PlayerPriority + 1)]
     private static void Assign()
@@ -76,7 +64,7 @@ public static class MapPlayerPerceptionPoints
                 if (collider is not BoxCollider)
                     continue;
 
-                if (!Bones.TryGetValue(collider.name, out var entry))
+                if (!Bones.TryGetValue(collider.name, out BodyRegion region))
                 {
                     Debug.LogWarning($"No region for collider '{collider.name}'.", collider);
                     continue;
@@ -89,9 +77,7 @@ public static class MapPlayerPerceptionPoints
                     point = collider.gameObject.AddComponent<PerceptionPoint>();
 
                 var so = new SerializedObject(point);
-                so.FindProperty(RegionField).enumValueIndex = (int)entry.region;
-                so.FindProperty(WeightField).floatValue = Weights[entry.region];
-                so.FindProperty(PriorityField).intValue = entry.priority;
+                so.FindProperty(RegionField).enumValueIndex = (int)region;
                 so.ApplyModifiedPropertiesWithoutUndo();
             }
 
@@ -102,7 +88,7 @@ public static class MapPlayerPerceptionPoints
             PrefabUtility.UnloadPrefabContents(root);
         }
 
-        // A renamed or deleted bone would otherwise leave its region without a cast point, silently.
+        // A renamed or deleted bone would otherwise drop out of its region silently.
         foreach (string bone in Bones.Keys)
         {
             if (!found.Contains(bone))
