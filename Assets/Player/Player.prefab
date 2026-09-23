@@ -327,8 +327,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 0
-  weight: 1
-  priority: 1
 --- !u!1 &6089463230962606709
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,8 +427,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 4
-  weight: 0.6
-  priority: 1
 --- !u!1 &6089463230962608807
 GameObject:
   m_ObjectHideFlags: 0
@@ -499,8 +495,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 1
-  weight: 1
-  priority: 1
 --- !u!1 &6089463230962666241
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,8 +770,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 0
-  weight: 1
-  priority: 0
 --- !u!1 &6089463230962669225
 GameObject:
   m_ObjectHideFlags: 0
@@ -880,8 +872,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 2
-  weight: 0.4
-  priority: 1
 --- !u!1 &6089463230962673023
 GameObject:
   m_ObjectHideFlags: 0
@@ -1013,8 +1003,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 1
-  weight: 1
-  priority: 1
 --- !u!1 &6089463230962679419
 GameObject:
   m_ObjectHideFlags: 0
@@ -1382,8 +1370,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 3
-  weight: 0.8
-  priority: 1
 --- !u!1 &6089463230962687737
 GameObject:
   m_ObjectHideFlags: 0
@@ -1657,8 +1643,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 1
-  weight: 1
-  priority: 1
 --- !u!1 &6089463230962695803
 GameObject:
   m_ObjectHideFlags: 0
@@ -1790,8 +1774,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 3
-  weight: 0.8
-  priority: 1
 --- !u!1 &6089463230962706205
 GameObject:
   m_ObjectHideFlags: 0
@@ -2269,8 +2251,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 2
-  weight: 0.4
-  priority: 1
 --- !u!1 &6089463230962720633
 GameObject:
   m_ObjectHideFlags: 0
@@ -2482,8 +2462,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 1
-  weight: 1
-  priority: 1
 --- !u!1 &6089463230962724175
 GameObject:
   m_ObjectHideFlags: 0
@@ -2552,8 +2530,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 1
-  weight: 1
-  priority: 1
 --- !u!1 &6089463230962724315
 GameObject:
   m_ObjectHideFlags: 0
@@ -2622,8 +2598,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 4
-  weight: 0.6
-  priority: 1
 --- !u!1 &6089463230962724369
 GameObject:
   m_ObjectHideFlags: 0
@@ -3119,8 +3093,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 1
-  weight: 1
-  priority: 1
 --- !u!1 &6089463230962769151
 GameObject:
   m_ObjectHideFlags: 0
@@ -3221,8 +3193,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 3
-  weight: 0.8
-  priority: 1
 --- !u!1 &6089463230962774523
 GameObject:
   m_ObjectHideFlags: 0
@@ -3718,8 +3688,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 3
-  weight: 0.8
-  priority: 1
 --- !u!1 &6089463230962790533
 GameObject:
   m_ObjectHideFlags: 0
@@ -3820,8 +3788,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PerceptionPoint
   region: 1
-  weight: 1
-  priority: 1
 --- !u!1 &6089463230962793343
 GameObject:
   m_ObjectHideFlags: 0

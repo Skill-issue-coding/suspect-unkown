@@ -24,7 +24,7 @@ public class NpcPerceptionDebug : MonoBehaviour
 
     [Header("Readout")]
     [SerializeField] private bool readouts = true;
-    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 260f);
+    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 275f);
 
     private NpcPerception perception;
 

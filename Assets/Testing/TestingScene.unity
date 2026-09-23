@@ -9847,13 +9847,14 @@ MonoBehaviour:
   rays: 1
   clearRayColor: {r: 0, g: 1, b: 0, a: 1}
   blockedRayColor: {r: 1, g: 0, b: 0, a: 1}
+  ignoredRayColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   readouts: 1
   readoutRect:
     serializedVersion: 2
     x: 10
     y: 10
     width: 220
-    height: 260
+    height: 300
 --- !u!1001 &1998944481
 PrefabInstance:
   m_ObjectHideFlags: 0

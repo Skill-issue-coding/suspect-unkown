@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1f479f0caeb42399171ea0310394d8, type: 3}
   m_Name: SecurityGuard
   m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
-  viewDistance: 15
+  viewDistance: 18
   fovDegrees: 110
-  eyeHeight: 1.65
+  eyeHeight: 1.7
   distanceFalloff:
     serializedVersion: 2
     m_Curve:
@@ -27,6 +27,15 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0
+    - serializedVersion: 3
+      time: 0.5
+      value: 0.9
+      inSlope: -0.5803284
+      outSlope: -0.5803284
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.28272253
+      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 0
@@ -52,16 +61,31 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
+      time: 0.6
+      value: 0.8
+      inSlope: -0.8284898
+      outSlope: -0.8284898
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
-      outWeight: 0
+      inWeight: 0.20157073
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0.2
+      inSlope: -1.3898308
+      outSlope: -1.3898308
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
   crouchVisibilityFactor: 0.6
+  regionWeights:
+    head: 1
+    upperBody: 1
+    hands: 0.8
+    lowerBody: 0.8
+    feet: 0.6
   tickRate: 10
