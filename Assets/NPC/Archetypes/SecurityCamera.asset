@@ -1,0 +1,91 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c1f479f0caeb42399171ea0310394d8, type: 3}
+  m_Name: SecurityCamera
+  m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
+  viewDistance: 20
+  fovDegrees: 70
+  eyeHeight: 0
+  distanceFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.8
+      value: 0.8
+      inSlope: -0.88560784
+      outSlope: -0.88560784
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.14594242
+      outWeight: 0.8429319
+    - serializedVersion: 3
+      time: 1
+      value: 0.3
+      inSlope: -3.8886228
+      outSlope: -3.8886228
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.2225131
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  angleFalloff:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.9
+      value: 1
+      inSlope: 0.00000033781862
+      outSlope: 0.00000033781862
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39208844
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0.8
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  crouchVisibilityFactor: 0.8
+  regionWeights:
+    head: 1
+    upperBody: 1
+    hands: 0.6
+    lowerBody: 0.6
+    feet: 0.3
+  tickRate: 10
