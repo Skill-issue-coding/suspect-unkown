@@ -28,7 +28,7 @@ Three phases are marked **GATE** (1, 4, and 9), and Phases 3 and 6 carry a light
 - **Decide the palette and the poly budget now.** Changing art direction after 40 assets exist is painful.
 - Pick and download a base asset pack (Kenney CC0 or Synty) to use as placeholder from day one. Never work against grey boxes longer than necessary.
 
-**Done when:** both of you can clone, open, and hit play without setup steps.
+**Done when:** anyone on the team can clone, open, and hit play without setup steps.
 
 ---
 
@@ -40,10 +40,10 @@ Three phases are marked **GATE** (1, 4, and 9), and Phases 3 and 6 carry a light
 - **Build both orthographic and narrow-FOV perspective, and compare with real art in frame.** Pick one and commit.
 - **Dither-fade occluder shader** in Shader Graph: sphere mask on the camera-to-player vector, applied to any geometry between the two
 - A greyboxed room in ProBuilder using **low interior walls** (waist to chest) with full-height exterior only
-- Third-person character controller with stance: stand, crouch, wall-flatten
+- Third-person character controller with stance: stand, crouch. Wall-flatten is deferred: add it later only if playtests show crouching behind low walls is not enough cover.
 - Mixamo animations retargeted onto a base character
 
-**Done when:** you can walk through a full room, crouch behind a counter, and move along a wall, and at no point lose sight of your character or misjudge where you are.
+**Done when:** you can walk through a full room, crouch behind a counter, and at no point lose sight of your character or misjudge where you are.
 
 **Gate:** show it to someone who has not seen it. If they ever ask "where am I?", the occlusion solution is not done. Fix it here, not later.
 
@@ -197,13 +197,13 @@ Requirement 1 is graded here. Reserve this time and do not let it get eaten.
 
 ---
 
-## Ownership split
+## System boundaries
 
-Two people, so split by system boundary rather than by file, and agree interfaces before either side starts.
+Split the work by system boundary rather than by file, and agree the interfaces between systems before building either side.
 
-**Suggested:**
+**The two sides:**
 
-| Emil (systems)                            | Marcus (world and experience)                  |
+| Systems                                   | World and experience                           |
 | ----------------------------------------- | ---------------------------------------------- |
 | Perception, cones, multi-point rays       | Camera, occlusion shader, character controller |
 | Suspicion, state machines, decision trees | Modular character rig, Mixamo retargeting      |
@@ -217,19 +217,19 @@ Interfaces to agree up front:
 - `IPerceiver` → what an observation event (`Observation`) contains. Named to avoid colliding with `System.IObserver<T>`.
 - `JobLog` → what gets recorded per job
 - `SecurityPlan` → what the optimiser hands back to the level loader
-- `CharacterAppearance` → how outfit state maps to both the rendered mesh set and the witness feature vector. **Get this one right early**; it is the seam between the two of you and the seam between art and systems.
+- `CharacterAppearance` → how outfit state maps to both the rendered mesh set and the witness feature vector. **Get this one right early**; it is the seam between art and systems.
 
-Whoever owns a system also owns making it legible, alongside the other person rather than afterwards. The most common failure here is one person building an invisible system and the other not knowing it exists.
+Making a system legible is part of building it, not a later step. The most common failure here is an invisible system that the rest of the game does not know exists.
 
 ---
 
 ## Weekly cadence
 
-- **Start of week:** agree in writing what this week's gate looks like. One sentence each.
+- **Start of week:** agree in writing what this week's gate looks like. One sentence per system area.
 - **Midweek:** integrate. Branches should not live longer than about three days. Unity scene merges get worse the longer you wait, and 3D scenes are worse than 2D ones.
 - **End of week:** make a build, and have one person outside the team play it for ten minutes. Write down what confused them and explain nothing while they play.
 
-Both of you will be blind to your own UI by week three, and the witness and adaptive-security systems are exactly the kind of thing that feels obvious to whoever wrote it and invisible to everyone else.
+The team will be blind to its own UI by week three, and the witness and adaptive-security systems are exactly the kind of thing that feels obvious to whoever wrote it and invisible to everyone else.
 
 ---
 

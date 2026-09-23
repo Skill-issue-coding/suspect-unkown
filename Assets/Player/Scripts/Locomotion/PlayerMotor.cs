@@ -25,6 +25,7 @@ public class PlayerMotor : MonoBehaviour
     [Tooltip("Time after walking off a ledge during which a jump still works.")]
     [SerializeField] private float _coyoteTime = 0.1f;
 
+    public bool IsSprinting { get; private set; }
     public Vector3 Velocity => _horizontalVelocity + Vector3.up * _verticalVelocity;
     public bool IsGrounded => _controller.isGrounded;
 
@@ -75,11 +76,11 @@ public class PlayerMotor : MonoBehaviour
 
     private void UpdateHorizontal()
     {
+        IsSprinting = _input.sprint && _input.move != Vector2.zero && _stance.Current == Stance.Standing;
         float targetSpeed = _stance.Current switch
         {
-            Stance.Sprinting => _sprintSpeed,
             Stance.Crouching => _crouchSpeed,
-            _ => _walkSpeed
+            _ => IsSprinting ? _sprintSpeed : _walkSpeed
         };
 
         // Camera-relative so W is always "up the screen", no matter where the player faces.

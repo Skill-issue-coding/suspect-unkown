@@ -5,7 +5,6 @@ public enum Stance
 {
     Standing,
     Crouching,
-    Sprinting
 }
 
 // Runs before PlayerMotor so the motor always reads this frame's stance.
@@ -47,8 +46,6 @@ public class PlayerStance : MonoBehaviour
 
         // Stay crouched until there is room to stand.
         if (Current == Stance.Crouching && !CanStand()) return Stance.Crouching;
-
-        if (_input.sprint && _input.move != Vector2.zero) return Stance.Sprinting;
 
         return Stance.Standing;
     }

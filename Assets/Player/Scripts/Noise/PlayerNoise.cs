@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerStance))]
+[RequireComponent(typeof(PlayerMotor))]
 public class PlayerNoise : MonoBehaviour
 {
     [SerializeField] private float CrouchNoiseRadius = 1.0f;
@@ -11,18 +12,21 @@ public class PlayerNoise : MonoBehaviour
 
     private PlayerStance _playerStance;
 
+    private PlayerMotor _motor;
+
     private void Awake()
     {
         _playerStance = GetComponent<PlayerStance>();
+        _motor = GetComponent<PlayerMotor>();
     }
 
-    private void Start()
+    private void Update()
     {
-        _playerStance.StanceChanged += UpdateNoiseRadius;
-    }
-
-    private void UpdateNoiseRadius(Stance stance)
-    {
-        PlayerNoiseCollider.radius = stance == Stance.Crouching ? CrouchNoiseRadius : stance == Stance.Standing ? NormalNoiseRadius : SprintingNoiseRadius;
+        PlayerNoiseCollider.radius =
+            _playerStance.Current == Stance.Crouching
+                ? CrouchNoiseRadius
+                : _motor.IsSprinting
+                ? SprintingNoiseRadius
+                : NormalNoiseRadius;
     }
 }
