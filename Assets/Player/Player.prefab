@@ -957,6 +957,7 @@ GameObject:
   - component: {fileID: 8683267482955256226}
   - component: {fileID: 5965732835050536709}
   - component: {fileID: 6391000241774421808}
+  - component: {fileID: 497805542045851784}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -5798,6 +5799,12 @@ SkinnedMeshRenderer:
     m_Center: {x: 2.3283064e-10, y: 0.00015216967, z: 0.00012361654}
     m_Extent: {x: 0.0016788356, y: 0.0011331697, z: 0.0012811748}
   m_DirtyAABB: 0
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e75896d518e60b4585185a32ec9c7b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerConduct
 --- !u!1 &6074714370566536504
 GameObject:
   m_ObjectHideFlags: 0

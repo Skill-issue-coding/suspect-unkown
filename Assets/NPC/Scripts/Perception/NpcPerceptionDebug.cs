@@ -24,13 +24,14 @@ public class NpcPerceptionDebug : MonoBehaviour
 
     [Header("Readout")]
     [SerializeField] private bool readouts = true;
-    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 275f);
+    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 365f);
 
     private NpcPerception perception;
+    private NpcSuspicion suspicion;
 
     private void OnDrawGizmosSelected()
     {
-        if (!TryGetPerception()) return;
+        if (!TryGetSuspicionAndPerception()) return;
 
         DrawCone();
         DrawRays();
@@ -93,7 +94,7 @@ public class NpcPerceptionDebug : MonoBehaviour
 
     private void OnGUI()
     {
-        if (!readouts || !TryGetPerception()) return;
+        if (!readouts || !TryGetSuspicionAndPerception()) return;
 
         GUILayout.BeginArea(readoutRect, GUI.skin.box);
         GUILayout.Label(name);
@@ -105,6 +106,8 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label($"fAngle      {observation.fAngle:F2}");
             GUILayout.Label($"fLight      {observation.fLight:F2}");
             GUILayout.Label($"fStance     {observation.fStance:F2}");
+            GUILayout.Label($"conduct     {observation.conduct}");
+            GUILayout.Label($"abnormality {observation.abnormality:F2}");
 
             IReadOnlyList<float> fractions = perception.DebugRegionFraction;
 
@@ -128,13 +131,22 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label("no observation");
         }
 
+        if (suspicion != null)
+        {
+            GUILayout.Label($"suspicion   {suspicion.Suspicion:F2}");
+            GUILayout.Label($"state       {suspicion.State}");
+        }
+
         GUILayout.EndArea();
     }
 
-    private bool TryGetPerception()
+    private bool TryGetSuspicionAndPerception()
     {
         if (perception == null)
             perception = GetComponent<NpcPerception>();
+
+        if (suspicion == null)
+            suspicion = GetComponent<NpcSuspicion>();
 
         return perception != null && perception.Archetype != null;
     }

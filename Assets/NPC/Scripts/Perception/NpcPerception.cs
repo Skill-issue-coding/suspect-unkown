@@ -8,6 +8,7 @@ using System.Collections.Generic;
 // per body point in each attended region. Visibility is the weighted fraction of regions with 
 // a clear line, which is the partial detection Phase 2 asks for. Quality factors stay separate 
 // so the debug readout can print each one. Visibility is the weighted average of region fractions.
+// Conduct is read at tick time and judged by this NPC's archetype (decision 6).
 public class NpcPerception : MonoBehaviour, IPerceiver
 {
     private static readonly BodyRegion[] Regions = (BodyRegion[])Enum.GetValues(typeof(BodyRegion));
@@ -19,6 +20,7 @@ public class NpcPerception : MonoBehaviour, IPerceiver
 
     private PerceptionTargets targets;
     private PlayerStance playerStance;
+    private PlayerConduct playerConduct;
     private float nextTick;
 
     private Observation latest;
@@ -66,6 +68,11 @@ public class NpcPerception : MonoBehaviour, IPerceiver
             enabled = false;
             return;
         }
+
+        playerConduct = targets.GetComponent<PlayerConduct>();
+        if (playerConduct == null)
+            Debug.LogWarning($"{name} found no PlayerConduct; conduct reads as None.", this);
+
 
         pointClear = new bool[targets.AllPoints.Count];
         regionFraction = new float[Regions.Length];
@@ -165,6 +172,8 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         observation.timestamp = Time.time;
         observation.playerPosition = targets.transform.position;
         observation.visibility = visibility;
+        observation.conduct = playerConduct != null ? playerConduct.Current : ConductFlags.None;
+        observation.abnormality = archetype.Abnormality(observation.conduct);
         return true;
     }
 }
