@@ -35,9 +35,9 @@ public static class PlayerLocomotionBuilder
         public StrafeSet AtSpeed(float speed) => new StrafeSet(Forward, Backward, Left, Right, speed);
     }
 
-    private const string ControllerPath = "Assets/Player/PlayerAnimationController.controller";
-    private const string AnimationsRoot = "Assets/Player/Animations";
-    private const string ArmMaskPath = "Assets/Player/Animations/Crouching/CrouchArmsMask.mask";
+    private const string ControllerPath = "Assets/Player/Art/PlayerAnimationController.controller";
+    private const string AnimationsRoot = "Assets/Player/Art/Animations";
+    private const string ArmMaskPath = "Assets/Player/Art/Animations/Crouching/CrouchArmsMask.mask";
 
     // PlayerAnimator finds these layers by name to drive their weights. Renaming them here means
     // renaming StandingArmsLayer and CrouchArmsLayer there.

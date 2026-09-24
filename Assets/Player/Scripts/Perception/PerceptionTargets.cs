@@ -4,6 +4,7 @@ using UnityEngine;
 
 // Exposes every PerceptionPoint on the player, flat and grouped by region. Lists are fixed
 // after Awake: NpcPerception indexes AllPoints by position.
+[RequireComponent(typeof(PlayerConduct))]
 public class PerceptionTargets : MonoBehaviour
 {
     private static readonly int RegionCount = Enum.GetValues(typeof(BodyRegion)).Length;
@@ -15,7 +16,7 @@ public class PerceptionTargets : MonoBehaviour
 
     private void Awake()
     {
-        PerceptionPoint[] found = GetComponentsInChildren<PerceptionPoint>(true);
+        PerceptionPoint[] found = GetComponentsInChildren<PerceptionPoint>(false);
 
         byRegion = new List<PerceptionPoint>[RegionCount];
         for (int r = 0; r < RegionCount; r++)
