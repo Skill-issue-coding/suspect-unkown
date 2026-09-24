@@ -3,21 +3,19 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-// In-world suspicion telegraph (concept 6.5). Hidden at zero, so a calm 
-// room shows nothing. Icon and colour follow AlertStateChanged; the fill 
-// follows Suspicion every frame. Billboards by copying the fixed camera's 
-// rotation.
+// In-world suspicion telegraph (concept 6.5). Hidden at zero, so a calm
+// room shows nothing. Icon and colour follow AlertStateChanged; the fill
+// follows Suspicion every frame. Billboards by copying the fixed camera's
+// rotation. The arrow rolls in the screen plane toward the last-known
+// position from the latest observation, never the live player, so it does
+// not leak where the player really is. Off screen, an OffscreenIndicatorElement
+// on the HUD takes over at the screen edge.
 [RequireComponent(typeof(CanvasGroup))]
 public class NpcSuspicionIndicator : MonoBehaviour
 {
     [SerializeField] private Image fill;
     [SerializeField] private TMP_Text icon;
-    [SerializeField] private CanvasGroup group;
     [SerializeField] private RectTransform arrowPivot;
-    [SerializeField] private float turnSpeed = 720f;
-    private NpcPerception perception;
-    private Vector3 lastKnownPosition;
-    private bool hasTarget;
 
     [Header("State colors")]
     [SerializeField] private Color idleColor = Color.gray;
@@ -30,41 +28,63 @@ public class NpcSuspicionIndicator : MonoBehaviour
     [SerializeField] private float turnSmoothTime = 0.12f;
     [SerializeField] private float fadeSpeed = 4f;
 
+    [Header("Offscreen")]
+    [Tooltip("Pixels between the edge indicator and the screen border.")]
+    [SerializeField] private float edgeMargin = 60f;
+    [Tooltip("Viewport fraction inside the screen edge where the world indicator hands over to the edge one.")]
+    [SerializeField] private float onScreenInset = 0.02f;
+
+    private NpcSuspicion suspicion;
+    private NpcPerception perception;
+    private CanvasGroup group;
+    private Camera mainCamera;
+    private OffscreenIndicatorElement offscreen;
+
+    // canRotate: the arrow has what it needs to turn. hasTarget: the NPC has seen the player at
+    // least once, so lastKnownPosition means something.
+    private bool canRotate;
+    private bool hasTarget;
+    private Vector3 lastKnownPosition;
+
     private float displayedFill;
     private float fillVelocity;
     private float currentAngle;
     private float angleVelocity;
 
-    private NpcSuspicion suspicion;
-    private Transform cameraTransform;
-
     private void Awake()
     {
+        group = GetComponent<CanvasGroup>();
+
         suspicion = GetComponentInParent<NpcSuspicion>();
         if (suspicion == null)
         {
             Debug.LogWarning($"{name} has no NpcSuspicion; NpcSuspicionIndicator disabled.", this);
             enabled = false;
+            return;
+        }
+
+        if (fill == null || icon == null)
+        {
+            Debug.LogWarning($"{name} is missing its fill or icon reference; NpcSuspicionIndicator disabled.", this);
+            enabled = false;
+            return;
         }
 
         perception = GetComponentInParent<NpcPerception>();
         if (perception == null)
-        {
             Debug.LogWarning($"{name} has no NpcPerception; indicator rotation disabled.", this);
-            hasTarget = false;
-        }
         else if (arrowPivot == null)
-        {
             Debug.LogWarning($"{name} has no ArrowPivot; indicator rotation disabled.", this);
-            hasTarget = false;
-        }
-        else
-            hasTarget = true;
 
-        group = GetComponent<CanvasGroup>();
+        canRotate = perception != null && arrowPivot != null;
     }
 
-    private void OnEnable() => suspicion.AlertStateChanged += OnAlertStateChanged;
+    private void OnEnable()
+    {
+        if (suspicion != null)
+            suspicion.AlertStateChanged += OnAlertStateChanged;
+    }
+
     private void OnDisable()
     {
         if (suspicion != null)
@@ -73,15 +93,24 @@ public class NpcSuspicionIndicator : MonoBehaviour
 
     private void Start()
     {
-        if (Camera.main == null)
+        mainCamera = Camera.main;
+        if (mainCamera == null)
         {
             Debug.LogWarning($"{name} found no main camera; indicator disabled.", this);
             enabled = false;
             return;
         }
 
-        cameraTransform = Camera.main.transform;
+        if (OffscreenIndicatorHUD.Instance != null)
+            offscreen = OffscreenIndicatorHUD.Instance.Create();
+
         ApplyState(suspicion.State);
+    }
+
+    private void OnDestroy()
+    {
+        if (offscreen != null)
+            Destroy(offscreen.gameObject);
     }
 
     private void LateUpdate()
@@ -89,27 +118,36 @@ public class NpcSuspicionIndicator : MonoBehaviour
         displayedFill = Mathf.SmoothDamp(displayedFill, suspicion.Suspicion, ref fillVelocity, fillSmoothTime);
         fill.fillAmount = displayedFill;
 
-        group.alpha = suspicion.Suspicion > 0f || suspicion.State != NpcAlertState.Idle ? 1f : 0f;
+        transform.rotation = mainCamera.transform.rotation;
 
+        if (canRotate)
+            UpdateArrow();
+
+        bool visible = displayedFill > 0.001f || suspicion.State != NpcAlertState.Idle;
+        group.alpha = Mathf.MoveTowards(group.alpha, visible ? 1f : 0f, fadeSpeed * Time.deltaTime);
+
+        // Last, because it reads this frame's alpha and fill.
+        UpdateOffscreen();
+    }
+
+    private void UpdateArrow()
+    {
         if (perception.TryGetLatest(out Observation observation))
         {
             lastKnownPosition = observation.playerPosition;
             hasTarget = true;
         }
 
-        if (hasTarget)
-        {
-            Vector3 toTarget = lastKnownPosition - transform.position;
+        if (!hasTarget) return;
 
-            float x = Vector3.Dot(toTarget, cameraTransform.right);
-            float y = Vector3.Dot(toTarget, cameraTransform.up);
-            float targetAngle = -Mathf.Atan2(x, y) * Mathf.Rad2Deg;
-            currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, turnSmoothTime);
-            arrowPivot.localRotation = Quaternion.Euler(0f, 0f, currentAngle);
-        }
+        Vector3 toTarget = lastKnownPosition - transform.position;
 
-        bool visible = displayedFill > 0.001f || suspicion.State != NpcAlertState.Idle;
-        group.alpha = Mathf.MoveTowards(group.alpha, visible ? 1f : 0f, fadeSpeed * Time.deltaTime);
+        float x = Vector3.Dot(toTarget, mainCamera.transform.right);
+        float y = Vector3.Dot(toTarget, mainCamera.transform.up);
+        float targetAngle = -Mathf.Atan2(x, y) * Mathf.Rad2Deg;
+
+        currentAngle = Mathf.SmoothDampAngle(currentAngle, targetAngle, ref angleVelocity, turnSmoothTime);
+        arrowPivot.localRotation = Quaternion.Euler(0f, 0f, currentAngle);
     }
 
     private void OnAlertStateChanged(NpcAlertState from, NpcAlertState to) => ApplyState(to);
@@ -136,5 +174,45 @@ public class NpcSuspicionIndicator : MonoBehaviour
 
         icon.color = color;
         fill.color = color;
+
+        if (offscreen != null)
+            offscreen.SetState(icon.text, color);
+    }
+
+    private void UpdateOffscreen()
+    {
+        if (offscreen == null) return;
+
+        Vector3 viewport = mainCamera.WorldToViewportPoint(transform.position);
+
+        // Behind the camera the projection comes out mirrored; flip it so the arrow points the right way.
+        bool behind = viewport.z < 0f;
+        if (behind)
+        {
+            viewport.x = 1f - viewport.x;
+            viewport.y = 1f - viewport.y;
+        }
+
+        bool onScreen = !behind
+            && viewport.x > onScreenInset && viewport.x < 1f - onScreenInset
+            && viewport.y > onScreenInset && viewport.y < 1f - onScreenInset;
+
+        if (onScreen)
+        {
+            offscreen.Place(Vector2.zero, 0f, displayedFill, 0f);
+            return;
+        }
+
+        // Push the centre-to-NPC direction out until it meets the screen rectangle, inset by edgeMargin.
+        // A zero axis divides to Infinity, and Min then picks the other axis.
+        Vector2 center = new Vector2(Screen.width, Screen.height) * 0.5f;
+        Vector2 direction = new Vector2(viewport.x * Screen.width, viewport.y * Screen.height) - center;
+        Vector2 halfExtents = center - Vector2.one * edgeMargin;
+
+        float scale = Mathf.Min(halfExtents.x / Mathf.Abs(direction.x), halfExtents.y / Mathf.Abs(direction.y));
+        Vector2 edge = center + direction * scale;
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+
+        offscreen.Place(edge, angle, displayedFill, group.alpha);
     }
 }
