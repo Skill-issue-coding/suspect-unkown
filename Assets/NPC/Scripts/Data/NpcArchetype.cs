@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 // Tuning numbers for one kind of observer: guard, civilian, clerk, or camera. One block per
@@ -31,6 +32,31 @@ public class NpcArchetype : ScriptableObject
     [SerializeField, Tooltip("Perception ticks per second"), Range(1f, 60f)]
     private float tickRate = 10f;
 
+    [Header("Suspicion")]
+    [SerializeField, Tooltip("How abnormal each act looks to this observer")]
+    private ConductWeights conductWeights = new ConductWeights(0.6f, 0.8f);
+
+    [SerializeField, Tooltip("Suspicion per second at full strength and abnormality 1. 0.5 means two seconds from empty to full"), Range(0f, 1f)]
+    private float riseRate = 0.5f;
+
+    [SerializeField, Tooltip("Suspicion lost per second while nothing abnormal is in view"), Range(0f, 1f)]
+    private float decayRate = 0.1f;
+
+    [SerializeField, Tooltip("Seconds after the last abnormal sighting before decay starts"), Range(0f, 5f)]
+    private float decayDelay = 2f;
+
+    [SerializeField, Tooltip("Suspicion needed to enter Curious"), Range(0f, 1f)]
+    private float curiousAt = 0.2f;
+
+    [SerializeField, Tooltip("Suspicion needed to enter Investigating"), Range(0f, 1f)]
+    private float investigatingAt = 0.5f;
+
+    [SerializeField, Tooltip("Suspicion needed to enter Alerted"), Range(0f, 1f)]
+    private float alertedAt = 0.9f;
+
+    [SerializeField, Tooltip("How far suspicion must drop below a threshold to leave that state"), Range(0f, 0.1f)]
+    private float hysteresis = 0.05f;
+
     public float ViewDistance => viewDistance;
     public float FovDegrees => fovDegrees;
     public float EyeHeight => eyeHeight;
@@ -40,6 +66,21 @@ public class NpcArchetype : ScriptableObject
     public float CrouchVisibilityFactor => crouchVisibilityFactor;
     public float TickRate => tickRate;
 
+    public float Abnormality(ConductFlags flags) => conductWeights.Abnormality(flags);
+    public float RiseRate => riseRate;
+    public float DecayDelay => decayDelay;
+    public float DecayRate => decayRate;
+    public float Hysteresis => hysteresis;
+
+    public float Threshold(NpcAlertState state) => state switch
+    {
+        NpcAlertState.Idle => 0,
+        NpcAlertState.Curious => curiousAt,
+        NpcAlertState.Investigating => investigatingAt,
+        NpcAlertState.Alerted => alertedAt,
+        _ => throw new ArgumentOutOfRangeException(nameof(state))
+    };
+
     private void OnValidate()
     {
         if (distanceFalloff == null || distanceFalloff.length == 0)
@@ -48,5 +89,14 @@ public class NpcArchetype : ScriptableObject
             angleFalloff = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
         if (regionWeights.AllZero)
             Debug.LogWarning($"{name} ignores every body region and can never see the player.", this);
+
+        if (curiousAt >= investigatingAt)
+            Debug.LogWarning($"{name} curiousAt value is greater (or equal) than investigatingAt value, will lead to state skipping", this);
+
+        if (investigatingAt >= alertedAt)
+            Debug.LogWarning($"{name} investigatingAt value is greater (or equal) than alertedAt value, will lead to state skipping", this);
+
+        if (hysteresis >= curiousAt)
+            Debug.LogWarning($"{name} hysteresis value greater (or equal) than curiousAt value, can never calm back to Idle", this);
     }
 }

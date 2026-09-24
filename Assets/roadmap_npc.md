@@ -70,7 +70,7 @@ These do not replace each other. A civilian can be `Alerted` and `Calling` at th
 
 `Roaming` (civilian wandering) and `Patrolling` (guard following a route) mean different things, which is why guard and civilian activities are two enums rather than one shared one.
 
-**Stance is posture only.** `PlayerStance` currently has `Sprinting`. Sprinting is a speed, and concept 6.1 treats running as a noise source rather than a posture, so it moves out of `Stance` and becomes a conduct flag (decision 6). Wall-flatten (concept 6.1) is deferred: it is added later, as a `WallFlatten` stance with its own `fStance` factor, only if playtests show crouch-cover is not enough. Moving sprinting out is a change to the player controller code, and `Stance.Sprinting` is used by `PlayerMotor` and `PlayerNoise`, so this is listed as an integration seam: change both sides together. Until then, `PlayerConduct` derives sprinting from `Stance.Sprinting` as an adapter, so no NPC code reads `Stance.Sprinting`.
+**Stance is posture only.** Sprinting is a speed, and concept 6.1 treats running as a noise source rather than a posture, so it lives on `PlayerMotor.IsSprinting` rather than in `Stance`, and NPCs read it as a conduct flag (decision 6). Wall-flatten (concept 6.1) is deferred: it is added later, as a `WallFlatten` stance with its own `fStance` factor, only if playtests show crouch-cover is not enough. The motor sprints only while standing, so crouching still beats sprinting.
 
 ### 4. Where types live, and which way dependencies point
 
@@ -112,6 +112,10 @@ The suspicion rise per tick is roughly `visibility × abnormality`. The same con
 
 - the witness **Behaviour** feature slot (concept 6.2: "moved abnormally, entered staff area"), and
 - decision-tree input 1, **severity** (concept 6.8: moving oddly is not a crowbar in a display case).
+
+**As built.** Conduct and context share one representation: `ConductFlags`, a `[Flags]` enum on the player side. Context is a flag like any other (`InStaffArea`), set by `PlayerConduct` from the `Zone` triggers the player is inside. NPCs therefore see one set of flags and weigh each through one mechanism, `ConductWeights` on the archetype. The uniform exception becomes one extra condition in `PlayerConduct` once wardrobe exists.
+
+Abnormality is computed by the **perceiver**, with its own archetype, at tick time, and carried on the `Observation`. Set flags combine as `1 − Π(1 − w)`: one fully abnormal act gives 1, two acts at 0.6 give 0.84, and adding an act never lowers the result. Because the perceiver judges, a camera's observation carries abnormality judged by the camera's weights, and that is what the guard at the monitor receives (decision 11).
 
 ### 7. Perception is stateless; two components accumulate, separately
 
@@ -210,6 +214,7 @@ Assets/
         ├── Perception/
         ├── Guard/
         ├── Civilian/
+        ├── UI/
         └── Witness/
 ```
 
@@ -239,14 +244,28 @@ Vision block starting values. Region weights are head / upper body / hands / low
 
 The guard's hand weight is high because tool use is conduct guards read. The camera's feet weight is low because a ceiling camera sees headwear well and footwear badly. Lower tick rates for civilians make them slower to notice and cheaper to run.
 
+Suspicion block starting values. Conduct weights are sprinting / in staff area.
+
+| Archetype         | Conduct   | Rise   | Decay  | Delay  | Curious | Investigating | Alerted | Hysteresis |
+| ----------------- | --------- | ------ | ------ | ------ | ------- | ------------- | ------- | ---------- |
+| SecurityGuard     | 0.6 / 0.8 | 0.5    | 0.1    | 2.0    | 0.2     | 0.5           | 0.9     | 0.05       |
+| Civilian          | 0.3 / 0.2 | 0.3    | 0.2    | 1.0    | 0.25    | 0.55          | 0.9     | 0.05       |
+| TiredClerk        | 0.2 / 0.6 | 0.2    | 0.3    | 0.5    | 0.3     | 0.6           | 0.9     | 0.05       |
+| Manager           | 0.4 / 0.9 | 0.35   | 0.15   | 1.5    | 0.2     | 0.5           | 0.9     | 0.08       |
+| DistractedShopper | 0.1 / 0.1 | 0.15   | 0.4    | 0.5    | 0.3     | 0.6           | 0.95    | 0.03       |
+| SecurityCamera    | 0.5 / 0.8 | unused | unused | unused | unused  | unused        | unused  | unused     |
+
+The clerk barely notices running but is staff, so a stranger in the back room stands out. The manager cares most about the staff area. The camera has no `NpcSuspicion` (decision 11), so only its conduct weights matter: they define what the guard at the monitor reads through the feed. Its other suspicion values copy the guard's so the asset stays valid.
+
 ### NPC/Scripts/Data/
 
 | File                   | Type                    | Purpose                                               | Status   | Milestone      |
 | ---------------------- | ----------------------- | ----------------------------------------------------- | -------- | -------------- |
-| `NpcArchetype.cs`      | ScriptableObject        | Every tuning number for one archetype                 | working (vision block) | M1, M2, M4, M7 |
+| `NpcArchetype.cs`      | ScriptableObject        | Every tuning number for one archetype                 | working (vision, suspicion) | M1, M2, M4, M7 |
 | `RegionWeights.cs`     | `[Serializable]` struct | Per-region attention weights for one observer (decision 13) | working  | M1             |
+| `ConductWeights.cs`    | `[Serializable]` struct | Per-flag abnormality weights and the combine formula (decision 6) | working  | M2             |
 | `NpcAlertState.cs`     | enum                    | Idle, Curious, Investigating, Alerted                 | declared | M2             |
-| `Observation.cs`       | struct                  | What a perceiver reports each tick it sees the player | working (M1 fields) | M1, M2         |
+| `Observation.cs`       | struct                  | What a perceiver reports each tick it sees the player | working (M1, M2 fields) | M1, M2         |
 | `IPerceiver.cs`        | interface               | `Perceived` event and `TryGetLatest`, shared by NPC perception and cameras | working  | M1             |
 | `FeatureSlot.cs`       | enum                    | Witness feature slots                                 | declared | M7             |
 | `FeatureVisibility.cs` | `[Serializable]` struct | Per-slot visibility mask for one observer             | declared | M7             |
@@ -257,7 +276,7 @@ The guard's hand weight is high because tool use is conduct guards read. The cam
 | ----------------------- | ------------- | ------------------------------------------------------------------ | ------ | --------- |
 | `NpcPerception.cs`      | MonoBehaviour | Vision cone, per-point linecasts, quality factors, conduct reading | working (M1) | M1, M2    |
 | `NpcPerceptionDebug.cs` | MonoBehaviour | Gizmos, floor cone, per-point rays, on-screen readout              | working | M1        |
-| `NpcSuspicion.cs`       | MonoBehaviour | Rise from abnormal conduct, decay, alert-state events              | stub   | M2        |
+| `NpcSuspicion.cs`       | MonoBehaviour | Rise from strength × abnormality, delayed decay, alert states with hysteresis, skill multipliers | working | M2        |
 | `NpcHeadLook.cs`        | MonoBehaviour | Animation Rigging look-at toward what the NPC noticed              | stub   | M3        |
 | `NpcHearing.cs`         | MonoBehaviour | `NoiseBus` subscriber, NavMesh path-length check                   | stub   | M4        |
 
@@ -281,6 +300,12 @@ The guard's hand weight is high because tool use is conduct guards read. The cam
 | `ReactionNode.cs`      | ScriptableObject | Becomes abstract, with branch and leaf subclasses                 | stub     | M6        |
 | `PanicContagion.cs`    | MonoBehaviour    | Spreads panic with distance falloff and a depth cap               | stub     | M6        |
 
+### NPC/Scripts/UI/
+
+| File                       | Type          | Purpose                                                                                   | Status  | Milestone |
+| -------------------------- | ------------- | ----------------------------------------------------------------------------------------- | ------- | --------- |
+| `NpcSuspicionIndicator.cs` | MonoBehaviour | World-space suspicion telegraph above the NPC: filling arc, state icon, arrow to last-known position | working | M2        |
+
 ### NPC/Scripts/Witness/
 
 | File                 | Type             | Purpose                                                             | Status   | Milestone |
@@ -296,7 +321,8 @@ The guard's hand weight is high because tool use is conduct guards read. The cam
 | ------------------------ | ------------- | ----------------------------------------------------------- | -------- | --------- |
 | `Noise/NoiseEvent.cs`    | struct        | Position, radius (loudness), source                         | declared | M4        |
 | `Noise/NoiseBus.cs`      | static class  | Publish and subscribe                                       | declared | M4        |
-| `Volumes/Zone.cs`        | MonoBehaviour | Trigger volume: zone id, public or staff. Reused by Phase 8 | —        | M2        |
+| `Volumes/ZoneType.cs`    | enum          | Public, Staff. Public first, so a forgotten zone is harmless | working  | M2        |
+| `Volumes/Zone.cs`        | MonoBehaviour | Trigger volume on the `Volume` layer, public or staff; several colliders make complex shapes. Zone id arrives with Phase 8 | working  | M2        |
 | `Volumes/LightVolume.cs` | MonoBehaviour | Trigger volume tagged with a light level                    | —        | M4        |
 
 ### Player/Scripts/ (what NPCs read)
@@ -308,8 +334,9 @@ The guard's hand weight is high because tool use is conduct guards read. The cam
 | `Perception/PerceptionTargets.cs` | MonoBehaviour | Every body point, flat and by region. Fixed after `Awake` | working | M1        |
 | `Perception/CharacterAppearance.cs` | struct      | Placeholder for the player's feature vector. Shape to agree at the art and systems seam | declared | M7 |
 | `Editor/MapPlayerPerceptionPoints.cs` | static class | Adds `PerceptionPoint` to the 17 bone colliders in `Player.prefab` by bone name | working | M1 |
-| `Perception/PlayerConduct.cs`     | MonoBehaviour | What the player is doing right now                    | —       | M2        |
-| `Locomotion/PlayerStance.cs`      | MonoBehaviour | Owns `Stance`; loses `Sprinting`                       | working | seam      |
+| `Perception/ConductFlags.cs`      | `[Flags]` enum | Sprinting, InStaffArea. Powers of two; a flag is added only with its producer | working | M2 |
+| `Perception/PlayerConduct.cs`     | MonoBehaviour | What the player is doing right now, including the staff-area flag from zone triggers, counted per zone | working | M2        |
+| `Locomotion/PlayerStance.cs`      | MonoBehaviour | Owns `Stance`: Standing and Crouching only            | working | done      |
 | `Noise/PlayerNoise.cs`            | MonoBehaviour | Movement noise; migrates to `NoiseBus`                | working | M4        |
 
 ### Prefab composition
@@ -341,9 +368,9 @@ Ordered by dependency. **Perception comes before behaviour.** A guard state mach
 - [ ] Add `.DS_Store` to `.gitignore`, and untrack the 4 already committed with `git rm --cached` on those paths only
 - [ ] Review `.gitattributes`: it has a single `filter=lfs` line for a repo that already holds FBX, `.blend`, and PNG files
 - [ ] Confirm the Phase 1 gate. The dither-fade occluder shader exists; wall-flatten is deferred and no longer part of the done-when. Perception work assumes the player can judge sightlines.
-- [ ] Make the `Stance` change on both sides together: move sprinting out to conduct (decision 3)
+- [x] Move sprinting out of `Stance`: it is now `PlayerMotor.IsSprinting`, and `PlayerNoise` reads it (decision 3)
 - [x] Test bench in `Assets/Testing/TestingScene.unity`: a floating table slab on `Occluder` (0.7–1.1 m, so the feet stay visible underneath) and one stationary guard with its root at floor level. No NavMesh.
-- [x] Physics layers: `Occluder`, `Player`, and `NPC` already exist. Walls and occluders go on `Occluder`; the player's bone colliders are on `Player`; the floor is on neither.
+- [x] Physics layers: `Occluder`, `Player`, `NPC`, and `Volume` (zones and light volumes; collides with `Player` only). Walls and occluders go on `Occluder`; the player's bone colliders are on `Player`; the floor is on neither.
 
 **Done when:** the test bench reproduces the Phase 2 scenario, even though nothing detects anything yet. Build the scenario before the code that passes it.
 
@@ -372,16 +399,18 @@ Implementation notes, as built:
 
 ### M2 — Conduct, suspicion, and the alert ladder (Phase 3)
 
-- `PlayerConduct` with the conduct that exists so far (sprinting; loot and tools as Phase 3 adds them).
-- `Zone` in Core, and a public/staff tag on the test bench.
-- `NpcPerception` reads conduct and zone into each `Observation`, and computes abnormality using the archetype's conduct weights (decision 6).
-- `NpcArchetype` suspicion block: conduct weights, rise rate, decay rate, one threshold per alert state.
-- `NpcSuspicion` rises by roughly `visibility × abnormality`, decays when there is nothing abnormal in view, and raises an event on each `NpcAlertState` change.
-- Use a lower threshold on the way down than on the way up, so an NPC hovering at a boundary does not flicker between states.
-- Leave hooks for skills: rise and decay multipliers that something else can set later (concept 7.4 Ghost, "slower suspicion accumulation in shadow"; Face, "talk down a Curious NPC"). No skill logic here.
-- A suspicion indicator above the NPC (concept 6.5, in-world telegraphing).
+- [x] `PlayerConduct` with the conduct that exists so far (sprinting; loot and tools as Phase 3 adds them).
+- [x] `Zone` in Core, on a new `Volume` layer that collides with `Player` only, and an L-shaped staff zone on the test bench.
+- [x] `NpcPerception` reads conduct into each `Observation`, and computes abnormality using the archetype's conduct weights (decision 6).
+- [x] `NpcArchetype` suspicion block: conduct weights, rise rate, decay rate, decay delay, one threshold per alert state, and hysteresis.
+- [x] `NpcSuspicion` rises by `strength × abnormality × rise rate`, where strength is visibility times the quality factors. It decays after a delay when nothing abnormal is in view, including while the player is seen behaving normally, and raises `AlertStateChanged(from, to)` on each change. A spike can skip states.
+- [x] Use a lower threshold on the way down than on the way up, so an NPC hovering at a boundary does not flicker between states.
+- [x] Leave hooks for skills: rise and decay multipliers that something else can set later (concept 7.4 Ghost, "slower suspicion accumulation in shadow"; Face, "talk down a Curious NPC"). No skill logic here.
+- [x] A suspicion indicator above the NPC (concept 6.5, in-world telegraphing). As built: a world-space canvas that copies the camera rotation, hidden at zero so a calm room shows nothing. A filling arc shows suspicion, and an icon shows the state (`?`, `?!`, `!`). The arc rolls in the screen plane to point at the **last-known** position from the latest observation, not the live player, so it never leaks where the player really is, and it shows where M3's guard will investigate. Displayed values are smoothed, since perception ticks at 10 Hz.
 
 **Done when:** walking normally in view of a guard raises nothing; sprinting, or walking into a staff zone, fills suspicion over time rather than instantly; breaking line of sight lets it drain; and the current state is readable above the NPC. Per the Phase 3 gate check: if there is no tension, lengthen Curious before doing anything else.
+
+**Status:** passed on the test bench with the guard archetype, including the Phase 3 tension check. **M2 is done.**
 
 ### M3 — The guard (Phases 2–3)
 
@@ -460,7 +489,7 @@ Plus: guards pursue across vault and climb routes via `NavMeshLink`, and the nea
 | Seam                     | NPC side needs                                                    | Player, world, and art side provides                                                 |
 | ------------------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
 | Phase 1 gate             | A camera and occlusion the player can judge sightlines through    | Dither-fade occluder, low interior walls                                             |
-| `Stance`                 | Posture only: Standing, Crouching                                 | Move sprinting out of `Stance` in `PlayerMotor` and `PlayerNoise`                    |
+| `Stance`                 | Posture only: Standing, Crouching                                 | Done. Sprinting is `PlayerMotor.IsSprinting`                                         |
 | Assembly definitions     | NPC → Player → Core, no cycles                                    | Agreement on the assembly split, and the Player assembly's package references      |
 | `PerceptionTargets`      | Body points that follow the animated rig, grouped by region       | A trigger `BoxCollider` on each mapped bone, on every outfit. Renaming a bone means updating `MapPlayerPerceptionPoints` |
 | `PlayerConduct`          | What the player is doing, readable each tick                      | Hooks from the controller and interactions (sprint, loot, tools)                     |
@@ -505,7 +534,7 @@ Plus: guards pursue across vault and climb routes via `NavMeshLink`, and the nea
 - **Does `NpcStance` exist?** Only if civilians crouch or hide as part of a reaction.
 - **Decision window length.** Likely 1.5–3 seconds, probably different per reaction. A playtest question.
 - **Social proof.** Is the contagion broadcast enough for a civilian to know someone else is panicking, or do NPCs need to perceive each other?
-- **Reading conduct through a feed.** Can the guard at a monitor react to abnormal conduct on screen? Probably yes for suspicion, while the camera's visual-only mask still keeps behaviour out of the evidence.
+- ~~**Reading conduct through a feed.**~~ Answered by decision 6: yes for suspicion. The camera's own conduct weights define what the monitor guard reads. The camera's visual-only mask still keeps behaviour out of the evidence (M7).
 - **Cameras and light.** Does `f_light` apply to cameras? Probably yes, which would make the breaker a counter to them too.
 
 ---
@@ -535,3 +564,6 @@ Plus: guards pursue across vault and climb routes via `NavMeshLink`, and the nea
   - `MenuPaths` moved into the `SuspectUnknown.Editor` assembly.
   - Camera 3D cone added to M8; body-point weighting and tick rate questions answered.
   - Wall-flatten deferred: removed from the `Stance` target and the Phase 1 done-when, kept as an open question.
+- **2026-09-24** — Sprinting moved out of `Stance` into `PlayerMotor.IsSprinting`. `PlayerNoise` polls stance and sprint each frame. `PlayerConduct` (M2) reads the motor directly, so no adapter is needed.
+- **2026-09-24** — M2 steps 1–4: `ConductFlags` and `PlayerConduct` (zone context folded in as `InStaffArea`), `Zone` and `ZoneType` on a new `Volume` layer, `ConductWeights` and the suspicion block on `NpcArchetype`, and conduct plus abnormality on `Observation`, computed by the perceiver. The feed question is answered by decision 6.
+- **2026-09-24** — M2 done: `NpcSuspicion` with delayed decay and hysteresis, `NpcSuspicionIndicator` in the new `NPC/Scripts/UI/` folder, and suspicion in the debug readout.

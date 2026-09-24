@@ -80,3 +80,13 @@ MonoBehaviour:
     lowerBody: 0.2
     feet: 0
   tickRate: 5
+  conductWeights:
+    sprinting: 0.3
+    inStaffArea: 0.2
+  riseRate: 0.3
+  decayRate: 0.2
+  decayDelay: 1
+  curiousAt: 0.25
+  investigatingAt: 0.55
+  alertedAt: 0.9
+  hysteresis: 0.05
