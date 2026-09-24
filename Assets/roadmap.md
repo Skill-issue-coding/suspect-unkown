@@ -142,8 +142,8 @@ The AI course deliverable.
 - Job logging: entry point, zone transitions, loot order, tools, detection events, vertical routes used
 - Markov transition model over **zones** with recency decay and Laplace smoothing; Dirichlet over entry points
 - Forward propagation to a predicted occupancy distribution
-- Fixed-budget greedy max-coverage placement over guard posts, patrol routes, and camera mounts, with softened selection and a solvability check
-- **Intel change log** generated from the marginal-gain step
+- Fixed-budget greedy max-coverage placement over **points of interest** and camera mounts, with softened selection and a solvability check. Guards patrol by serving POIs whose coverage drains over time, so the optimiser's output for guards is which POIs exist and how fast each one drains (its decay multiplier). Total drain is the budget: more than the guards can cover and every POI empties.
+- **Intel change log** generated from the marginal-gain step, phrased in POI terms: "guards now check the back door more often, because you used it on your last three jobs"
 
 **Done when:** you can hit the same store four times the same way and watch coverage visibly migrate onto your route, with the change log explaining why.
 
@@ -155,7 +155,7 @@ The AI course deliverable.
 
 - Decoy wardrobe pieces, visibly marked in the shop
 - Verify by hand that three front-door jobs followed by a rear-door score is measurably easier
-- Tune budget size and decay rate until it is
+- Tune budget size and decay rate until it is. Poisoning works through POI weights: repeated use of a decoy entry raises that POI's decay multiplier and pulls guard time away from the real target. Recency decay in the model lets old habits fade, so the player can change strategy.
 
 **Gate:** if a planned deception produces no noticeable advantage, the budget is too large or decay too slow. This is a tuning problem, not a design problem. Do not abandon the mechanic.
 
@@ -242,6 +242,7 @@ The team will be blind to its own UI by week three, and the witness and adaptive
 | Phase 4 is not fun                                | Find out in month one, not month three                                                      |
 | Modular character system fights the animation rig | Build outfits and retargeting together in Phase 6; one shared skeleton, no exceptions       |
 | Adaptive security makes levels unwinnable         | Solvability check after placement; cap changes per job                                      |
+| Coverage-driven patrols look random to the player  | Deterministic POI scoring, commitment until covered, POIs visible in debug. See decision 15 in `roadmap_npc.md`. |
 | Poisoning turns out to be pointless               | Phase 9 gate, tuned against one level before content exists                                 |
 | Witness system is invisible to players            | Report and lineup screens are presentation work, not programming work. Budget them as such. |
 | Verticality doubles level cost                    | One floor until tier 2                                                                      |

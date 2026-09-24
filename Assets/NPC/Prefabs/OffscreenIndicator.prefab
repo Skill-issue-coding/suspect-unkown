@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6013577095829280687}
   - component: {fileID: 2449426289634970536}
   - component: {fileID: 7932462388534321089}
-  m_Layer: 14
+  m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ GameObject:
   - component: {fileID: 4367769667061813341}
   - component: {fileID: 3037068454710553913}
   - component: {fileID: 8445349542231423015}
-  m_Layer: 14
+  m_Layer: 5
   m_Name: OffscreenIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -212,7 +212,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1672800421879439709}
-  m_Layer: 14
+  m_Layer: 5
   m_Name: ArrowPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,7 +250,7 @@ GameObject:
   - component: {fileID: 654116387860729493}
   - component: {fileID: 5227673765085333680}
   - component: {fileID: 2275630738660726936}
-  m_Layer: 14
+  m_Layer: 5
   m_Name: Arrow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
