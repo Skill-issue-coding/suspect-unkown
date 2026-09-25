@@ -67,5 +67,5 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "Suspect Unkown.slnx"
+    "dotnet.defaultSolution": "suspect-unkown.slnx"
 }

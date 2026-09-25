@@ -311,12 +311,12 @@ The clerk barely notices running but is staff, so a stranger in the back room st
 
 ### NPC/Scripts/Guard/
 
-| File                 | Type          | Purpose                                                         | Status   | Milestone |
-| -------------------- | ------------- | --------------------------------------------------------------- | -------- | --------- |
-| `GuardBehaviour.cs`  | MonoBehaviour | FSM, `NavMeshAgent`, last-known position, POI selection and claims | stub     | M3        |
-| `GuardActivity.cs`   | enum          | Patrolling, Watching, Investigating, Pursuing, Reporting        | declared | M3        |
+| File                 | Type          | Purpose                                                                                           | Status   | Milestone |
+| -------------------- | ------------- | ------------------------------------------------------------------------------------------------- | -------- | --------- |
+| `GuardBehaviour.cs`  | MonoBehaviour | FSM, `NavMeshAgent`, last-known position, POI selection and claims                                | stub     | M3        |
+| `GuardActivity.cs`   | enum          | Patrolling, Watching, Investigating, Pursuing, Reporting                                          | declared | M3        |
 | `PointOfInterest.cs` | MonoBehaviour | Coverage that fills while a guard is near and drains by importance; static registry (decision 15) | —        | M3        |
-| `SecurityMonitor.cs` | MonoBehaviour | Relays camera observations to the guard posted at it            | —        | M8        |
+| `SecurityMonitor.cs` | MonoBehaviour | Relays camera observations to the guard posted at it                                              | —        | M8        |
 
 ### NPC/Scripts/Civilian/
 
