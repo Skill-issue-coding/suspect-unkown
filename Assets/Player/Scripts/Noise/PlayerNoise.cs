@@ -50,6 +50,5 @@ public class PlayerNoise : MonoBehaviour
         float alarm = sprinting ? _sprintAlarm : 0f;
 
         NoiseBus.Publish(new NoiseEvent(transform.position, radius, alarm));
-        Debug.Log($"Step r={radius} a={alarm}");
     }
 }

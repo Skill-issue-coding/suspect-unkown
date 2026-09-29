@@ -11,6 +11,7 @@ using UnityEngine;
 public class NpcSuspicion : MonoBehaviour
 {
     private NpcPerception perception;
+    private NpcHearing hearing;
 
     public float Suspicion { get; private set; }
     public NpcAlertState State { get; private set; }
@@ -36,9 +37,22 @@ public class NpcSuspicion : MonoBehaviour
         set => decayMultiplier = Mathf.Max(0f, value);
     }
 
+    // Where the NPC's attention last went: every sighting, and sounds that matter while the player is
+    // out of sight (alarming ones, or any sound once alert). The indicator's arrow points here, and it
+    // is the same rule GuardBehaviour uses for its last-known position, so the two always agree
+    public Vector3 LastStimulus { get; private set; }
+    public bool HasStimulus { get; private set; }
+
     private float lastAbnormalTime = float.NegativeInfinity;
 
-    private void Awake() => perception = GetComponent<NpcPerception>();
+    private void Awake()
+    {
+        perception = GetComponent<NpcPerception>();
+        hearing = GetComponent<NpcHearing>();
+    }
+
+    private void OnEnable() { if (hearing != null) hearing.Heard += OnHeard; }
+    private void OnDisable() { if (hearing != null) hearing.Heard -= OnHeard; }
 
     private void Start()
     {
@@ -54,7 +68,14 @@ public class NpcSuspicion : MonoBehaviour
         NpcArchetype archetype = perception.Archetype;
         float suspicion = Suspicion;
 
-        if (perception.TryGetLatest(out Observation observation) && observation.abnormality > 0f)
+        bool sees = perception.TryGetLatest(out Observation observation);
+        if (sees)
+        {
+            LastStimulus = observation.playerPosition;
+            HasStimulus = true;
+        }
+
+        if (sees && observation.abnormality > 0f)
         {
             suspicion += observation.Strength * observation.abnormality *
                 archetype.RiseRate * RiseMultiplier * Time.deltaTime;
@@ -84,5 +105,29 @@ public class NpcSuspicion : MonoBehaviour
         NpcAlertState from = State;
         State = target;
         AlertStateChanged?.Invoke(from, target);
+    }
+
+    // A sound can raise suspicion up to alarm × loudness × the archetype's hearing weight, never past it:
+    // the loudest thing heard sets how worried the NPC is, and repeated footsteps don't stack. It also
+    // resets the decay delay, so a heard sprint holds suspicion like a seen one.
+    private void OnHeard(HeardNoise noise)
+    {
+        // Attention first: a sound the NPC turns toward is a stimulus even if it raises nothing
+        bool seesPlayer = perception.TryGetLatest(out _);
+        bool matters = noise.Alarm > 0f || State != NpcAlertState.Idle;
+        if (matters && !seesPlayer)
+        {
+            LastStimulus = noise.Position;
+            HasStimulus = true;
+        }
+
+        if (noise.Alarm <= 0f) return;
+
+        float floor = noise.Alarm * noise.Loudness * perception.Archetype.HearingSuspicion * RiseMultiplier;
+        if (floor <= Suspicion) return;
+
+        Suspicion = floor;
+        lastAbnormalTime = Time.time;
+        UpdateState();
     }
 }

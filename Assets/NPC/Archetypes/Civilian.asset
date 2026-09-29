@@ -73,6 +73,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   crouchVisibilityFactor: 0.5
+  darkVisibilityFactor: 0.25
   regionWeights:
     head: 1
     upperBody: 0.8
@@ -80,6 +81,8 @@ MonoBehaviour:
     lowerBody: 0.2
     feet: 0
   tickRate: 5
+  hearingSensitivity: 0.8
+  hearingSuspicion: 0.3
   conductWeights:
     sprinting: 0.3
     inStaffArea: 0.2

@@ -2168,6 +2168,7 @@ GameObject:
   - component: {fileID: 8890725952143270588}
   - component: {fileID: 1867975804306738566}
   - component: {fileID: 509245131827645603}
+  - component: {fileID: 2366553931734634579}
   m_Layer: 15
   m_Name: Guard
   m_TagString: NPC
@@ -2357,6 +2358,18 @@ MonoBehaviour:
   blendSpeed: 4
   maxAngle: 110
   neckWeight: 0.4
+--- !u!114 &2366553931734634579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6720325424012129814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 253b3cb39911844929b5e240f6b92939, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcHearing
 --- !u!1 &7060616932561885397
 GameObject:
   m_ObjectHideFlags: 0

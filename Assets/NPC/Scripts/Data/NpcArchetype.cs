@@ -26,11 +26,21 @@ public class NpcArchetype : ScriptableObject
     [SerializeField, Tooltip("fStance when the player crouches. Standing is 1"), Range(0.1f, 1f)]
     private float crouchVisibilityFactor = 0.6f;
 
+    [SerializeField, Range(0f, 1f), Tooltip("fLight when the player stands in full darkness. Full light is 1")]
+    private float darkVisibilityFactor = 0.3f;
+
     [SerializeField, Tooltip("How much each body region counts toward visibility. 0 ignores the region: no rays cast")]
     private RegionWeights regionWeights = new RegionWeights(1f, 1f, 1f, 1f, 1f);
 
     [SerializeField, Tooltip("Perception ticks per second"), Range(1f, 60f)]
     private float tickRate = 10f;
+
+    [Header("Hearing")]
+    [SerializeField, Range(0f, 2f), Tooltip("Multiplier on how far a sound carries to this NPC")]
+    private float hearingSensitivity = 1.0f;
+
+    [SerializeField, Range(0f, 1f), Tooltip("Suspicion added by a sound at full loudness and alarm 1")]
+    private float hearingSuspicion = 0.5f;
 
     [Header("Suspicion")]
     [SerializeField, Tooltip("How abnormal each act looks to this observer")]
@@ -71,6 +81,12 @@ public class NpcArchetype : ScriptableObject
     public float DecayDelay => decayDelay;
     public float DecayRate => decayRate;
     public float Hysteresis => hysteresis;
+    public float HearingSensitivity => hearingSensitivity;
+    public float HearingSuspicion => hearingSuspicion;
+
+    // Light level 0 is darkness, 1 full light. Shadow lowers visibility but never to zero:
+    // a figure in the dark is harder to see, not invisible.
+    public float LightFactor(float lightLevel) => Mathf.Lerp(darkVisibilityFactor, 1f, Mathf.Clamp01(lightLevel));
 
     public float Threshold(NpcAlertState state) => state switch
     {

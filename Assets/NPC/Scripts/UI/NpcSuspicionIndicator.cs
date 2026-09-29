@@ -6,10 +6,10 @@ using UnityEngine.UI;
 // In-world suspicion telegraph (concept 6.5). Hidden at zero, so a calm
 // room shows nothing. Icon and colour follow AlertStateChanged; the fill
 // follows Suspicion every frame. Billboards by copying the fixed camera's
-// rotation. The arrow rolls in the screen plane toward the last-known
-// position from the latest observation, never the live player, so it does
-// not leak where the player really is. Off screen, an OffscreenIndicatorElement
-// on the HUD takes over at the screen edge.
+// rotation. The arrow rolls in the screen plane toward the NPC's last stimulus 
+// (NpcSuspicion.LastStimulus): what it last saw or heard, never the live player, 
+// never the live player, so it does not leak where the player really is. 
+// Off screen, an OffscreenIndicatorElement on the HUD takes over at the screen edge.
 [RequireComponent(typeof(CanvasGroup))]
 public class NpcSuspicionIndicator : MonoBehaviour
 {
@@ -35,16 +35,10 @@ public class NpcSuspicionIndicator : MonoBehaviour
     [SerializeField] private float onScreenInset = 0.02f;
 
     private NpcSuspicion suspicion;
-    private NpcPerception perception;
     private CanvasGroup group;
     private Camera mainCamera;
     private OffscreenIndicatorElement offscreen;
-
-    // canRotate: the arrow has what it needs to turn. hasTarget: the NPC has seen the player at
-    // least once, so lastKnownPosition means something.
     private bool canRotate;
-    private bool hasTarget;
-    private Vector3 lastKnownPosition;
 
     private float displayedFill;
     private float fillVelocity;
@@ -70,13 +64,8 @@ public class NpcSuspicionIndicator : MonoBehaviour
             return;
         }
 
-        perception = GetComponentInParent<NpcPerception>();
-        if (perception == null)
-            Debug.LogWarning($"{name} has no NpcPerception; indicator rotation disabled.", this);
-        else if (arrowPivot == null)
+        if (arrowPivot == null)
             Debug.LogWarning($"{name} has no ArrowPivot; indicator rotation disabled.", this);
-
-        canRotate = perception != null && arrowPivot != null;
     }
 
     private void OnEnable()
@@ -132,15 +121,9 @@ public class NpcSuspicionIndicator : MonoBehaviour
 
     private void UpdateArrow()
     {
-        if (perception.TryGetLatest(out Observation observation))
-        {
-            lastKnownPosition = observation.playerPosition;
-            hasTarget = true;
-        }
+        if (!suspicion.HasStimulus) return;
 
-        if (!hasTarget) return;
-
-        Vector3 toTarget = lastKnownPosition - transform.position;
+        Vector3 toTarget = suspicion.LastStimulus - transform.position;
 
         float x = Vector3.Dot(toTarget, mainCamera.transform.right);
         float y = Vector3.Dot(toTarget, mainCamera.transform.up);

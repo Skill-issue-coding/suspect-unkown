@@ -7,6 +7,7 @@ using System.Collections.Generic;
 // tick rate while their endpoints follow the player every frame, so a lag of one tick is expected.
 // Grey rays are points in regions the archetype ignores; no ray was cast.
 [RequireComponent(typeof(NpcPerception))]
+[RequireComponent(typeof(NpcHearing))]
 public class NpcPerceptionDebug : MonoBehaviour
 {
     private static readonly BodyRegion[] Regions = (BodyRegion[])Enum.GetValues(typeof(BodyRegion));
@@ -24,14 +25,21 @@ public class NpcPerceptionDebug : MonoBehaviour
 
     [Header("Readout")]
     [SerializeField] private bool readouts = true;
-    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 365f);
+    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 405f);
 
     private NpcPerception perception;
     private NpcSuspicion suspicion;
+    private NpcHearing hearing;
 
     private void OnDrawGizmosSelected()
     {
         if (!TryGetSuspicionAndPerception()) return;
+
+        if (suspicion != null && suspicion.HasStimulus)
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireSphere(suspicion.LastStimulus, 0.35f);
+        }
 
         DrawCone();
         DrawRays();
@@ -137,6 +145,17 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label($"state       {suspicion.State}");
         }
 
+        if (hearing != null && Time.time - hearing.DebugTime < 3f)
+        {
+            string result = hearing.DebugVerdict == NpcHearing.Verdict.Heard
+                ? $"heard  loud {hearing.DebugLoudness:F2}  alarm {hearing.DebugAlarm:F2}"
+                : $"{hearing.DebugVerdict}  {hearing.DebugPathLength:F1} / {hearing.DebugReach:F1} m";
+            GUILayout.Label($"sound  {result}");
+        }
+
+        if (suspicion != null && suspicion.HasStimulus)
+            GUILayout.Label($"stimulus {Vector3.Distance(transform.position, suspicion.LastStimulus):F1} m away");
+
         GUILayout.EndArea();
     }
 
@@ -147,6 +166,9 @@ public class NpcPerceptionDebug : MonoBehaviour
 
         if (suspicion == null)
             suspicion = GetComponent<NpcSuspicion>();
+
+        if (hearing == null)
+            hearing = GetComponent<NpcHearing>();
 
         return perception != null && perception.Archetype != null;
     }

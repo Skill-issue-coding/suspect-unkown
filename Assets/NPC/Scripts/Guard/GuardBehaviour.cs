@@ -66,6 +66,9 @@ public class GuardBehaviour : MonoBehaviour
     [SerializeField, Tooltip("Optional. A guard without a rig simply doesn't turn its head")]
     private NpcHeadLook headLook;
 
+    [SerializeField, Tooltip("Seconds the head stays on a sound the guard is not otherwise reacting to")]
+    private float glanceDuration = 1.5f;
+
     [Header("Debug")]
     [SerializeField] private bool debug = true;
 
@@ -89,6 +92,10 @@ public class GuardBehaviour : MonoBehaviour
 
     private NpcSuspicion suspicion;
     private NpcPerception perception;
+    private NpcHearing hearing;
+
+    private Vector3 glancePoint;
+    private float glanceUntil = float.NegativeInfinity;
 
     private bool seesPlayer;
     private bool hasLastKnown;
@@ -118,12 +125,17 @@ public class GuardBehaviour : MonoBehaviour
 
         suspicion = GetComponent<NpcSuspicion>();
         perception = GetComponent<NpcPerception>();
+        hearing = GetComponent<NpcHearing>();
     }
+
+    private void OnEnable() { if (hearing != null) hearing.Heard += OnHeard; }
 
     private void OnDisable()
     {
         if (target != null) target.Release(this);
         target = null;
+
+        if (hearing != null) hearing.Heard -= OnHeard;
     }
 
     private void Update()
@@ -391,8 +403,30 @@ public class GuardBehaviour : MonoBehaviour
 
         if (hasLastKnown && alert && !IsSearching)
             headLook.LookAt(lastKnownPosition);
+        else if (Time.time < glanceUntil)
+            headLook.LookAt(glancePoint);
         else
             headLook.ClearLook();
+    }
+
+    // Every audible sound earns a glance. A sound becomes the last-known position when the guard can't
+    // see the player and the sound matters: it is alarming, or the guard is already alert and following up
+    private void OnHeard(HeardNoise noise)
+    {
+        glancePoint = noise.Position;
+        glanceUntil = Time.time + glanceDuration;
+
+        bool matters = noise.Alarm > 0f || Activity != GuardActivity.Patrolling;
+        if (!matters || !LostSight) return;
+
+        bool moved = !hasLastKnown
+            || (noise.Position - lastKnownPosition).sqrMagnitude > repathDistance * repathDistance;
+
+        lastKnownPosition = noise.Position;
+        hasLastKnown = true;
+
+        if (moved && (Activity == GuardActivity.Investigating || Activity == GuardActivity.Pursuing))
+            MoveTo(lastKnownPosition);
     }
 
     private void OnDrawGizmos()
