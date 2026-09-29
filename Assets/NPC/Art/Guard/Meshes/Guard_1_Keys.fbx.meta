@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: 22545b20ae58e4403b2de2104f477238
+guid: 7d8ee703f132aca46ab9889882749e57
 ModelImporter:
   serializedVersion: 24600
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PolygonPrototype_Texture_01
+    second: {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

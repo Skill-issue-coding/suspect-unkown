@@ -54,6 +54,9 @@ public class GuardBehaviour : MonoBehaviour
     [SerializeField, Range(1f, 5f), Tooltip("How fast the search sweep swings left and right")]
     private float searchSweepSpeed = 1.2f;
 
+    [SerializeField, Tooltip("Seconds the guard stands still after giving up, for the give-up clip")]
+    private float giveUpPause = 3f;
+
     [Header("Debug")]
     [SerializeField] private bool debug = true;
 
@@ -61,6 +64,9 @@ public class GuardBehaviour : MonoBehaviour
     public event Action Caught;
 
     public GuardActivity Activity { get; private set; } = GuardActivity.Patrolling;
+
+    public bool IsSearching => arrived &&
+        (Activity == GuardActivity.Investigating || (Activity == GuardActivity.Pursuing && !seesPlayer));
 
     private NavMeshAgent agent;
     private NavMeshPath path;
@@ -188,7 +194,11 @@ public class GuardBehaviour : MonoBehaviour
 
         switch (next)
         {
-            case GuardActivity.Patrolling: nextChooseTime = 0f; break;
+            case GuardActivity.Patrolling:
+                bool gaveUp = from == GuardActivity.Investigating || from == GuardActivity.Pursuing;
+                nextChooseTime = gaveUp ? Time.time + giveUpPause : 0f;
+                if (gaveUp) agent.ResetPath();
+                break;
             case GuardActivity.Watching: agent.ResetPath(); break;
             case GuardActivity.Investigating: agent.speed = investigateSpeed; MoveTo(lastKnownPosition); break;
             case GuardActivity.Pursuing: agent.speed = pursueSpeed; MoveTo(lastKnownPosition); break;

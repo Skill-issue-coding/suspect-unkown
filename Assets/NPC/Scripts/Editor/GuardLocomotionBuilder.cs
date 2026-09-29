@@ -4,49 +4,62 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-// Rebuilds the guard locomotion graph from scratch via Tools > Suspect Unknown > NPC > Rebuild Locomotion.
+// Rebuilds the guard locomotion graph from scratch via Tools > Suspect Unknown > NPC > Guard > Rebuild Locomotion.
 // Guards never strafe: GuardBehaviour turns the body toward where it is heading, so one 1D tree on
 // Speed (idle, walk, run) is the whole graph. Thresholds are in metres per second, measured from the
 // clips themselves, so NpcAnimator feeds the agent's speed straight in and the feet match the ground.
-public static class NPCLocomotionBuilder
+public static class GuardLocomotionBuilder
 {
-    private const string ControllerPath = "Assets/NPC/Animation/GuardAnimator.controller";
-    private const string ClipsRoot = "Assets/NPC/Art/Guard/Animation Clips";
-
-    // Used when a clip was exported "In Place" and carries no root motion to measure.
-    // Keep them near GuardBehaviour's patrol and pursue speeds.
+    // Fallback speeds for clips exported "In Place", which carry no root motion to measure.
+    // GuardBehaviour's patrolSpeed, investigateSpeed and pursueSpeed must match the thresholds the
+    // rebuild logs, or the feet slide.
+    private const float FallbackPatrolSpeed = 1.5f;
+    private const float FallbackInvestigateSpeed = 2.5f;
     private const float FallbackRunSpeed = 4.5f;
 
-    // Below this, a measured speed is treated as "no root motion" rather than a very slow clip.
+    private const string ControllerPath = "Assets/NPC/Animators/GuardAnimator.controller";
+    private const string ClipsRoot = "Assets/NPC/Art/Guard/Animation Clips";
+
+    // Below this, a measured speed is treated as "no root motion" rather than a very slow clip
     private const float MinMeasurableSpeed = 0.05f;
 
-    [MenuItem(MenuPaths.NpcRebuildLocomotion, false, MenuPaths.NpcPriority)]
+    [MenuItem(MenuPaths.GuardRebuildLocomotion, false, MenuPaths.NpcPriority)]
     public static void Rebuild()
     {
-        AnimationClip idle = LoadClip("guard_idle.fbx");
-        AnimationClip walk = LoadClip("guard_walk.fbx");
-        AnimationClip run = LoadClip("guard_run_forward.fbx");
+        AnimationClip idle = LoadClip("Patrolling/guard_patrolling_idle_1.fbx");
+        AnimationClip patrolWalk = LoadClip("Patrolling/guard_patrol_walking.fbx");
+        AnimationClip investigateWalk = LoadClip("Investigating/guard_investigating_walk.fbx");
+        AnimationClip search = LoadClip("Investigating/guard_investigating_looking.fbx");
+        AnimationClip run = LoadClip("Pursuing/guard_pursuing_run.fbx");
+        AnimationClip watch = LoadClip("Watching/guard_watching.fbx");
+        AnimationClip giveUp = LoadClip("Transitions/guard_giving_up_1.fbx");
 
-        if (idle == null || walk == null)
+        if (idle == null || patrolWalk == null)
         {
-            Debug.LogError("[NpcLocomotionBuilder] Missing guard_idle or guard_walk. Aborting.");
+            Debug.LogError("[NpcLocomotionBuilder] Missing the patrol idle or walk. Aborting.");
             return;
         }
 
         EnsureFolder(Path.GetDirectoryName(ControllerPath));
 
         // Reset in place rather than delete and recreate: a new asset gets a new GUID and would
-        // silently unhook the Animator on every guard prefab.
+        // silently unhook the Animator on every guard prefab
         AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
         if (controller == null) controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
         else ResetController(controller);
 
         controller.AddParameter("Speed", AnimatorControllerParameterType.Float);
+        controller.AddParameter("Watching", AnimatorControllerParameterType.Bool);
+        controller.AddParameter("Searching", AnimatorControllerParameterType.Bool);
+        controller.AddParameter("GiveUp", AnimatorControllerParameterType.Trigger);
 
         AnimatorStateMachine root = controller.layers[0].stateMachine;
-        AnimatorState locomotion = BuildLocomotion(controller, idle, walk, run);
-        locomotion.writeDefaultValues = false;
+        AnimatorState locomotion = BuildLocomotion(controller, idle, patrolWalk, investigateWalk, run);
         root.defaultState = locomotion;
+
+        if (watch != null) AddToggleState(root, locomotion, watch, "Watching", fromAnyState: true);
+        if (search != null) AddToggleState(root, locomotion, search, "Searching", fromAnyState: false);
+        if (giveUp != null) AddOneShot(root, locomotion, giveUp, "GiveUp");
 
         AssetDatabase.SaveAssets();
         Debug.Log($"[NpcLocomotionBuilder] Rebuilt {ControllerPath}", controller);
@@ -54,38 +67,65 @@ public static class NPCLocomotionBuilder
     }
 
     private static AnimatorState BuildLocomotion(AnimatorController controller, AnimationClip idle,
-        AnimationClip walk, AnimationClip run)
+    AnimationClip patrolWalk, AnimationClip investigateWalk, AnimationClip run)
     {
         AnimatorState state = controller.CreateBlendTreeInController("Locomotion", out BlendTree tree, 0);
+        state.writeDefaultValues = false;
         tree.blendType = BlendTreeType.Simple1D;
         tree.blendParameter = "Speed";
         tree.useAutomaticThresholds = false;
 
-        float walkSpeed = MeasureSpeed(run, FallbackRunSpeed);
+        tree.AddChild(idle, 0f);
+        tree.AddChild(patrolWalk, MeasureSpeed(patrolWalk, FallbackPatrolSpeed));
+        if (investigateWalk != null) tree.AddChild(investigateWalk, MeasureSpeed(investigateWalk, FallbackInvestigateSpeed));
+        if (run != null) tree.AddChild(run, MeasureSpeed(run, FallbackRunSpeed));
 
-        tree.AddChild(idle, 0.0f);
-        tree.AddChild(walk, walkSpeed);
-
-        if (run != null)
-            tree.AddChild(run, MeasureSpeed(run, FallbackRunSpeed));
-        else
-        {
-            // No run clip: the walk played faster, at the rate that keeps its feet planted at run speed.
-            Debug.LogWarning("[NpcLocomotionBuilder] No run clip; pursuit reuses the walk clip sped up.");
-            tree.AddChild(walk, FallbackRunSpeed);
-            ChildMotion[] children = tree.children;
-            children[2].timeScale = FallbackRunSpeed / walkSpeed;
-            tree.children = children;
-        }
-
-        Debug.Log($"[NpcLocomotionBuilder] Thresholds: " +
+        Debug.Log("[NpcLocomotionBuilder] Thresholds: " +
                   string.Join(", ", tree.children.Select(c => $"{c.motion.name} {c.threshold:0.00} m/s")));
-
         return state;
     }
 
+    // A looping state entered while a bool is true and left when it turns false
+    private static void AddToggleState(AnimatorStateMachine root, AnimatorState locomotion, AnimationClip clip,
+        string parameter, bool fromAnyState)
+    {
+        AnimatorState state = root.AddState(clip.name);
+        state.motion = clip;
+        state.writeDefaultValues = false;
+
+        AnimatorStateTransition enter = fromAnyState ? root.AddAnyStateTransition(state) : locomotion.AddTransition(state);
+        enter.AddCondition(AnimatorConditionMode.If, 0f, parameter);
+        enter.duration = 0.2f;
+        enter.hasExitTime = false;
+        enter.canTransitionToSelf = false;
+
+        AnimatorStateTransition exit = state.AddTransition(locomotion);
+        exit.AddCondition(AnimatorConditionMode.IfNot, 0f, parameter);
+        exit.duration = 0.2f;
+        exit.hasExitTime = false;
+    }
+
+    // A one-shot entered on a trigger that plays nearly to the end, then blends back
+    private static void AddOneShot(AnimatorStateMachine root, AnimatorState locomotion, AnimationClip clip, string trigger)
+    {
+        AnimatorState state = root.AddState(clip.name);
+        state.motion = clip;
+        state.writeDefaultValues = false;
+
+        AnimatorStateTransition enter = root.AddAnyStateTransition(state);
+        enter.AddCondition(AnimatorConditionMode.If, 0f, trigger);
+        enter.duration = 0.2f;
+        enter.hasExitTime = false;
+        enter.canTransitionToSelf = false;
+
+        AnimatorStateTransition exit = state.AddTransition(locomotion);
+        exit.hasExitTime = true;
+        exit.exitTime = 0.9f;
+        exit.duration = 0.25f;
+    }
+
     // averageSpeed is the clip's root motion in metres per second. A Humanoid clip exported with
-    // "In Place" unchecked has it; an in-place clip reads zero and gets the fallback.
+    // "In Place" unchecked has it; an in-place clip reads zero and gets the fallback
     private static float MeasureSpeed(AnimationClip clip, float fallback)
     {
         float speed = new Vector3(clip.averageSpeed.x, 0.0f, clip.averageSpeed.z).magnitude;
