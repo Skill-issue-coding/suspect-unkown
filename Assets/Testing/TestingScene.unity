@@ -915,10 +915,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ea553274e4bc76c45b00338838ea436d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PointOfInterest
-  radius: 2
-  fillRate: 0.5
+  radius: 3
+  fillRate: 0.05
   baseDecayRate: 0.06
-  dwellTime: 3
+  dwellTime: 15
   initialCoverage: 0.5
 --- !u!1 &397543234
 GameObject:
@@ -2772,9 +2772,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PointOfInterest
   radius: 2
-  fillRate: 0.5
-  baseDecayRate: 0.03
-  dwellTime: 3
+  fillRate: 0.1
+  baseDecayRate: 0.01
+  dwellTime: 15
   initialCoverage: 0.5
 --- !u!1 &720466885
 GameObject:

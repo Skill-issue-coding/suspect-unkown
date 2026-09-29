@@ -4,189 +4,145 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-// Rebuilds the guard locomotion graph from scratch via Tools > Suspect Unknown > NPC > Guard > Rebuild Locomotion.
-// Guards never strafe: GuardBehaviour turns the body toward where it is heading, so one 1D tree on
-// Speed (idle, walk, run) is the whole graph. Thresholds are in metres per second, measured from the
-// clips themselves, so NpcAnimator feeds the agent's speed straight in and the feet match the ground.
-// TurnRate is yaw in degrees per second, positive turning right.
+// Rebuilds the guard's animator from code via Tools > Suspect Unknown > NPC > Guard > Rebuild Locomotion.
+// Clips are grouped into stances (ClipSet); a stance with several clips becomes a variant tree the runtime
+// picks from. Standing stances step into turn clips on TurnRate, in degrees per second, positive right.
+// Locomotion is a Speed tree in metres per second: GuardBehaviour's speeds must match the logged values,
+// or the feet slide. Turn clips must keep root rotation unbaked.
 public static class GuardLocomotionBuilder
 {
-    // Fallback speeds for clips exported "In Place", which carry no root motion to measure.
-    // GuardBehaviour's patrolSpeed, investigateSpeed and pursueSpeed must match the thresholds the
-    // rebuild logs, or the feet slide.
-    private const float FallbackPatrolSpeed = 1.5f;
-    private const float FallbackInvestigateSpeed = 2.5f;
-    private const float FallbackRunSpeed = 4.5f;
-
     private const string ControllerPath = "Assets/NPC/Animators/GuardAnimator.controller";
-    private const string ClipsRoot = "Assets/NPC/Art/Guard/Animation Clips";
-
-    // Below this, a measured speed is treated as "no root motion" rather than a very slow clip
-    private const float MinMeasurableSpeed = 0.05f;
+    private const string LogPrefix = "[GuardLocomotionBuilder]";
 
     [MenuItem(MenuPaths.GuardRebuildLocomotion, false, MenuPaths.NpcPriority)]
     public static void Rebuild()
     {
-        AnimationClip idle = LoadClip("Patrolling/guard_patrolling_idle_1.fbx");
-        AnimationClip patrolWalk = LoadClip("Patrolling/guard_patrol_walking.fbx");
-        AnimationClip investigateWalk = LoadClip("Investigating/guard_investigating_walk.fbx");
-        AnimationClip search = LoadClip("Investigating/guard_investigating_looking.fbx");
-        AnimationClip run = LoadClip("Pursuing/guard_pursuing_run.fbx");
-        AnimationClip watch = LoadClip("Watching/guard_watching.fbx");
-        AnimationClip giveUp = LoadClip("Transitions/guard_giving_up_1.fbx");
-
-        if (idle == null || patrolWalk == null)
+        GuardClips clips = GuardClips.Load();
+        if (!clips.HasRequired)
         {
-            Debug.LogError("[NpcLocomotionBuilder] Missing the patrol idle or walk. Aborting.");
+            Debug.LogError($"{LogPrefix} Missing the patrol idle or walk. Aborting.");
             return;
         }
 
-        EnsureFolder(Path.GetDirectoryName(ControllerPath));
+        AnimatorController controller = PrepareController();
+        AddParameters(controller);
 
-        // Reset in place rather than delete and recreate: a new asset gets a new GUID and would
-        // silently unhook the Animator on every guard prefab
+        AnimatorStateMachine root = controller.layers[0].stateMachine;
+        AnimatorState locomotion = AnimatorBuildUtility.AddState(root, "Locomotion", Locomotion(controller, clips));
+        root.defaultState = locomotion;
+
+        if (!clips.Watch.IsEmpty)
+            AnimatorBuildUtility.AddToggleTransitions(root, locomotion,
+                AnimatorBuildUtility.AddState(root, GuardAnimatorParams.Watching, Stand(controller, clips.Watch, clips.Turn)),
+                GuardAnimatorParams.Watching, fromAnyState: true);
+
+        if (!clips.Search.IsEmpty)
+            AnimatorBuildUtility.AddToggleTransitions(root, locomotion,
+                AnimatorBuildUtility.AddState(root, GuardAnimatorParams.Searching, Variants(controller, clips.Search)),
+                GuardAnimatorParams.Searching, fromAnyState: false);
+
+        if (!clips.GiveUp.IsEmpty)
+            AnimatorBuildUtility.AddOneShotTransitions(root, locomotion,
+                AnimatorBuildUtility.AddState(root, GuardAnimatorParams.GiveUp, Variants(controller, clips.GiveUp)),
+                GuardAnimatorParams.GiveUp);
+
+        WarnOnVariantCount(clips.Idle, GuardAnimatorParams.IdleVariantCount);
+        WarnOnVariantCount(clips.GiveUp, GuardAnimatorParams.GiveUpVariantCount);
+
+        AssetDatabase.SaveAssets();
+        Debug.Log($"{LogPrefix} Rebuilt {ControllerPath}", controller);
+        Selection.activeObject = controller;
+    }
+
+    // Reset in place rather than delete and recreate: a new asset gets a new GUID and would
+    // silently unhook the Animator on every guard prefab.
+    private static AnimatorController PrepareController()
+    {
+        AnimatorBuildUtility.EnsureFolder(Path.GetDirectoryName(ControllerPath));
+
         AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
-        if (controller == null) controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
-        else ResetController(controller);
+        if (controller == null) return AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
 
+        AnimatorBuildUtility.ResetController(controller, ControllerPath);
+        return controller;
+    }
+
+    private static void AddParameters(AnimatorController controller)
+    {
         controller.AddParameter(NpcAnimatorParams.Speed, AnimatorControllerParameterType.Float);
         controller.AddParameter(NpcAnimatorParams.TurnRate, AnimatorControllerParameterType.Float);
         controller.AddParameter(GuardAnimatorParams.Watching, AnimatorControllerParameterType.Bool);
         controller.AddParameter(GuardAnimatorParams.Searching, AnimatorControllerParameterType.Bool);
+        controller.AddParameter(GuardAnimatorParams.IdleVariant, AnimatorControllerParameterType.Float);
         controller.AddParameter(GuardAnimatorParams.GiveUp, AnimatorControllerParameterType.Trigger);
-
-        AnimatorStateMachine root = controller.layers[0].stateMachine;
-        AnimatorState locomotion = BuildLocomotion(controller, idle, patrolWalk, investigateWalk, run);
-        root.defaultState = locomotion;
-
-        if (watch != null) AddToggleState(root, locomotion, watch, GuardAnimatorParams.Watching, fromAnyState: true);
-        if (search != null) AddToggleState(root, locomotion, search, GuardAnimatorParams.Searching, fromAnyState: false);
-        if (giveUp != null) AddOneShot(root, locomotion, giveUp, GuardAnimatorParams.GiveUp);
-
-        AssetDatabase.SaveAssets();
-        Debug.Log($"[NpcLocomotionBuilder] Rebuilt {ControllerPath}", controller);
-        Selection.activeObject = controller;
+        controller.AddParameter(GuardAnimatorParams.GiveUpVariant, AnimatorControllerParameterType.Float);
     }
 
-    private static AnimatorState BuildLocomotion(AnimatorController controller, AnimationClip idle,
-    AnimationClip patrolWalk, AnimationClip investigateWalk, AnimationClip run)
+    // Speed tree in metres per second: standing (with turns) at 0, then each gait at its own speed.
+    // Children must be added in ascending threshold order.
+    private static Motion Locomotion(AnimatorController controller, GuardClips clips)
     {
-        AnimatorState state = controller.CreateBlendTreeInController("Locomotion", out BlendTree tree, 0);
-        state.writeDefaultValues = false;
-        tree.blendType = BlendTreeType.Simple1D;
-        tree.blendParameter = NpcAnimatorParams.Speed;
-        tree.useAutomaticThresholds = false;
+        BlendTree tree = AnimatorBuildUtility.CreateTree(controller, "Locomotion", NpcAnimatorParams.Speed);
 
-        tree.AddChild(idle, 0f);
-        tree.AddChild(patrolWalk, MeasureSpeed(patrolWalk, FallbackPatrolSpeed));
-        if (investigateWalk != null) tree.AddChild(investigateWalk, MeasureSpeed(investigateWalk, FallbackInvestigateSpeed));
-        if (run != null) tree.AddChild(run, MeasureSpeed(run, FallbackRunSpeed));
+        tree.AddChild(Stand(controller, clips.Idle, clips.Turn), 0f);
+        AddGait(tree, clips.PatrolWalk);
+        AddGait(tree, clips.InvestigateWalk);
+        AddGait(tree, clips.Run);
 
-        Debug.Log("[NpcLocomotionBuilder] Thresholds: " +
-                  string.Join(", ", tree.children.Select(c => $"{c.motion.name} {c.threshold:0.00} m/s")));
-        return state;
+        Debug.Log($"{LogPrefix} Speeds: " +
+             string.Join(", ", tree.children.Skip(1).Select(c => $"{c.motion.name} {c.threshold:0.00} m/s")));
+        return tree;
     }
 
-    // A looping state entered while a bool is true and left when it turns false
-    private static void AddToggleState(AnimatorStateMachine root, AnimatorState locomotion, AnimationClip clip,
-        string parameter, bool fromAnyState)
+    private static void AddGait(BlendTree tree, Gait gait) { if (!gait.IsEmpty) tree.AddChild(gait.Clip, gait.Speed); }
+
+    // A standing stance that steps into a turn clip when the body rotates in place. TurnRate is signed:
+    // negative left, positive right. At twice a clip's own rate it plays twice as fast, so the feet keep
+    // up with quick turns. Without both turn clips, the stance is just its pose.
+    private static Motion Stand(AnimatorController controller, ClipSet set, TurnSet turn)
     {
-        AnimatorState state = root.AddState(clip.name);
-        state.motion = clip;
-        state.writeDefaultValues = false;
+        Motion pose = Variants(controller, set);
+        if (!turn.IsComplete) return pose;
 
-        AnimatorStateTransition enter = fromAnyState ? root.AddAnyStateTransition(state) : locomotion.AddTransition(state);
-        enter.AddCondition(AnimatorConditionMode.If, 0f, parameter);
-        enter.duration = 0.2f;
-        enter.hasExitTime = false;
-        enter.canTransitionToSelf = false;
+        BlendTree tree = AnimatorBuildUtility.CreateTree(controller, $"{set.Name} Stand", NpcAnimatorParams.TurnRate);
+        tree.AddChild(turn.Left, -2f * turn.LeftRate);
+        tree.AddChild(turn.Left, -turn.LeftRate);
+        tree.AddChild(pose, 0f);
+        tree.AddChild(turn.Right, turn.RightRate);
+        tree.AddChild(turn.Right, 2f * turn.RightRate);
 
-        AnimatorStateTransition exit = state.AddTransition(locomotion);
-        exit.AddCondition(AnimatorConditionMode.IfNot, 0f, parameter);
-        exit.duration = 0.2f;
-        exit.hasExitTime = false;
+        ChildMotion[] children = tree.children;
+        children[0].timeScale = 2f;
+        children[4].timeScale = 2f;
+        tree.children = children;
+
+        return tree;
     }
 
-    // A one-shot entered on a trigger that plays nearly to the end, then blends back
-    private static void AddOneShot(AnimatorStateMachine root, AnimatorState locomotion, AnimationClip clip, string trigger)
+    // A stance as a motion: its one clip, or a 1D tree over its variants with clip n at threshold n.
+    private static Motion Variants(AnimatorController controller, ClipSet set)
     {
-        AnimatorState state = root.AddState(clip.name);
-        state.motion = clip;
-        state.writeDefaultValues = false;
+        if (!set.HasVariants) return set.Clips[0];
 
-        AnimatorStateTransition enter = root.AddAnyStateTransition(state);
-        enter.AddCondition(AnimatorConditionMode.If, 0f, trigger);
-        enter.duration = 0.2f;
-        enter.hasExitTime = false;
-        enter.canTransitionToSelf = false;
-
-        AnimatorStateTransition exit = state.AddTransition(locomotion);
-        exit.hasExitTime = true;
-        exit.exitTime = 0.9f;
-        exit.duration = 0.25f;
-    }
-
-    // averageSpeed is the clip's root motion in metres per second. A Humanoid clip exported with
-    // "In Place" unchecked has it; an in-place clip reads zero and gets the fallback
-    private static float MeasureSpeed(AnimationClip clip, float fallback)
-    {
-        float speed = new Vector3(clip.averageSpeed.x, 0.0f, clip.averageSpeed.z).magnitude;
-        if (speed >= MinMeasurableSpeed) return speed;
-
-        Debug.LogWarning($"[NpcLocomotionBuilder] {clip.name} has no root motion; using {fallback} m/s. " +
-                        "Expect foot sliding until it matches the clip.");
-
-        return fallback;
-    }
-
-    private static AnimationClip LoadClip(string fileName)
-    {
-        string path = $"{ClipsRoot}/{fileName}";
-
-        // An imported FBX holds its clip as a sub-asset, alongside a hidden __preview__ copy.
-        AnimationClip clip = AssetDatabase.LoadAllAssetsAtPath(path)
-            .OfType<AnimationClip>()
-            .FirstOrDefault(c => !c.name.StartsWith("__preview__"));
-
-        if (clip == null) Debug.LogWarning($"[NpcLocomotionBuilder] No clip at {path}");
-        return clip;
-    }
-
-    private static void EnsureFolder(string folder)
-    {
-        folder = folder.Replace('\\', '/');
-        if (AssetDatabase.IsValidFolder(folder)) return;
-
-        string parent = Path.GetDirectoryName(folder).Replace('\\', '/');
-        EnsureFolder(parent);
-        AssetDatabase.CreateFolder(parent, Path.GetFileName(folder));
-    }
-
-    // Strips the controller back to a single empty layer, keeping the asset (and its GUID) alive.
-    private static void ResetController(AnimatorController controller)
-    {
-        while (controller.parameters.Length > 0) controller.RemoveParameter(0);
-        while (controller.layers.Length > 1) controller.RemoveLayer(1);
-
-        if (controller.layers.Length == 0) controller.AddLayer("Base Layer");
-
-        AnimatorStateMachine root = controller.layers[0].stateMachine;
-
-        foreach (AnimatorStateTransition transition in root.anyStateTransitions.ToArray())
-            root.RemoveAnyStateTransition(transition);
-
-        foreach (ChildAnimatorState child in root.states.ToArray())
-            root.RemoveState(child.state);
-
-        foreach (ChildAnimatorStateMachine child in root.stateMachines.ToArray())
-            root.RemoveStateMachine(child.stateMachine);
-
-        // Blend trees are sub-assets and are not collected when their state goes away.
-        foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(ControllerPath))
+        if (set.VariantParameter == null)
         {
-            if (asset is BlendTree tree) Object.DestroyImmediate(tree, true);
-            else if (asset is AnimatorStateMachine machine && machine != root) Object.DestroyImmediate(machine, true);
-            else if (asset is AnimatorState orphan) Object.DestroyImmediate(orphan, true);
+            Debug.LogWarning($"{LogPrefix} {set.Name} has {set.Clips.Length} clips but no variant parameter; using the first.");
+            return set.Clips[0];
         }
+
+        BlendTree tree = AnimatorBuildUtility.CreateTree(controller, set.Name, set.VariantParameter);
+        for (int i = 0; i < set.Clips.Length; i++)
+            tree.AddChild(set.Clips[i], i);
+        return tree;
+    }
+
+    // The runtime picks a variant within the count in GuardAnimatorParams. A mismatch would make it pick
+    // a clip that doesn't exist (too few clips) or never pick one that does (too many).
+    private static void WarnOnVariantCount(ClipSet set, int expected)
+    {
+        if (set.Clips.Length == expected) return;
+
+        Debug.LogWarning($"{LogPrefix} {set.Name}: {set.Clips.Length} clips, " +
+                         $"GuardAnimatorParams expects {expected}.");
     }
 }
