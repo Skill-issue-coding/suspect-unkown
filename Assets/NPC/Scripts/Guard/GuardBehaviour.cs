@@ -13,6 +13,9 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NpcPerception))]
 public class GuardBehaviour : MonoBehaviour
 {
+    // Below 0.25 m/s the guard keeps its facing: steering is noisy while starting and braking.
+    private const float MinFacingSpeedSqr = 0.25f * 0.25f;
+
     [Header("Patrol")]
     [SerializeField, Tooltip("Metres per second while serving points of interest")]
     private float patrolSpeed = 1.5f;
@@ -54,6 +57,15 @@ public class GuardBehaviour : MonoBehaviour
     [SerializeField, Range(1f, 5f), Tooltip("How fast the search sweep swings left and right")]
     private float searchSweepSpeed = 1.2f;
 
+    [SerializeField, Tooltip("Seconds the guard stands still after giving up, for the give-up clip")]
+    private float giveUpPause = 3f;
+
+    [SerializeField, Range(0f, 1f), Tooltip("Seconds without a sighting before the guard counts the player as lost")]
+    private float lostSightGrace = 0.3f;
+
+    [SerializeField, Tooltip("Optional. A guard without a rig simply doesn't turn its head")]
+    private NpcHeadLook headLook;
+
     [Header("Debug")]
     [SerializeField] private bool debug = true;
 
@@ -61,6 +73,11 @@ public class GuardBehaviour : MonoBehaviour
     public event Action Caught;
 
     public GuardActivity Activity { get; private set; } = GuardActivity.Patrolling;
+
+    public bool IsSearching => arrived &&
+        (Activity == GuardActivity.Investigating || (Activity == GuardActivity.Pursuing && LostSight));
+
+    public bool IsDwelling => Activity == GuardActivity.Patrolling && target != null && arrived;
 
     private NavMeshAgent agent;
     private NavMeshPath path;
@@ -85,11 +102,19 @@ public class GuardBehaviour : MonoBehaviour
     private float searchTimer;
     private bool caught;
 
+    private float lastSeenTime = float.NegativeInfinity;
+
+    private bool LostSight => Time.time - lastSeenTime > lostSightGrace;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
         path = new NavMeshPath();
         agent.updateRotation = false;
+
+        // Guards start in Patrolling without an activity change, so its speed is set here once;
+        // SetActivity sets it on every later return to patrol.
+        agent.speed = patrolSpeed;
 
         suspicion = GetComponent<NpcSuspicion>();
         perception = GetComponent<NpcPerception>();
@@ -117,6 +142,7 @@ public class GuardBehaviour : MonoBehaviour
             case GuardActivity.Pursuing: UpdatePursuing(); break;
         }
 
+        UpdateHead();
         UpdateRotation();
     }
 
@@ -133,8 +159,8 @@ public class GuardBehaviour : MonoBehaviour
 
     private void UpdateRotation()
     {
-        if (!hasDesiredYaw && agent.velocity.sqrMagnitude > 0.01f)
-            LookDirection(agent.velocity);
+        if (!hasDesiredYaw && agent.desiredVelocity.sqrMagnitude > MinFacingSpeedSqr)
+            LookDirection(agent.desiredVelocity);
 
         if (hasDesiredYaw)
         {
@@ -158,6 +184,8 @@ public class GuardBehaviour : MonoBehaviour
     {
         seesPlayer = perception.TryGetLatest(out Observation observation);
         if (!seesPlayer) return;
+
+        lastSeenTime = Time.time;
 
         float threshold = Activity == GuardActivity.Pursuing ? 0.1f : repathDistance;
         bool moved = !hasLastKnown
@@ -188,7 +216,12 @@ public class GuardBehaviour : MonoBehaviour
 
         switch (next)
         {
-            case GuardActivity.Patrolling: nextChooseTime = 0f; break;
+            case GuardActivity.Patrolling:
+                agent.speed = patrolSpeed;
+                bool gaveUp = from == GuardActivity.Investigating || from == GuardActivity.Pursuing;
+                nextChooseTime = gaveUp ? Time.time + giveUpPause : 0f;
+                if (gaveUp) agent.ResetPath();
+                break;
             case GuardActivity.Watching: agent.ResetPath(); break;
             case GuardActivity.Investigating: agent.speed = investigateSpeed; MoveTo(lastKnownPosition); break;
             case GuardActivity.Pursuing: agent.speed = pursueSpeed; MoveTo(lastKnownPosition); break;
@@ -217,8 +250,6 @@ public class GuardBehaviour : MonoBehaviour
     {
         if (!arrived)
         {
-            searchBaseYaw = transform.eulerAngles.y;
-
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
             {
                 arrived = true;
@@ -240,14 +271,18 @@ public class GuardBehaviour : MonoBehaviour
 
     private void UpdatePursuing()
     {
-        agent.autoBraking = !seesPlayer;
+        bool chasing = !LostSight;
+        agent.autoBraking = !chasing;
 
-        if (seesPlayer)
+        if (chasing)
         {
-            Vector3 offset = lastKnownPosition - transform.position;
-            offset.y = 0f;
-            if (offset.sqrMagnitude <= catchRadius * catchRadius)
-                Catch();
+            if (seesPlayer)
+            {
+                Vector3 offset = lastKnownPosition - transform.position;
+                offset.y = 0f;
+                if (offset.sqrMagnitude <= catchRadius * catchRadius)
+                    Catch();
+            }
             return;
         }
 
@@ -263,8 +298,6 @@ public class GuardBehaviour : MonoBehaviour
 
     private void UpdatePatrol()
     {
-        agent.speed = patrolSpeed;
-
         if (target != null && !target.isActiveAndEnabled)
             target = null;
 
@@ -346,9 +379,33 @@ public class GuardBehaviour : MonoBehaviour
         return length;
     }
 
+    // Head on the last-known spot while alert and not searching. While searching, the clip and the
+    // sweep do the looking; while patrolling, the animation's own head motion plays.
+    private void UpdateHead()
+    {
+        if (headLook == null) return;
+
+        bool alert = Activity == GuardActivity.Watching
+            || Activity == GuardActivity.Investigating
+            || Activity == GuardActivity.Pursuing;
+
+        if (hasLastKnown && alert && !IsSearching)
+            headLook.LookAt(lastKnownPosition);
+        else
+            headLook.ClearLook();
+    }
+
     private void OnDrawGizmos()
     {
         if (!debug) return;
+
+#if UNITY_EDITOR
+        string label = Activity.ToString();
+        if (target != null) label += $" → {target.name}";
+        if (IsSearching) label += " (searching)";
+        if (IsDwelling) label += " (dwelling)";
+        UnityEditor.Handles.Label(transform.position + Vector3.up * 2.4f, label);
+#endif
 
         if (target != null)
         {
