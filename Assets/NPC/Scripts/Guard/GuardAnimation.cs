@@ -3,10 +3,6 @@ using UnityEngine;
 [RequireComponent(typeof(GuardBehaviour))]
 public class GuardAnimation : MonoBehaviour
 {
-    private static readonly int WatchingId = Animator.StringToHash("Watching");
-    private static readonly int SearchingId = Animator.StringToHash("Searching");
-    private static readonly int GiveUpId = Animator.StringToHash("GiveUp");
-
     private GuardBehaviour guard;
     private Animator animator;
 
@@ -26,13 +22,13 @@ public class GuardAnimation : MonoBehaviour
 
     private void Update()
     {
-        animator.SetBool(WatchingId, guard.Activity == GuardActivity.Watching);
-        animator.SetBool(SearchingId, guard.IsSearching);
+        animator.SetBool(GuardAnimatorParams.WatchingId, guard.Activity == GuardActivity.Watching);
+        animator.SetBool(GuardAnimatorParams.SearchingId, guard.IsSearching);
     }
 
     private void OnActivityChanged(GuardActivity from, GuardActivity to)
     {
         bool gaveUp = to == GuardActivity.Patrolling && (from == GuardActivity.Investigating || from == GuardActivity.Pursuing);
-        if (gaveUp) animator.SetTrigger(GiveUpId);
+        if (gaveUp) animator.SetTrigger(GuardAnimatorParams.GiveUpId);
     }
 }

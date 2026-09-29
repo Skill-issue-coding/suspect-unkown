@@ -8,6 +8,7 @@ using UnityEngine;
 // Guards never strafe: GuardBehaviour turns the body toward where it is heading, so one 1D tree on
 // Speed (idle, walk, run) is the whole graph. Thresholds are in metres per second, measured from the
 // clips themselves, so NpcAnimator feeds the agent's speed straight in and the feet match the ground.
+// TurnRate is yaw in degrees per second, positive turning right.
 public static class GuardLocomotionBuilder
 {
     // Fallback speeds for clips exported "In Place", which carry no root motion to measure.
@@ -48,18 +49,19 @@ public static class GuardLocomotionBuilder
         if (controller == null) controller = AnimatorController.CreateAnimatorControllerAtPath(ControllerPath);
         else ResetController(controller);
 
-        controller.AddParameter("Speed", AnimatorControllerParameterType.Float);
-        controller.AddParameter("Watching", AnimatorControllerParameterType.Bool);
-        controller.AddParameter("Searching", AnimatorControllerParameterType.Bool);
-        controller.AddParameter("GiveUp", AnimatorControllerParameterType.Trigger);
+        controller.AddParameter(NpcAnimatorParams.Speed, AnimatorControllerParameterType.Float);
+        controller.AddParameter(NpcAnimatorParams.TurnRate, AnimatorControllerParameterType.Float);
+        controller.AddParameter(GuardAnimatorParams.Watching, AnimatorControllerParameterType.Bool);
+        controller.AddParameter(GuardAnimatorParams.Searching, AnimatorControllerParameterType.Bool);
+        controller.AddParameter(GuardAnimatorParams.GiveUp, AnimatorControllerParameterType.Trigger);
 
         AnimatorStateMachine root = controller.layers[0].stateMachine;
         AnimatorState locomotion = BuildLocomotion(controller, idle, patrolWalk, investigateWalk, run);
         root.defaultState = locomotion;
 
-        if (watch != null) AddToggleState(root, locomotion, watch, "Watching", fromAnyState: true);
-        if (search != null) AddToggleState(root, locomotion, search, "Searching", fromAnyState: false);
-        if (giveUp != null) AddOneShot(root, locomotion, giveUp, "GiveUp");
+        if (watch != null) AddToggleState(root, locomotion, watch, GuardAnimatorParams.Watching, fromAnyState: true);
+        if (search != null) AddToggleState(root, locomotion, search, GuardAnimatorParams.Searching, fromAnyState: false);
+        if (giveUp != null) AddOneShot(root, locomotion, giveUp, GuardAnimatorParams.GiveUp);
 
         AssetDatabase.SaveAssets();
         Debug.Log($"[NpcLocomotionBuilder] Rebuilt {ControllerPath}", controller);
@@ -72,7 +74,7 @@ public static class GuardLocomotionBuilder
         AnimatorState state = controller.CreateBlendTreeInController("Locomotion", out BlendTree tree, 0);
         state.writeDefaultValues = false;
         tree.blendType = BlendTreeType.Simple1D;
-        tree.blendParameter = "Speed";
+        tree.blendParameter = NpcAnimatorParams.Speed;
         tree.useAutomaticThresholds = false;
 
         tree.AddChild(idle, 0f);
