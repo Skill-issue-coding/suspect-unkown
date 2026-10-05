@@ -2257,7 +2257,7 @@ MonoBehaviour:
     x: 10
     y: 10
     width: 220
-    height: 370
+    height: 420
 --- !u!114 &7572797309826588232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2298,6 +2298,7 @@ MonoBehaviour:
   giveUpPause: 3
   lostSightGrace: 0.3
   headLook: {fileID: 0}
+  glanceDuration: 1.5
   debug: 1
 --- !u!114 &1194697038773332964
 MonoBehaviour:
