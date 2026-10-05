@@ -110,7 +110,7 @@ Aim for a practical industry standard: code another developer could pick up, ext
 | Occluder | 10 | Walls and cover. The only layer perception rays test against |
 | Player | 14 | The player and its bone perception colliders |
 | NPC | 15 | NPC bodies |
-| Volume | 16 | `Zone` and light volumes. Collides with Player only |
+| Volume | 16 | `Zone` volumes. Collides with Player only |
 | UI | 5 | HUD canvases |
 
 ---

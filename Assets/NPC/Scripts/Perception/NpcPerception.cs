@@ -3,12 +3,13 @@ using UnityEngine;
 using System.Collections.Generic;
 
 // Answers "what can I see right now, and how well" once per tick, and accumulates nothing.
-// Alarm is NpcSuspicion (M2); memory and f_duration are NpcWitness (M7). Checks run cheap to
+// Alarm is NpcSuspicion, memory and f_duration are NpcWitness (M7). Checks run cheap to
 // expensive and bail at the first failure: range, then flattened FOV angle, then one linecast 
 // per body point in each attended region. Visibility is the weighted fraction of regions with 
 // a clear line, which is the partial detection Phase 2 asks for. Quality factors stay separate 
 // so the debug readout can print each one. Visibility is the weighted average of region fractions.
-// Conduct is read at tick time and judged by this NPC's archetype (decision 6).
+// Conduct is read at tick time and judged by this NPC's archetype.
+// "Light is read from PlayerLighting, not sampled here: it is the player's property, computed once.
 public class NpcPerception : MonoBehaviour, IPerceiver
 {
     private static readonly BodyRegion[] Regions = (BodyRegion[])Enum.GetValues(typeof(BodyRegion));
@@ -21,6 +22,7 @@ public class NpcPerception : MonoBehaviour, IPerceiver
     private PerceptionTargets targets;
     private PlayerStance playerStance;
     private PlayerConduct playerConduct;
+    private PlayerLighting playerLighting;
     private float nextTick;
 
     private Observation latest;
@@ -73,6 +75,9 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         if (playerConduct == null)
             Debug.LogWarning($"{name} found no PlayerConduct; conduct reads as None.", this);
 
+        playerLighting = targets.GetComponent<PlayerLighting>();
+        if (playerLighting == null)
+            Debug.LogWarning($"{name} found no PlayerLighting; light reads as full.", this);
 
         pointClear = new bool[targets.AllPoints.Count];
         regionFraction = new float[Regions.Length];
@@ -166,7 +171,7 @@ public class NpcPerception : MonoBehaviour, IPerceiver
 
         observation.fDistance = archetype.EvaluateDistance(toPlayer.magnitude / archetype.ViewDistance);
         observation.fAngle = archetype.EvaluateAngle(angle / (archetype.FovDegrees * 0.5f));
-        observation.fLight = 1f;
+        observation.fLight = archetype.LightFactor(playerLighting != null ? playerLighting.Level : 1f);
         observation.fStance = playerStance.Current == Stance.Crouching ? archetype.CrouchVisibilityFactor : 1f;
         observation.perceiver = this;
         observation.timestamp = Time.time;

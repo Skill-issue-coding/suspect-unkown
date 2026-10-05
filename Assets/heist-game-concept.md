@@ -111,7 +111,7 @@ Reporting — a guard radioing in, a civilian making a call — is something an 
 
 The **Curious** state is where the game lives. Detection must not be binary. A guard who pauses, turns, and walks toward where you were gives the player a chance to react, and that moment is the whole genre.
 
-**Light as volumes, not as rendering.** Do not try to sample the rendered lighting. Place trigger volumes tagged with a light level and read those. Every shipped stealth game does it this way; it is controllable, debuggable, and level designers can see it.
+**Light from the lamps, not from the rendered image.** Do not read pixels back from the screen. Instead, compute the light level at the player from the scene's actual lights: distance falloff, spot cone, and a shadow ray per lamp, summed and normalised, with an ambient floor. Lamps that count are marked as gameplay lights. Because the number comes from the same lamps the player sees, a visible shadow always hides you, and a breaker darkens a zone simply by switching its lamps off. An earlier plan used hand-placed trigger volumes tagged with a light level; those drift from the real lighting every time a lamp moves. See decision 17 in `roadmap_npc.md`.
 
 **Cover and stance.** Standing, crouching, and flattening against a wall change your detection profile and your movement noise. With a steep camera this reads clearly, and it gives the player a constant meaningful choice.
 
@@ -153,7 +153,7 @@ q = f_dist · f_angle · f_light · f_duration · f_stance · observerSkill · f
 
 - `f_dist` — falloff, clamped, tuned by feel rather than realism
 - `f_angle` — how centred the player was in the cone, and whether the NPC was facing them
-- `f_light` — from the light volume the player occupied at the time
+- `f_light` — from the light level at the player at the time, sampled from the scene's lights (6.1)
 - `f_duration` — accumulated across frames. A glance and a ten-second stare must not produce the same evidence. This factor matters most.
 - `f_stance` — crouching behind cover occludes lower-body features specifically. Partial visibility should produce partial descriptions.
 - `observerSkill` — per archetype: tired clerk ~0.4, civilian ~0.6, guard 1.0
@@ -225,7 +225,7 @@ These systems are worthless to both courses if the player cannot perceive them.
 - **Pre-job briefing board** — the 3D suspect lineup, plus confirmed items flagged as burned in your wardrobe.
 - **Intel change log** — what changed at this location and why, generated from the placement step.
 - **Post-job witness report** — the newspaper screen. Each witness, what they saw, how confident. This teaches the entire witness system without a tutorial and is a headline feature for the game course.
-- **In-world telegraphing** — vision cones projected onto the floor, suspicion indicator above the NPC, audible cue on state change, a clear visual for which light volume you are standing in.
+- **In-world telegraphing** — vision cones projected onto the floor, suspicion indicator above the NPC, audible cue on state change, a clear visual for how lit you are.
 
 ### 6.6 Poisoning the model — the core counterplay
 

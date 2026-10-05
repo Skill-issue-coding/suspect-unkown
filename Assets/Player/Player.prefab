@@ -1303,6 +1303,7 @@ GameObject:
   - component: {fileID: 6391000241774421808}
   - component: {fileID: 2539254286474842390}
   - component: {fileID: 1876262237866924067}
+  - component: {fileID: 8681365460147532909}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -1535,6 +1536,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e15119de0c52240e58928ee909f8afcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLighting
+  samplePoint: {fileID: 4699944288802902038}
+  occluderMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  tickRate: 10
+  ambientLevel: 0.1
+  fullLightIntensity: 1
+--- !u!114 &8681365460147532909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15853f7ed2cf48648a0410105599983b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  readout: 1
+  readoutRect:
+    serializedVersion: 2
+    x: 240
+    y: 10
+    width: 200
+    height: 125
+  levelGizmo: 1
+  darkColor: {r: 0.1, g: 0.1, b: 0.4, a: 1}
+  brightColor: {r: 1, g: 0.9, b: 0.3, a: 1}
+  gizmoRadius: 0.2
 --- !u!1 &1386813031399317714
 GameObject:
   m_ObjectHideFlags: 0

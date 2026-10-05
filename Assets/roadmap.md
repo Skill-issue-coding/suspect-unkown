@@ -55,7 +55,7 @@ Three phases are marked **GATE** (1, 4, and 9), and Phases 3 and 6 carry a light
 - **Multi-point body raycasts** (head, torso, feet) so partial cover yields partial detection. This is the mechanical payoff of going 3D and must work correctly.
 - Cone projected onto the floor so it is visible from this camera angle
 - NavMeshSurface bake, guard patrol via NavMesh, investigation of a last-known position
-- **Light volumes** as triggers, tagged by level, with a debug readout of the player's current light level
+- **Light level from the scene's lamps**: gameplay lights sampled at the player with shadow rays, with a debug readout of the player's current light level (decision 17 in `roadmap_npc.md`)
 - Hearing propagated through the navmesh rather than through walls
 - Head look-at via Animation Rigging so NPCs visibly turn toward noise
 
@@ -179,7 +179,7 @@ Requirement 1 is graded here. Reserve this time and do not let it get eaten.
 
 - Main menu, pause, options (audio sliders, resolution, rebinding), save slots
 - Tutorial that teaches by design rather than text
-- Lighting pass: bake lightmaps, place fixtures, pool light and shadow deliberately
+- Lighting pass: bake lightmaps, place fixtures, pool light and shadow deliberately. Lamps that should hide or reveal the player get `GameplayLight` with shadows on; breaker lamps stay Mixed or Realtime
 - Camera feel: damping, a push on alert, a freeze frame on being spotted
 - Adaptive music tied to alert state
 - Consistent art pass, no placeholder assets in the final build
