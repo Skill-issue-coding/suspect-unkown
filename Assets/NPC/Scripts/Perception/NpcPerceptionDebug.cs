@@ -7,7 +7,6 @@ using System.Collections.Generic;
 // tick rate while their endpoints follow the player every frame, so a lag of one tick is expected.
 // Grey rays are points in regions the archetype ignores; no ray was cast.
 [RequireComponent(typeof(NpcPerception))]
-[RequireComponent(typeof(NpcHearing))]
 public class NpcPerceptionDebug : MonoBehaviour
 {
     private static readonly BodyRegion[] Regions = (BodyRegion[])Enum.GetValues(typeof(BodyRegion));

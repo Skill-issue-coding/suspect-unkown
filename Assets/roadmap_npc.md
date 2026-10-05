@@ -303,6 +303,19 @@ Suspicion block starting values. Conduct weights are sprinting / in staff area.
 
 The clerk barely notices running but is staff, so a stranger in the back room stands out. The manager cares most about the staff area. The camera has no `NpcSuspicion` (decision 11), so only its conduct weights matter: they define what the guard at the monitor reads through the feed. Its other suspicion values copy the guard's so the asset stays valid.
 
+Hearing block starting values. Sensitivity multiplies how far a sound carries to this NPC (decision 10); suspicion is what a sound at full loudness and alarm 1 adds.
+
+| Archetype         | Sensitivity | Suspicion |
+| ----------------- | ----------- | --------- |
+| SecurityGuard     | 1.0         | 0.5       |
+| Civilian          | 0.8         | 0.3       |
+| TiredClerk        | 0.6         | 0.2       |
+| Manager           | 0.9         | 0.35      |
+| DistractedShopper | 0.4         | 0.1       |
+| SecurityCamera    | 0           | 0         |
+
+The shopper is on their phone, so sound barely reaches them. The camera hears nothing (decision 2); its zeros keep the asset valid.
+
 ### NPC/Scripts/Data/
 
 | File                   | Type                    | Purpose                                                                    | Status                      | Milestone      |

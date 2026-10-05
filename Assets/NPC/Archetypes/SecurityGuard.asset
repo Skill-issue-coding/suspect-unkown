@@ -89,6 +89,8 @@ MonoBehaviour:
     lowerBody: 0.8
     feet: 0.6
   tickRate: 10
+  hearingSensitivity: 1
+  hearingSuspicion: 0.5
   conductWeights:
     sprinting: 0.6
     inStaffArea: 0.8

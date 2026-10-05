@@ -76,18 +76,27 @@ public class NpcHearing : MonoBehaviour
 #endif
             return;
         }
-        if (!NavMesh.CalculatePath(listener, hit.position, NavMesh.AllAreas, path)) return;
-        if (path.status != NavMeshPathStatus.PathComplete) return;
+        if (!NavMesh.CalculatePath(listener, hit.position, NavMesh.AllAreas, path)
+            || path.status != NavMeshPathStatus.PathComplete)
+        {
+#if UNITY_EDITOR
+            Record(Verdict.NoPath, noise, reach, 0f, 0);
+#endif
+            return;
+        }
 
-        float length = PathLength(reach);
+        float length = PathLength(reach, out int cornerCount);
+#if UNITY_EDITOR
+        Record(length > reach ? Verdict.TooFar : Verdict.Heard, noise, reach, length, cornerCount);
+#endif
         if (length > reach) return;
 
         Heard?.Invoke(new HeardNoise(noise.Position, 1f - length / reach, noise.Alarm));
     }
 
-    private float PathLength(float limit)
+    private float PathLength(float limit, out int count)
     {
-        int count = path.GetCornersNonAlloc(corners);
+        count = path.GetCornersNonAlloc(corners);
         if (count >= MaxCorners) return float.PositiveInfinity;
 
         float length = 0f;
