@@ -121,7 +121,7 @@ public class NpcPerceptionDebug : MonoBehaviour
                     : Color.Lerp(blockedRayColor, clearRayColor, fraction);
 
                 string value = weight <= 0f ? "ignored" : $"{fraction:P0}";
-                GUILayout.Label($"{region,-10} {value}");
+                GUILayout.Label($"{region.ToString().PadRight(10)} {value}");
             }
 
             GUI.contentColor = Color.white;
