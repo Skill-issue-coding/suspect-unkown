@@ -4,7 +4,7 @@ Companion to `roadmap.md` and `heist-game-concept.md`. Those cover the whole gam
 
 Covers the systems side of the split in `roadmap.md`. Integration seams with the player, world, and art side have their own section.
 
-> Written 2026-09-21 after the base scaffolding commit (`8f8bd04`), and revised the same day after cross-checking it against `roadmap.md` and the concept document. Revised again on 2026-09-23 after M1's perception core was built and the per-archetype region weights design replaced fixed cast points, and kept current through M3 (2026-09-29) and the M4 light rework (2026-10-05). See the changelog at the end. Update the status column in the file tables as files get implemented.
+> Written 2026-09-21 after the base scaffolding commit (`8f8bd04`), and revised the same day after cross-checking it against `roadmap.md` and the concept document. Revised again on 2026-09-23 after M1's perception core was built and the per-archetype region weights design replaced fixed cast points, and kept current through M3 (2026-09-29), the M4 light rework, and the M5 redesign around doors, anomalies, and abilities (both 2026-10-05). See the changelog at the end. Update the status column in the file tables as files get implemented.
 
 ---
 
@@ -28,7 +28,7 @@ The NPC system is finished when its share of these `roadmap.md` criteria passes.
 | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 2     | Crouching behind a half-height occluder with a gap underneath (a table top, not a solid counter) breaks the ray to the head while the ray to the feet still lands, and the partial detection shows in the debug readout. |
 | 3     | You can get caught, and there is tension before you are. The Curious state lasts long enough to react to.                                                                                                                |
-| 4     | **GATE.** Every verb (thrown object, breaker, jammed door) visibly moves an NPC or changes what it perceives.                                                                                                            |
+| 4     | **GATE.** Every verb (opening a door, the breaker, one device ability) visibly moves an NPC or changes what it perceives, and the vision cones are readable without the debug view.                                     |
 | 5     | A player can look at a room and correctly guess which civilian is the dangerous one.                                                                                                                                     |
 | 6     | A player can predict who saw them well and who did not, purely from how the encounter played out.                                                                                                                        |
 | 10    | Guards read behaviour. Cameras see only within their arc and from their mounted height.                                                                                                                                  |
@@ -81,7 +81,7 @@ NPC  ──►  Player  ──►  Core
  └──────────────────►  Core
 ```
 
-- **Core** holds what both sides need and nobody owns: `NoiseBus`, `NoiseEvent`, `Zone`, `GameplayLight`. Core references no gameplay assembly. Zones and gameplay lights are passive: readers query them, they never look up the player.
+- **Core** holds what both sides need and nobody owns: `NoiseBus`, `NoiseEvent`, `Zone`, `GameplayLight`, and the world objects (`Anomaly`, `Door`, `Breaker`, `Device`, and the `Ability` asset type). Core references no gameplay assembly. These are passive: readers query them, they never look up the player. A device does not check the player's ability charges; the player side checks and spends a charge, then calls the device (decision 20).
 - **Player** owns every type NPCs read about the player: `Stance`, `PerceptionTargets`, `PlayerConduct`.
 - **NPC** reads Player and Core. Nothing reads NPC except scenes and tests.
 
@@ -116,6 +116,8 @@ The suspicion rise per tick is roughly `visibility × abnormality`. The same con
 **As built.** Conduct and context share one representation: `ConductFlags`, a `[Flags]` enum on the player side. Context is a flag like any other (`InStaffArea`), set by `PlayerConduct` from the `Zone` triggers the player is inside. NPCs therefore see one set of flags and weigh each through one mechanism, `ConductWeights` on the archetype. The uniform exception becomes one extra condition in `PlayerConduct` once wardrobe exists.
 
 Abnormality is computed by the **perceiver**, with its own archetype, at tick time, and carried on the `Observation`. Set flags combine as `1 − Π(1 − w)`: one fully abnormal act gives 1, two acts at 0.6 give 0.84, and adding an act never lowers the result. Because the perceiver judges, a camera's observation carries abnormality judged by the camera's weights, and that is what the guard at the monitor receives (decision 11).
+
+**Extended 2026-10-05: abnormal world state counts too.** Suspicion comes from abnormal conduct **or** abnormal world state: an open door, lights that went out (decision 18). Both are things only a robber causes. It still never comes from the player merely being seen. Sound was already a third source (decision 10); like sound, an anomaly sets a suspicion floor rather than rising every frame, and on its own never pushes an NPC past Investigating.
 
 ### 7. Perception is stateless; two components accumulate, separately
 
@@ -240,6 +242,50 @@ The light level NPCs read comes from the actual lamps. `GameplayLight` (Core) ma
 
 It stays explainable for the course: the level is a sum of named terms, and the debug readout prints the level, the raw sum, and how many lights are lit and shadowed.
 
+### 18. Anomalies: world state only a robber causes
+
+An **anomaly** is a world object in a state that only the player causes: an open door, a tripped breaker, later an emptied display case. NPCs notice anomalies the way they notice the player, and react to the world instead of only to the player's body.
+
+- `Anomaly` (Core) is a passive component with a static registry, like `GameplayLight`. It exposes whether it is active, the point an NPC must see, and its kind (`AnomalyKind`). The object that owns it (a `Door`, a `Breaker`) switches it on and off.
+- NPCs check active anomalies on their perception tick, cheap to expensive like the player rays: range, then the cone, then one linecast to the anomaly's point. Noticing one raises an event; it does not go on the `Observation`, which is about the player (decision 14).
+- **Suspicion:** noticing sets a floor of `anomalySuspicion × kind weight`, per archetype, and makes the anomaly the stimulus and the guard's last-known position. Like sound, an anomaly alone never pushes past Investigating (decision 6).
+- **Resolution is an errand** (decision 20): one NPC of the right role claims the anomaly, walks to it, plays a reaction, and fixes it. The guard plays a confused animation and slams the open door shut; staff walk to the breaker and reset it. A claim works like a POI claim (decision 15), so two NPCs never fix the same thing.
+- **Witnesses:** being seen *causing* an anomaly is conduct, a `ConductFlags` flag such as `OpeningDoor`. It feeds the Behaviour slot in M7, which is where the comedy lands: "they opened a door".
+
+**Why.** Only the robber opens doors or trips breakers, so these are the clearest evidence the game has, and they tell the player that their actions leave traces even when nobody saw them. One mechanism covers doors, the breaker, and later loot, instead of one special case each.
+
+### 19. Doors are the player's
+
+NPCs walk only in open areas and never use doors. A closed door is a wall to them: it blocks their NavMesh and therefore their paths and their hearing (decision 10). Only the player opens doors, by lockpicking or other means.
+
+- An **open door** is an anomaly (decision 18). It also opens the NavMesh, so a guard can now follow the player through it, and sound now carries through it.
+- A guard who notices it plays a confused animation and slams it shut, which closes the path and clears the anomaly. The tone is comedic on purpose: the joke is the genre convention that only players open doors, made into a rule NPCs believe.
+- Doors are built with a `NavMeshObstacle` that carves while the door is closed. The door leaf is ignored by the NavMesh bake, or it would be baked in as a permanent wall.
+- The leaf is on `Occluder`, so a closed door also blocks sight and light.
+
+This replaces the earlier "jam a door" verb, which assumed NPCs walk through doors.
+
+### 20. Verbs are abilities used at in-world devices
+
+There is no physical throwing. Every verb is a **bought ability** with a limited number of uses per heist, used by reaching an in-world **device**: a router, the breaker, a desk phone. The tone is cartoony and relatable, and every ability must move an NPC or change what an NPC perceives (concept 6.7).
+
+- `Ability` (Core) is a ScriptableObject holding data only: name, uses per heist, description. The remaining uses are runtime state on the player (`PlayerAbilities`), never on the asset (decision 1). The shop (Phase 7) decides which abilities the player owns.
+- `Device` (Core) is the world object. It names the `Ability` it needs and exposes `Activate()`. It never looks up the player: the player side checks a charge, spends it, and calls `Activate()`, so dependencies stay Player → Core.
+- Activating a device raises an event. NPC role behaviours subscribe and respond.
+- **Responses are errands:** a claimed target, a point to walk to, a reaction clip, a duration, then back to normal. Slamming a door, resetting the breaker, complaining to the manager about the internet, and answering a prank call are all the same mechanism with different data. This is the one shared piece; there is no general scripting system, and each ability is its own small, named effect.
+- Until the interaction system exists, devices are triggered with `[ContextMenu]`, calling the same `Activate()` the interaction will call.
+
+Abilities that act on civilians (disable the internet, so shoppers go and complain to the manager) need civilians and arrive in M6. M5 proves the system with an ability that acts on the guard.
+
+### 21. The vision cone is drawn as a light
+
+The vision cone is a player-facing gameplay element, not a debug view: a glowing cone on the floor, like a torch beam, coloured by alert state. The player reads danger from it at a glance.
+
+- It is a mesh built from a fan of rays at eye height against `Occluder`, so full-height walls cut it. Its range and angle come from the archetype, so it always matches perception.
+- **Low cover is shown, not hidden.** An eye-height ray passes over a counter, but a crouched player behind it is hidden. A second fan at crouched-head height finds low cover, and the area behind it inside the cone is shaded as "crouch-safe" instead of being cut out. A flat cone that stopped at counters would lie to a standing player.
+- The overlay approximates perception; it does not drive it. Tune the crouch height so that "crouch-safe" really is safe, and check it against the debug rays. Where the two disagree, perception is the truth and the overlay is fixed.
+- It updates in `LateUpdate`, after the NPC has turned, with reused ray and mesh buffers. Measure the cost before lowering the update rate or the ray count.
+
 ---
 
 ## File structure
@@ -258,7 +304,8 @@ Assets/
 │   ├── Animation/      Dangle
 │   ├── Lighting/       GameplayLight
 │   ├── Noise/          NoiseBus, NoiseEvent
-│   └── Volumes/        Zone, ZoneType
+│   ├── Volumes/        Zone, ZoneType
+│   └── World/          Anomaly, AnomalyKind, Door, Breaker, Device, Ability (M5)
 ├── Player/Scripts/
 │   ├── Editor/         MapPlayerPerceptionPoints …
 │   ├── Locomotion/     PlayerStance …
@@ -321,28 +368,29 @@ Suspicion block starting values. Conduct weights are sprinting / in staff area.
 
 The clerk barely notices running but is staff, so a stranger in the back room stands out. The manager cares most about the staff area. The camera has no `NpcSuspicion` (decision 11), so only its conduct weights matter: they define what the guard at the monitor reads through the feed. Its other suspicion values copy the guard's so the asset stays valid.
 
-Hearing block starting values. Sensitivity multiplies how far a sound carries to this NPC (decision 10); suspicion is what a sound at full loudness and alarm 1 adds.
+Hearing and light block values, as tuned in M4. Sensitivity multiplies how far a sound carries to this NPC (decision 10); hearing suspicion is the floor a sound at full loudness and alarm 1 sets. Dark factor is `fLight` in full darkness (decision 17). The last two columns use the formula in the M4 notes: a sprint is radius 9, alarm 0.3; a "crash" is a reference loud sound of radius 12 and alarm 1, such as a noisy ability effect or panic (M6). Nothing publishes one yet.
 
-| Archetype         | Sensitivity | Suspicion |
-| ----------------- | ----------- | --------- |
-| SecurityGuard     | 1.0         | 0.5       |
-| Civilian          | 0.8         | 0.3       |
-| TiredClerk        | 0.6         | 0.2       |
-| Manager           | 0.9         | 0.35      |
-| DistractedShopper | 0.4         | 0.1       |
-| SecurityCamera    | 0           | 0         |
+| Archetype         | Sensitivity | Hearing suspicion | Dark factor | Sprint: Curious within | Crash: Curious / Investigating within |
+| ----------------- | ----------- | ----------------- | ----------- | ---------------------- | ------------------------------------- |
+| SecurityGuard     | 3.0         | 0.7               | 0.3         | 1.3 m                  | 25.7 m / 10.3 m                       |
+| Manager           | 2.0         | 0.6               | 0.3         | never                  | 16 m / 4 m                            |
+| Civilian          | 1.5         | 0.5               | 0.25        | never                  | 9 m / never                           |
+| TiredClerk        | 0.6         | 0.4               | 0.2         | never                  | 1.8 m / never                         |
+| DistractedShopper | 0.4         | 0.4               | 0.2         | never                  | 1.2 m / never                         |
+| SecurityCamera    | 0           | 0                 | 0.15        | never                  | never                                 |
 
-The shopper is on their phone, so sound barely reaches them. The camera hears nothing (decision 2); its zeros keep the asset valid.
+Only the guard reacts to footsteps; for everyone else the sound that counts is a crash, and civilians do not investigate (their reaction is the M6 tree). Every hearing suspicion is below that archetype's `alertedAt`, so a sound alone never alerts. The shopper is on their phone, so sound barely reaches them. The camera hears nothing (decision 2); its zeros keep the asset valid, and its low dark factor makes the breaker a strong counter to cameras.
 
 ### NPC/Scripts/Data/
 
 | File                   | Type                    | Purpose                                                                    | Status                      | Milestone      |
 | ---------------------- | ----------------------- | -------------------------------------------------------------------------- | --------------------------- | -------------- |
-| `NpcArchetype.cs`      | ScriptableObject        | Every tuning number for one archetype                                      | working (vision, suspicion) | M1, M2, M4, M7 |
+| `NpcArchetype.cs`      | ScriptableObject        | Every tuning number for one archetype                                      | working (vision, light, hearing, suspicion) | M1, M2, M4, M7 |
 | `RegionWeights.cs`     | `[Serializable]` struct | Per-region attention weights for one observer (decision 13)                | working                     | M1             |
 | `ConductWeights.cs`    | `[Serializable]` struct | Per-flag abnormality weights and the combine formula (decision 6)          | working                     | M2             |
 | `NpcAlertState.cs`     | enum                    | Idle, Curious, Investigating, Alerted                                      | declared                    | M2             |
 | `Observation.cs`       | struct                  | What a perceiver reports each tick it sees the player                      | working (M1, M2 fields)     | M1, M2         |
+| `HeardNoise.cs`        | struct                  | A sound as one NPC heard it: position, loudness along the NavMesh, alarm   | working                     | M4             |
 | `IPerceiver.cs`        | interface               | `Perceived` event and `TryGetLatest`, shared by NPC perception and cameras | working                     | M1             |
 | `FeatureSlot.cs`       | enum                    | Witness feature slots                                                      | declared                    | M7             |
 | `FeatureVisibility.cs` | `[Serializable]` struct | Per-slot visibility mask for one observer                                  | declared                    | M7             |
@@ -355,7 +403,8 @@ The shopper is on their phone, so sound barely reaches them. The camera hears no
 | `NpcPerceptionDebug.cs` | MonoBehaviour | Gizmos, floor cone, per-point rays, on-screen readout                                            | working      | M1        |
 | `NpcSuspicion.cs`       | MonoBehaviour | Rise from strength × abnormality, delayed decay, alert states with hysteresis, skill multipliers | working      | M2        |
 | `NpcHeadLook.cs`        | MonoBehaviour | Animation Rigging head and neck aim; executes `LookAt`/`ClearLook`, the role behaviour decides   | working      | M3        |
-| `NpcHearing.cs`         | MonoBehaviour | `NoiseBus` subscriber, NavMesh path-length check                                                 | stub         | M4        |
+| `NpcHearing.cs`         | MonoBehaviour | `NoiseBus` subscriber, NavMesh path-length check, raises `Heard`; verdict readout and path gizmo | working      | M4        |
+| `NpcAnomalySight.cs`    | MonoBehaviour | Checks active anomalies on the perception tick (range, cone, linecast); raises `Noticed`         | —            | M5        |
 
 ### NPC/Scripts/Guard/
 
@@ -383,6 +432,7 @@ The shopper is on their phone, so sound barely reaches them. The camera hears no
 | File                           | Type          | Purpose                                                                                              | Status  | Milestone |
 | ------------------------------ | ------------- | ---------------------------------------------------------------------------------------------------- | ------- | --------- |
 | `NpcSuspicionIndicator.cs`     | MonoBehaviour | World-space suspicion telegraph above the NPC: filling arc, state icon, arrow to last-known position | working | M2        |
+| `NpcVisionCone.cs`             | MonoBehaviour | Player-facing cone drawn as light on the floor, cut by walls, crouch-safe shading behind low cover (decision 21) | —       | M5        |
 | `OffscreenIndicatorHUD.cs`     | MonoBehaviour | Screen-space layer for edge indicators, one per scene; static `Instance`                             | working | M2        |
 | `OffscreenIndicatorElement.cs` | MonoBehaviour | Draws one edge-of-screen indicator; placed by `NpcSuspicionIndicator`                                | working | M2        |
 
@@ -419,11 +469,17 @@ The shopper is on their phone, so sound barely reaches them. The camera hears no
 | File                     | Type          | Purpose                                                                                                                    | Status   | Milestone |
 | ------------------------ | ------------- | -------------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
 | `Animation/Dangle.cs`    | MonoBehaviour | Procedural pendulum for small hanging accessories (the guard's keys). No physics; runs after the animated pose             | working  | M3        |
-| `Noise/NoiseEvent.cs`    | struct        | Position, radius (loudness), source                                                                                        | declared | M4        |
-| `Noise/NoiseBus.cs`      | static class  | Publish and subscribe                                                                                                      | declared | M4        |
+| `Noise/NoiseEvent.cs`    | struct        | Position, radius (loudness), alarm                                                                                         | working  | M4        |
+| `Noise/NoiseBus.cs`      | static class  | Publish and subscribe                                                                                                      | working  | M4        |
 | `Volumes/ZoneType.cs`    | enum          | Public, Staff. Public first, so a forgotten zone is harmless                                                               | working  | M2        |
 | `Volumes/Zone.cs`        | MonoBehaviour | Trigger volume on the `Volume` layer, public or staff; several colliders make complex shapes. Zone id arrives with Phase 8 | working  | M2        |
 | `Lighting/GameplayLight.cs` | MonoBehaviour | Marks a Point or Spot light as one gameplay counts; static registry and unshadowed contribution at a point (decision 17) | working  | M4        |
+| `World/Anomaly.cs`       | MonoBehaviour | World state only a robber causes; static registry, active flag, point to see, kind (decision 18)                           | —        | M5        |
+| `World/AnomalyKind.cs`   | enum          | OpenDoor, PowerOut. A kind is added only with its producer                                                                 | —        | M5        |
+| `World/Door.cs`          | MonoBehaviour | Player-only door: carves the NavMesh while closed, raises an anomaly while open, can be slammed shut (decision 19)          | —        | M5        |
+| `World/Breaker.cs`       | MonoBehaviour | Switches a set of lamps; an anomaly while tripped; reset by staff                                                          | —        | M5        |
+| `World/Device.cs`        | MonoBehaviour | In-world object an ability is used at; names its `Ability`, exposes `Activate()`, raises `Activated` (decision 20)          | —        | M5        |
+| `World/Ability.cs`       | ScriptableObject | Data for one bought ability: name, uses per heist, description. No runtime state                                        | —        | M5        |
 
 ### Player/Scripts/ (what NPCs read)
 
@@ -434,18 +490,19 @@ The shopper is on their phone, so sound barely reaches them. The camera hears no
 | `Perception/PerceptionTargets.cs`     | MonoBehaviour  | Every body point, flat and by region. Fixed after `Awake`                                                | working  | M1        |
 | `Perception/CharacterAppearance.cs`   | struct         | Placeholder for the player's feature vector. Shape to agree at the art and systems seam                  | declared | M7        |
 | `Editor/MapPlayerPerceptionPoints.cs` | static class   | Adds `PerceptionPoint` to the 17 bone colliders in `Player.prefab` by bone name                          | working  | M1        |
-| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea. Powers of two; a flag is added only with its producer                            | working  | M2        |
+| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea; `OpeningDoor` joins in M5. Powers of two; a flag is added only with its producer | working  | M2, M5    |
 | `Perception/PlayerConduct.cs`         | MonoBehaviour  | What the player is doing right now, including the staff-area flag from zone triggers, counted per zone   | working  | M2        |
 | `Perception/PlayerLighting.cs`        | MonoBehaviour  | Light level at the player, sampled from every `GameplayLight` on a tick with shadow rays (decision 17)   | working  | M4        |
+| `Abilities/PlayerAbilities.cs`        | MonoBehaviour  | Remaining uses per owned ability for this heist; checks and spends a charge, then calls `Device.Activate()` | —     | M5        |
 | `Perception/PlayerLightingDebug.cs`   | MonoBehaviour  | On-screen light readout and a level-tinted sphere at the sample point; computes nothing itself           | working  | M4        |
 | `Locomotion/PlayerStance.cs`          | MonoBehaviour  | Owns `Stance`: Standing and Crouching only                                                               | working  | done      |
-| `Noise/PlayerNoise.cs`                | MonoBehaviour  | Movement noise; migrates to `NoiseBus`                                                                   | working  | M4        |
+| `Noise/PlayerNoise.cs`                | MonoBehaviour  | A footstep on `NoiseBus` every stride; louder and alarming when sprinting, quieter when crouching        | working  | M4        |
 
 ### Prefab composition
 
 | Prefab   | Components                                                                                                                                                                                                                                                             |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Guard    | `NpcPerception`, `NpcPerceptionDebug`, `NpcSuspicion`, `NpcHeadLook`, `GuardBehaviour`, `GuardAnimation`, `NpcAnimator`, `NavMeshAgent`; the model has an Animator and a `RigBuilder` with head and neck aim constraints. `NpcHearing` joins in M4, `NpcWitness` in M7 |
+| Guard    | `NpcPerception`, `NpcPerceptionDebug`, `NpcSuspicion`, `NpcHeadLook`, `GuardBehaviour`, `GuardAnimation`, `NpcAnimator`, `NpcHearing`, `NavMeshAgent`; the model has an Animator and a `RigBuilder` with head and neck aim constraints. `NpcWitness` joins in M7          |
 | Civilian | `NpcPerception`, `NpcSuspicion`, `NpcHearing`, `NpcWitness`, `CivilianBehaviour`, `NavMeshAgent`                                                                                                                                                                       |
 | Clerk    | Same as Civilian with the `TiredClerk` archetype and no patrol                                                                                                                                                                                                         |
 | Camera   | `NpcPerception`, `NpcWitness` — nothing else                                                                                                                                                                                                                           |
@@ -543,11 +600,20 @@ Implementation notes, as built:
 
 ### M4 — Hearing and light (the rest of Phase 2)
 
-- `NoiseEvent` and `NoiseBus` (in Core).
-- `NpcHearing`: `NavMesh.CalculatePath` length compared against `radius × sensitivity` (decision 10). `NpcArchetype` gains a hearing-sensitivity value.
-- `PlayerNoise` migrates from resizing a `SphereCollider` to publishing on `NoiseBus`.
-- `NpcHeadLook` turns toward heard noise.
+- [x] `NoiseEvent` and `NoiseBus` (in Core). A `NoiseEvent` carries position, radius, and alarm (0 harmless, 1 unmistakable), so ordinary footsteps can be heard without raising anything.
+- [x] `NpcHearing`: `NavMesh.CalculatePath` length compared against `radius × sensitivity` (decision 10). `NpcArchetype` gains hearing sensitivity and hearing suspicion.
+- [x] `PlayerNoise` migrates from resizing a `SphereCollider` to publishing a footstep on `NoiseBus` every stride. Only sprinting carries alarm.
+- [x] `NpcHeadLook` turns toward heard noise: every audible sound earns the guard a short glance.
 - [x] Light from the scene's lights (decision 17). `GameplayLight` in Core, `PlayerLighting` samples it, and `NpcPerception` turns the level into `fLight` through `NpcArchetype.LightFactor`. `PlayerLightingDebug` shows the level, the raw sum, and lit and shadowed light counts, with a sphere at the sample point tinted by level. Putting `GameplayLight` on the right lamps is level design. `LightVolume` was replaced before any level used it.
+
+Implementation notes for hearing, as built:
+
+- `NpcHearing` rejects by straight-line distance first (a path is never shorter), snaps the sound onto the NavMesh within 1 m, then measures the path with a reused `NavMeshPath` and a fixed corner buffer. It raises `Heard` with a `HeardNoise`: loudness is 1 at the source and 0 at the edge of this NPC's reach.
+- A sound sets a suspicion **floor** of `alarm × loudness × hearingSuspicion` rather than adding to suspicion, so repeated footsteps don't stack, and it resets the decay delay like a sighting.
+- A sound becomes the stimulus and the guard's last-known position only while the player is out of sight, and only if it is alarming or the NPC is already alert.
+- **A sound alone never alerts.** Every archetype keeps `hearingSuspicion` below `alertedAt`, so the most a sound can do is make an NPC investigate. This is held in data rather than code.
+- The reaction radius for a state threshold `T` is `reach × (1 − T / (alarm × hearingSuspicion))`, with `reach = radius × sensitivity`. Use it to tune: the guard turns Curious at a sprint within about 1.3 m, and investigates a reference loud sound (radius 12, alarm 1) within about 10 m.
+- The debug readout shows the last verdict (heard, too far, no path, off NavMesh) with loudness or path length against reach; the hearing gizmo draws the measured path.
 
 Implementation notes for light, as built:
 
@@ -558,19 +624,28 @@ Implementation notes for light, as built:
 
 **Done when:** running behind a wall is heard around the corner but not through it, and stepping into shadow visibly lowers `f_light` in the readout.
 
-**Status:** the light half passed on the test bench: shadow lowers `fLight`, a wall between lamp and player blocks it, and switching a lamp off drops `fLight` within a tick.
+**Status:** passed on the test bench. Sprinting around a wall's end is heard, through a wall with no path it is not, and a sprint close behind the guard makes it Curious. Shadow lowers `fLight`, a wall between lamp and player blocks it, and switching a lamp off drops `fLight` within a tick. **M4 is done.**
 
 ### M5 — Verbs move NPCs (Phase 4, hard gate)
 
-NPC-side support for the three Phase 4 verbs:
+Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no jammed door. NPCs never use doors, verbs are abilities used at in-world devices, and the vision cone becomes a player-facing light. The interaction system is player-side work that does not exist yet, so devices and doors are triggered with `[ContextMenu]` placeholders that call the same methods the interaction will. No level exists yet; everything is tested on the test bench.
 
-- **Thrown object** → a `NoiseEvent` → a guard leaves their patrol to investigate.
-- **Breaker** → the zone's `GameplayLight` lamps switch off → `f_light` drops for every NPC looking at a player there (decision 17). Breaker lamps must be Mixed or Realtime.
-- **Jammed door** → `NavMeshObstacle` carving → an investigating guard takes the long way round.
+1. [ ] **Vision cone overlay** (decision 21). `NpcVisionCone`: eye-height ray fan cut by walls, crouch-safe shading behind low cover, colour by alert state, matching the archetype's range and angle. Readable without the debug view.
+2. [ ] **Anomalies and doors** (decisions 18, 19). `Anomaly` and `AnomalyKind` in Core, `NpcAnomalySight` on NPCs, and the archetype gains anomaly suspicion and per-kind weights. A player-only `Door` that carves the NavMesh while closed and is an anomaly while open. A guard who notices an open door claims it, walks over, plays a confused animation, and slams it shut. `OpeningDoor` conduct when the player is seen opening one.
+3. [ ] **Breaker** (decisions 17, 18). Trips a set of lamps: `f_light` drops for everyone looking into the zone, and the tripped breaker is an anomaly. Staff notice the dark, walk to the breaker, and reset it. Breaker lamps must be Mixed or Realtime.
+4. [ ] **Abilities at devices** (decision 20). `Ability` and `Device` in Core, `PlayerAbilities` on the player with uses per heist, and the errand mechanism on the guard. One ability that acts on the guard, chosen from the ideas list, proves it end to end.
+   Optional abilities, built after the first one proves the system. Each is a device plus an errand (decision 20):
 
-Plus: guards pursue across vault and climb routes via `NavMeshLink`, and the near miss is designed rather than accidental — suspicion decays, investigation is interruptible, and the player always has a recovery move.
+   - [ ] **Call the guard's mum** (desk phone). The guard walks to the phone and is stuck in the call, facing the wall. Guard only.
+   - [ ] **Page the guard** (store PA microphone). "Security to the loading dock, your car is being towed" sends the guard to the far end. Guard only.
+   - [ ] **Leak the group chat** (router, staff Wi-Fi). The guard stops and stares at his phone, head down, and his cone shrinks while he scrolls. Guard only. Needs one extra errand field: a perception modifier while busy, applied to the archetype's view distance and angle and shown by the cone (decision 21).
+   - [ ] **Clog the toilet** (staff restroom). The clerk or manager runs over with a plunger and stays to fix it. Needs staff NPCs, so it lands with M6.
+   - [ ] **Car alarm** (key fob on a parked car). Staff and shoppers turn to the window and face away from the shop floor. Changes facing, not position. Needs civilians, so it lands with M6.
 
-**Done when:** each verb visibly moves an NPC or changes what an NPC perceives. The overall Phase 4 gate is that someone outside the team plays three jobs and wants a fourth; if the loop is flat here, fix it here rather than moving on to civilians.
+5. [ ] **Pursuit across vaults.** Guards follow over counters via `NavMeshLink`, first with built-in traversal, then with a vault clip in the guard's animator builder (decision 16). An opened door also opens a pursuit route (decision 19).
+6. [ ] **Near-miss pass.** Suspicion decays, investigation and errands are interruptible, the player always has a recovery move, and Curious lasts long enough to react to.
+
+**Done when:** opening a door, tripping the breaker, and one device ability each visibly move an NPC or change what it perceives, and an outsider reads the guards from their cones and indicators alone. The overall Phase 4 gate is that someone outside the team plays three jobs and wants a fourth; if the loop is flat here, fix it here rather than moving on to civilians.
 
 ### M6 — Civilians (Phase 5)
 
@@ -621,7 +696,8 @@ Plus: guards pursue across vault and climb routes via `NavMeshLink`, and the nea
 | `PerceptionTargets`      | Body points that follow the animated rig, grouped by region       | A trigger `BoxCollider` on each mapped bone, on every outfit. Renaming a bone means updating `MapPlayerPerceptionPoints` |
 | `PlayerConduct`          | What the player is doing, readable each tick                      | Hooks from the controller and interactions (sprint, loot, tools)                                                         |
 | `CharacterAppearance`    | The player's feature vector at the moment of each observation     | Outfit state mapped to both meshes and features. **Agree this early.**                                                   |
-| Vision cone on the floor | A debug cone during M1                                            | The final look, agreed together                                                                                          |
+| Vision cone on the floor | `NpcVisionCone`, drawn as light (decision 21)                     | The material and colours, agreed together so the cone fits the palette                                                   |
+| Doors and devices        | `Door`, `Breaker`, `Device`, and the NPC errands that answer them | The interaction system that opens doors and uses devices, and their placement in levels                                  |
 | NPC animation            | Patrol, investigate, run; civilian phone reach, back away, freeze | Mixamo retargeting onto the NPC rig                                                                                      |
 | Zones                    | The component and its debug gizmo                                 | Placement during level design                                                                                            |
 | Gameplay lights          | `GameplayLight` and `PlayerLighting` with their debug readouts    | During the lighting pass: `GameplayLight` on every lamp that should hide or reveal, shadows on, fixtures off `Occluder`, breaker lamps Mixed or Realtime |
@@ -649,6 +725,8 @@ Plus: guards pursue across vault and climb routes via `NavMeshLink`, and the nea
 | An archetype with empty curves or all-zero weights is blind with no error | `OnValidate` restores empty curves and warns on all-zero weights                                                                                                                                            |
 | A camera pointing straight down sees 360°                                 | M8 adds a 3D cone for cameras. Mount test cameras at an angle.                                                                                                                                              |
 | A player prefab rework drops a perception component                       | `NpcPerception` warns when `PlayerConduct` is missing, but suspicion then silently never rises. Consider `[RequireComponent(typeof(PlayerConduct))]` on `PerceptionTargets`, so Unity refuses to remove it. |
+| The vision cone promises safety that perception does not give             | Decision 21. Perception is the truth; the overlay is tuned against the debug rays until "crouch-safe" really is safe.                                                                                      |
+| Abilities grow into a scripting framework                                 | Decision 20. Each ability is a small named effect; the only shared piece is the errand.                                                                                                                    |
 | A visible shadow does not hide the player                                 | Decision 17. Usually a lamp without `GameplayLight`, with shadows off, or with a fixture on `Occluder`. Select the player and read the gizmo lines: green is lit, red is shadowed.                         |
 | The player spawns after NPCs start                                        | `NpcPerception` finds the player once in `Start`. Replace with a static accessor on `PerceptionTargets` when spawning arrives.                                                                              |
 
@@ -668,6 +746,10 @@ Plus: guards pursue across vault and climb routes via `NavMeshLink`, and the nea
 - ~~**Reading conduct through a feed.**~~ Answered by decision 6: yes for suspicion. The camera's own conduct weights define what the monitor guard reads. The camera's visual-only mask still keeps behaviour out of the evidence (M7).
 - ~~**Cameras and light.**~~ Answered by decision 17: yes. Cameras use `NpcPerception`, so `f_light` applies to them automatically, and the breaker counters them too. The camera archetype's `darkVisibilityFactor` sets how much.
 - **Baked lights in builds.** Not yet verified in this Unity version: does a Baked light keep its `Light` component and parameters in a player build? `GameplayLight` assumes it does.
+- **Which abilities ship.** Kept so far (concept 6.7, and optional in M5 step 4): disable the internet, call the guard's mum, page the guard, leak the group chat, clog the toilet, car alarm. "Call the guard's mum" and "page the guard" act on the guard alone, so one of them is the M5 ability. The car alarm is the one that changes facing rather than position: everyone turns to the window.
+- **What "caught" means without a guard.** Tier 1 has only civilians. A discreet call starts a police timer; what happens when it runs out?
+- **What a guard's `Reporting` does.** Who receives the report: other guards, a global alarm, or the police timer?
+- **Takedowns and knock-and-hide** (concept 6.7). In no phase and not on the cut list. In scope or not? A takedown would add an unconscious state and body discovery.
 
 ---
 
@@ -709,3 +791,6 @@ Plus: guards pursue across vault and climb routes via `NavMeshLink`, and the nea
   - The player moved to a modular, correctly scaled model; perception points are mapped onto its active skeleton only.
   - File tables, prefab composition, and folder tree updated; the broken UI table repaired.
 - **2026-10-05** — Light reworked (decision 17). Authored `LightVolume` triggers are replaced by sampling the scene's lights: `GameplayLight` in Core, `PlayerLighting` and `PlayerLightingDebug` on the player, and `NpcPerception` reading the level through `LightFactor`. The light half of M4 passed on the test bench. The M5 breaker now switches lamps off, the `Volume` layer holds zones only, and the cameras-and-light question is answered.
+- **2026-10-05** — M4 done. Hearing through the NavMesh (`NoiseBus`, `NpcHearing`, `HeardNoise`, `PlayerNoise` on the bus) with glances, suspicion floors, and last-known positions from sound. Hearing values retuned for every archetype with the reaction-radius formula, so only the guard reacts to footsteps and no sound alone can alert. File tables, prefab composition, and the hearing table updated, with a dark-factor column added.
+- **2026-10-05** — M5 redesigned after design answers. Decision 6 extended: abnormal world state raises suspicion too. New decisions: anomalies (18), doors are the player's (19), verbs are abilities used at in-world devices (20), and the vision cone is drawn as light (21). The thrown object and the jammed door are gone; M5 is now the cone, doors, the breaker, abilities, vault pursuit, and the near-miss pass. Planned files added to the tables; open questions added for abilities, the caught state, reporting, and takedowns.
+- **2026-10-05** — Optional M5 abilities listed under step 4: call the guard's mum, page the guard, leak the group chat (guard only), clog the toilet and car alarm (with M6). The group chat adds a perception modifier to errands.

@@ -1,9 +1,19 @@
 fileFormatVersion: 2
-guid: 141276ea75e3c2146a1cb98b7853256e
+guid: 69ecac005fcf9524e84d9ecb66c29fd9
 ModelImporter:
   serializedVersion: 24600
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PhoneHolderEmission
+    second: {fileID: 2100000, guid: 4b2353610d2f911469d00573339099a8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PolygonPrototype_Texture_01
+    second: {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

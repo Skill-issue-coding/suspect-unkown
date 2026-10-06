@@ -99,7 +99,7 @@ Every NPC has:
 
 - **Vision** — a 3D cone with a height component, occluded by geometry. Sphere-cast or raycast to several points on the player's body rather than one. This is what makes crouching behind a half-height counter work: the ray to your head is blocked, the ray to your feet is not, and partial visibility yields partial detection strength.
 - **Hearing** — a radius, triggered by running, breaking glass, drilling, dropped items. Propagated through the navmesh rather than through walls, so sound goes around corners instead of through them.
-- **Suspicion** — a float accumulating while you are perceived doing something abnormal, decaying when you are not.
+- **Suspicion** — a float accumulating while you are perceived doing something abnormal, or while an NPC notices something abnormal in the world that only a robber causes (an open door, the lights going out), decaying when neither is happening.
 
 State machine:
 
@@ -113,7 +113,9 @@ The **Curious** state is where the game lives. Detection must not be binary. A g
 
 **Light from the lamps, not from the rendered image.** Do not read pixels back from the screen. Instead, compute the light level at the player from the scene's actual lights: distance falloff, spot cone, and a shadow ray per lamp, summed and normalised, with an ambient floor. Lamps that count are marked as gameplay lights. Because the number comes from the same lamps the player sees, a visible shadow always hides you, and a breaker darkens a zone simply by switching its lamps off. An earlier plan used hand-placed trigger volumes tagged with a light level; those drift from the real lighting every time a lamp moves. See decision 17 in `roadmap_npc.md`.
 
-**Cover and stance.** Standing, crouching, and flattening against a wall change your detection profile and your movement noise. With a steep camera this reads clearly, and it gives the player a constant meaningful choice.
+**Cover and stance.** Standing and crouching change your detection profile and your movement noise. With a steep camera this reads clearly, and it gives the player a constant meaningful choice. Flattening against a wall is deferred, and added only if playtests show crouching behind low walls is not enough cover.
+
+**Only the robber opens doors.** NPCs never use doors; to them a closed door is a wall. The player opens doors by lockpicking or other means, and an open door is therefore evidence: an NPC who spots one grows suspicious, plays a confused beat, and slams it shut. The joke is the genre convention that only players open doors, turned into a rule the NPCs believe. An open door also opens a path, so a guard can now follow you through it. The tripped breaker works the same way: staff notice the dark and go and reset it. See decisions 18 and 19 in `roadmap_npc.md`.
 
 ### 6.2 Witness model — per job
 
@@ -129,7 +131,7 @@ When an NPC perceives you, it does not record "the player." It records a **featu
 | Face covering | mask, balaclava, scarf, none |
 | Build / height | short, average, tall |
 | Gait | limping, fast, casual |
-| Behaviour | moved abnormally, avoided eye contact, entered staff area |
+| Behaviour | moved abnormally, avoided eye contact, entered staff area, opened a door |
 | Method | picked lock, drilled, smashed glass, roof entry |
 
 3D helps here: every one of these visual features corresponds to a visible mesh or material on the character, so what the witness reports and what the player saw on screen are the same thing.
@@ -225,7 +227,7 @@ These systems are worthless to both courses if the player cannot perceive them.
 - **Pre-job briefing board** — the 3D suspect lineup, plus confirmed items flagged as burned in your wardrobe.
 - **Intel change log** — what changed at this location and why, generated from the placement step.
 - **Post-job witness report** — the newspaper screen. Each witness, what they saw, how confident. This teaches the entire witness system without a tutorial and is a headline feature for the game course.
-- **In-world telegraphing** — vision cones projected onto the floor, suspicion indicator above the NPC, audible cue on state change, a clear visual for how lit you are.
+- **In-world telegraphing** — vision cones drawn on the floor as light, like a torch beam, cut by walls and shaded behind low cover where crouching hides you; suspicion indicator above the NPC, audible cue on state change, a clear visual for how lit you are.
 
 ### 6.6 Poisoning the model — the core counterplay
 
@@ -248,9 +250,21 @@ The strategic layer does not save the second-to-second game. Removing guns leave
 
 **The rule: every tool should either move an NPC or change what an NPC can perceive.** Tools that only make the player quieter are passive and forgettable.
 
-- Throw an object to pull a guard off a patrol point
-- Trip a breaker to darken a zone
-- Jam or lock a door so an investigating guard takes the long way
+**Verbs are bought abilities used at in-world devices.** There is no throwing. The player buys abilities, each with a few uses per heist, and uses them by reaching a device in the level: a router, the breaker, a desk phone. The tone is cartoony and relatable: disable the internet at the router, and the shoppers march over to complain to the manager. NPCs answer each ability with a short errand: walk somewhere, react, deal with it, return. See decision 20 in `roadmap_npc.md`.
+
+- Disable the internet at the router, so shoppers go and complain to the manager
+- Trip a breaker to darken a zone; staff come to reset it
+- Open a door: a new route for you, evidence for them, and a slammed door when a guard finds it
+
+Ability ideas kept so far. The common thread is everyday, relatable annoyance played for comedy, readable from body language at this camera height:
+
+| Ability | Device | Effect | Comedic beat |
+|---|---|---|---|
+| Call the guard's mum | Desk phone | The guard walks to the phone and is stuck in the call, facing the wall | "Yes mum… no mum… I *am* eating vegetables" |
+| Page the guard | Store PA microphone | "Security to the loading dock, your car is being towed" sends the guard to the far end | Pats pockets for keys, then jogs off |
+| Leak the group chat | Router (staff Wi-Fi) | The guard stops and stares at his phone, head down; his vision cone shrinks while he scrolls | Gasps, types furiously, scrolls back up |
+| Clog the toilet | Staff restroom | The clerk or manager runs over with a plunger and stays to fix it | Plunger raised like a sword |
+| Car alarm | Key fob on a parked car | Staff and shoppers turn to the window and face away from the shop floor | Everyone pressed against the glass |
 - Tamper with a camera so it shows an empty aisle
 - Knock and hide
 - Non-lethal takedown, with somewhere to hide the body
@@ -344,7 +358,7 @@ Clothing is functional, not cosmetic. Each piece occupies a feature slot the wit
 | Camera looper | Blinds one camera temporarily |
 | Grappling hook / rope | Opens vertical routes: roofs, mezzanines |
 | Bag upgrades | Carry capacity, directly converting to value per trip |
-| Distraction items | Pull an NPC off a patrol point |
+| Device abilities | Used at an in-world device, a few uses per heist. Each sends an NPC on an errand or changes what NPCs perceive (6.7) |
 
 ### 7.4 Skills
 
@@ -371,7 +385,7 @@ Better fence contacts; intel purchases revealing patrol routes or camera arcs pr
 - **ProBuilder** for greyboxing levels directly in Unity before any art exists. This is how you iterate on level design without waiting for models.
 
 ### Navigation
-- **Unity AI Navigation** (`com.unity.ai.navigation`) — NavMeshSurface with runtime rebaking, NavMeshObstacle with carving for doors you lock, NavMeshLink for vaulting, vents, and stairs. In 3D this is the built-in answer and the A\* Pathfinding Project is no longer needed.
+- **Unity AI Navigation** (`com.unity.ai.navigation`) — NavMeshSurface with runtime rebaking, NavMeshObstacle with carving for doors (closed doors are walls to NPCs; a door the player opens opens the path), NavMeshLink for vaulting, vents, and stairs. In 3D this is the built-in answer and the A\* Pathfinding Project is no longer needed.
 - NavMeshLink is also how vertical routes become traversable for both the player's AI-facing state and for guards pursuing you.
 
 ### Characters and animation

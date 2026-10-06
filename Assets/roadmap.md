@@ -53,7 +53,7 @@ Three phases are marked **GATE** (1, 4, and 9), and Phases 3 and 6 carry a light
 
 - 3D vision cones with height, occluded by geometry
 - **Multi-point body raycasts** (head, torso, feet) so partial cover yields partial detection. This is the mechanical payoff of going 3D and must work correctly.
-- Cone projected onto the floor so it is visible from this camera angle
+- Cone drawn on the floor as light so it is visible from this camera angle, cut by walls and shaded behind low cover (decision 21 in `roadmap_npc.md`)
 - NavMeshSurface bake, guard patrol via NavMesh, investigation of a last-known position
 - **Light level from the scene's lamps**: gameplay lights sampled at the player with shadow rays, with a debug readout of the player's current light level (decision 17 in `roadmap_npc.md`)
 - Hearing propagated through the navmesh rather than through walls
@@ -82,7 +82,8 @@ The prototype job uses a guard. Tier 1's only opposition is civilians, whose beh
 
 **The critical phase. No persistence exists yet and none should.**
 
-- **Three verbs**: throw an object to pull a patrol, trip a breaker to darken a zone, jam a door. Each must visibly move an NPC or change what an NPC perceives.
+- **Three verbs**: open a door (only the robber opens doors, so an open door is evidence and a new route), trip a breaker to darken a zone (staff come to reset it), and one bought ability used at an in-world device. Each must visibly move an NPC or change what an NPC perceives. No physical throwing (decisions 18–20 in `roadmap_npc.md`).
+- An interaction system for doors and devices. Placeholders until it exists.
 - **Vault and climb** via NavMeshLink, so cover is traversable rather than just an obstacle
 - **The greed ratchet**: escalating value at escalating exposure. Register fast, back office safe 40s, display case loud. Leaving early with a partial take is always allowed.
 - Audio on every interaction. Placeholder is fine; silence is not.
@@ -128,7 +129,7 @@ The art side and the systems side of the same feature. Build them together.
 - Save/load via JSON: police profile, wardrobe, money, per-location state
 - Persistent profile with burn status per item
 - **The 3D suspect lineup screen** — a mannequin assembled from confirmed features, unknown slots left as grey geometry. Nearly free given the modular character work in Phase 6, and it communicates the whole mechanic wordlessly.
-- Laundering, shop, two to three tools
+- Laundering, shop, two to three tools or device abilities
 - Pre-job briefing board
 
 **Done when:** burning an item forces a real purchasing decision.
@@ -235,18 +236,18 @@ The team will be blind to its own UI by week three, and the witness and adaptive
 
 ## Risk register
 
-| Risk                                              | Mitigation                                                                                  |
-| ------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| Camera occlusion makes the game unreadable        | Phase 1 gate. Low walls plus dither fade, prototyped before content exists.                 |
-| 3D asset workload overruns the schedule           | Asset packs and Mixamo from day one; greybox-first; three tiers instead of five             |
-| Phase 4 is not fun                                | Find out in month one, not month three                                                      |
-| Modular character system fights the animation rig | Build outfits and retargeting together in Phase 6; one shared skeleton, no exceptions       |
-| Adaptive security makes levels unwinnable         | Solvability check after placement; cap changes per job                                      |
-| Coverage-driven patrols look random to the player  | Deterministic POI scoring, commitment until covered, POIs visible in debug. See decision 15 in `roadmap_npc.md`. |
-| Poisoning turns out to be pointless               | Phase 9 gate, tuned against one level before content exists                                 |
-| Witness system is invisible to players            | Report and lineup screens are presentation work, not programming work. Budget them as such. |
-| Verticality doubles level cost                    | One floor until tier 2                                                                      |
-| Art inconsistency reads as unfinished             | Fixed palette, one asset pack as the visual baseline, no mixing sources                     |
+| Risk                                              | Mitigation                                                                                                       |
+| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Camera occlusion makes the game unreadable        | Phase 1 gate. Low walls plus dither fade, prototyped before content exists.                                      |
+| 3D asset workload overruns the schedule           | Asset packs and Mixamo from day one; greybox-first; three tiers instead of five                                  |
+| Phase 4 is not fun                                | Find out in month one, not month three                                                                           |
+| Modular character system fights the animation rig | Build outfits and retargeting together in Phase 6; one shared skeleton, no exceptions                            |
+| Adaptive security makes levels unwinnable         | Solvability check after placement; cap changes per job                                                           |
+| Coverage-driven patrols look random to the player | Deterministic POI scoring, commitment until covered, POIs visible in debug. See decision 15 in `roadmap_npc.md`. |
+| Poisoning turns out to be pointless               | Phase 9 gate, tuned against one level before content exists                                                      |
+| Witness system is invisible to players            | Report and lineup screens are presentation work, not programming work. Budget them as such.                      |
+| Verticality doubles level cost                    | One floor until tier 2                                                                                           |
+| Art inconsistency reads as unfinished             | Fixed palette, one asset pack as the visual baseline, no mixing sources                                          |
 
 ---
 
