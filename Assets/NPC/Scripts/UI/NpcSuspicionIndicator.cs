@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // In-world suspicion telegraph (concept 6.5). Hidden at zero, so a calm
-// room shows nothing. Icon and colour follow AlertStateChanged; the fill
+// room shows nothing. Icon and color follow AlertStateChanged; the fill
 // follows Suspicion every frame. Billboards by copying the fixed camera's
 // rotation. The arrow rolls in the screen plane toward the NPC's last stimulus 
 // (NpcSuspicion.LastStimulus): what it last saw or heard, never the live player, 

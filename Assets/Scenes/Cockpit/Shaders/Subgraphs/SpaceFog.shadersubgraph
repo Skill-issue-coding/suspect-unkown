@@ -3541,7 +3541,7 @@
     "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.GroupData",
     "m_ObjectId": "47eebab4211d409c9ff0e0dafdfbb692",
-    "m_Title": "Coloured Fog",
+    "m_Title": "Colored Fog",
     "m_Position": {
         "x": -865.0001220703125,
         "y": 983.0001220703125

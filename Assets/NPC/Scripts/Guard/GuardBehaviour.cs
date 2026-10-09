@@ -409,14 +409,15 @@ public class GuardBehaviour : MonoBehaviour
             headLook.ClearLook();
     }
 
-    // Every audible sound earns a glance. A sound becomes the last-known position when the guard can't
-    // see the player and the sound matters: it is alarming, or the guard is already alert and following up
+    // Every audible sound earns a glance. A sound becomes the last-known position only when the guard
+    // can't see the player and the sound is alarming. Ordinary footsteps never move it, or a watching
+    // guard would track a quiet player through walls step by step. Same rule as NpcSuspicion.LastStimulus
     private void OnHeard(HeardNoise noise)
     {
         glancePoint = noise.Position;
         glanceUntil = Time.time + glanceDuration;
 
-        bool matters = noise.Alarm > 0f || Activity != GuardActivity.Patrolling;
+        bool matters = noise.Alarm > 0f;
         if (!matters || !LostSight) return;
 
         bool moved = !hasLastKnown

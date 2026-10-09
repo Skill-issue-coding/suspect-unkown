@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 // Draws what NpcPerception already found; never casts a ray of its own, so what you tune is what
-// the NPC used. Cone and rays show when the NPC is selected. Ray colours update at the perception
+// the NPC used. Cone and rays show when the NPC is selected. Ray colors update at the perception
 // tick rate while their endpoints follow the player every frame, so a lag of one tick is expected.
 // Grey rays are points in regions the archetype ignores; no ray was cast.
 [RequireComponent(typeof(NpcPerception))]

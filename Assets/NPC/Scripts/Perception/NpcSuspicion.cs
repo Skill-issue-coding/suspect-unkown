@@ -37,9 +37,10 @@ public class NpcSuspicion : MonoBehaviour
         set => decayMultiplier = Mathf.Max(0f, value);
     }
 
-    // Where the NPC's attention last went: every sighting, and sounds that matter while the player is
-    // out of sight (alarming ones, or any sound once alert). The indicator's arrow points here, and it
-    // is the same rule GuardBehaviour uses for its last-known position, so the two always agree
+    // Where the NPC's attention last went: every sighting, and alarming sounds while the player is out
+    // of sight. Ordinary footsteps never move it, or an alert NPC would track a quiet player through
+    // walls step by step. The indicator's arrow points here, and it is the same rule GuardBehaviour
+    // uses for its last-known position, so the two always agree
     public Vector3 LastStimulus { get; private set; }
     public bool HasStimulus { get; private set; }
 
@@ -114,7 +115,7 @@ public class NpcSuspicion : MonoBehaviour
     {
         // Attention first: a sound the NPC turns toward is a stimulus even if it raises nothing
         bool seesPlayer = perception.TryGetLatest(out _);
-        bool matters = noise.Alarm > 0f || State != NpcAlertState.Idle;
+        bool matters = noise.Alarm > 0f;
         if (matters && !seesPlayer)
         {
             LastStimulus = noise.Position;

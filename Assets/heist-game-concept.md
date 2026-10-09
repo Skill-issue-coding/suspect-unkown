@@ -28,7 +28,7 @@ A fixed camera pitched 65–70° down, low-poly models, no free orbit. The angle
 **What you gain over top-down 2D:**
 
 - **Real occlusion in three dimensions.** Crouching behind a counter genuinely breaks line of sight. Cover becomes a mechanic instead of a wall-hugging abstraction.
-- **Silhouette reads at a glance.** Clothing, headwear, body shape, and carried tools are visible on the model, which makes the witness system legible without UI. The player can *see* what a witness would describe.
+- **Silhouette reads at a glance.** Clothing, headwear, body shape, and carried tools are visible on the model, which makes the witness system legible without UI. The player can _see_ what a witness would describe.
 - **Verticality.** Mezzanines, vents, second floors, rooftops. Each is a route the security model has to account for.
 - **Cheap art.** Flat-shaded low-poly is fast to produce and reads as intentional. A two-person team can build a consistent-looking 3D world faster than a consistent-looking pixel-art one.
 
@@ -50,9 +50,9 @@ Recommend 1 + 2 together, and skip 3 unless playtesting demands it.
 
 ## 3. Art direction
 
-- **Flat-shaded low poly**, no textures or minimal ones. Colour comes from vertex colours or per-material palettes. This is the cheapest path to a consistent look.
+- **Flat-shaded low poly**, no textures or minimal ones. Color comes from vertex colors or per-material palettes. This is the cheapest path to a consistent look.
 - **Limited palette**, chosen up front and never deviated from. Consistency reads as intentional style; mixed fidelity reads as unfinished. This matters more for the game course grade than polygon count does.
-- **Readable silhouettes over detail.** A guard must be distinguishable from a civilian at a glance from this camera height. Use colour and silhouette, not facial detail.
+- **Readable silhouettes over detail.** A guard must be distinguishable from a civilian at a glance from this camera height. Use color and silhouette, not facial detail.
 - **Characters are modular**: a base body with attachment sockets for head, torso, legs, and a carried item. Clothing becomes mesh swaps plus material tints, which is what makes the wardrobe system cheap to build and makes the suspect lineup screen possible.
 - **Lighting sells the mood.** Baked lightmaps for the static world plus a handful of realtime lights. Dark corners, pooled light under fixtures, harsh light at entrances.
 
@@ -63,7 +63,7 @@ Recommend 1 + 2 together, and skip 3 unless playtesting demands it.
 1. **Plan** — pick a target, review what the police already know about you, choose a disguise and loadout.
 2. **Case** — enter the location, observe patrols, camera arcs, staff routines, and where the value is.
 3. **Steal** — take as much value as possible while managing suspicion.
-4. **Escape** — reach the getaway vehicle. Being seen is not failure; being *identified* is the cost.
+4. **Escape** — reach the getaway vehicle. Being seen is not failure; being _identified_ is the cost.
 5. **Aftermath** — witnesses give statements, your police profile updates, security at that location adapts.
 6. **Spend** — launder the take, buy gear, skills, and new clothing. Repeat with a bigger target.
 
@@ -75,11 +75,11 @@ The tension in the loop is greed versus exposure. Every extra thirty seconds ins
 
 Three tiers, reduced from five because 3D locations cost roughly double (see `roadmap.md` Phase 10). Each tier introduces exactly one new opposition concept so the player learns them one at a time. Verticality lets each tier also add a spatial dimension.
 
-| Tier | Target | New opposition | New space |
-|---|---|---|---|
-| 1 | Convenience store | Civilians: a tired clerk (poor memory, decays fast) and a few customers giving independent partial descriptions. | Single room, low shelving, stockroom door |
-| 2 | Jewelry store | Patrolling guard. Trained observer, reads behaviour. | Mezzanine (first verticality), security office above |
-| 3 | Bank branch | Cameras, watched from a security monitor. Perfect retention, fixed arcs, visual features only. Locked zones. | Two floors, vault stairwell |
+| Tier | Target            | New opposition                                                                                                   | New space                                            |
+| ---- | ----------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| 1    | Convenience store | Civilians: a tired clerk (poor memory, decays fast) and a few customers giving independent partial descriptions. | Single room, low shelving, stockroom door            |
+| 2    | Jewelry store     | Patrolling guard. Trained observer, reads behaviour.                                                             | Mezzanine (first verticality), security office above |
+| 3    | Bank branch       | Cameras, watched from a security monitor. Perfect retention, fixed arcs, visual features only. Locked zones.     | Two floors, vault stairwell                          |
 
 Folded or cut from the five-tier plan: the pharmacy tier's civilians move into tier 1, and the vault tier's alarm timers and guards sharing information become stretch goals. Roof access, vents, and service shafts are no longer tied to a tier; add them where a level wants them, and note that they are third in the `roadmap.md` cut order.
 
@@ -107,7 +107,7 @@ State machine:
 Idle → Curious → Investigating → Alerted
 ```
 
-Reporting — a guard radioing in, a civilian making a call — is something an NPC *does* once alerted, not a further level of suspicion, so it lives with the reactions in 6.8 rather than on this ladder.
+Reporting — a guard radioing in, a civilian making a call — is something an NPC _does_ once alerted, not a further level of suspicion, so it lives with the reactions in 6.8 rather than on this ladder.
 
 The **Curious** state is where the game lives. Detection must not be binary. A guard who pauses, turns, and walks toward where you were gives the player a chance to react, and that moment is the whole genre.
 
@@ -123,16 +123,16 @@ The **Curious** state is where the game lives. Detection must not be binary. A g
 
 When an NPC perceives you, it does not record "the player." It records a **feature vector with per-feature confidence**:
 
-| Feature | Example values |
-|---|---|
-| Headwear | beanie, cap, hood, none |
-| Upper body | jacket colour, hoodie, coat |
-| Lower body | jeans, work trousers, colour |
-| Face covering | mask, balaclava, scarf, none |
-| Build / height | short, average, tall |
-| Gait | limping, fast, casual |
-| Behaviour | moved abnormally, avoided eye contact, entered staff area, opened a door |
-| Method | picked lock, drilled, smashed glass, roof entry |
+| Feature        | Example values                                                           |
+| -------------- | ------------------------------------------------------------------------ |
+| Headwear       | beanie, cap, hood, none                                                  |
+| Upper body     | jacket color, hoodie, coat                                               |
+| Lower body     | jeans, work trousers, color                                              |
+| Face covering  | mask, balaclava, scarf, none                                             |
+| Build / height | short, average, tall                                                     |
+| Gait           | limping, fast, casual                                                    |
+| Behaviour      | moved abnormally, avoided eye contact, entered staff area, opened a door |
+| Method         | picked lock, drilled, smashed glass, roof entry                          |
 
 3D helps here: every one of these visual features corresponds to a visible mesh or material on the character, so what the witness reports and what the player saw on screen are the same thing.
 
@@ -189,7 +189,7 @@ Between jobs each location spends a **security budget** against your logged tend
 - Always come in through the roof → the roof hatch gets a sensor, and a camera covers the stairwell.
 - Hit the same store repeatedly → more staff, fewer civilians (fewer bodies to hide among, more trained eyes).
 
-Some budget goes to a global pool, so hitting many *different* jewelry stores raises awareness across the category.
+Some budget goes to a global pool, so hitting many _different_ jewelry stores raises awareness across the category.
 
 #### The budget is fixed — the most important rule in the design
 
@@ -213,7 +213,7 @@ Score(S) = Σ_zones  occupancy[zone] × detectionProb[zone | S]
 
 Greedy selection: repeatedly add the candidate with the largest marginal gain until the budget runs out. The objective is submodular, so greedy carries the standard (1 − 1/e) approximation guarantee, worth a paragraph in the report.
 
-Greedy has a second benefit: because it picks one candidate at a time for one identifiable reason, the intel change-log text generates itself from the marginal-gain step. *"Camera installed over the stairwell — used in 6 of your last 8 jobs."*
+Greedy has a second benefit: because it picks one candidate at a time for one identifiable reason, the intel change-log text generates itself from the marginal-gain step. _"Camera installed over the stairwell — used in 6 of your last 8 jobs."_
 
 **Two guardrails:**
 
@@ -236,7 +236,7 @@ Security learns from what it observes, so let the player feed it false data deli
 - **Feed false entry habits.** Three cheap jobs through the front door. Security invests in fronts. Then take the bank through the rear, which is thin because the budget is fixed.
 - **Build a decoy identity.** Wear a distinctive red jacket on low-value jobs until the profile confirms it. That confirmation is an asset you paid for. Burn the jacket before the real score and witnesses describe someone who does not match the suspect on file.
 - **Feed false method signatures.** Drill a safe loudly on a small job. They buy reinforced safes. Come back with a glass cutter and take the display case.
-- **Plant wrong data.** Deliberately let a *low-quality* witness see you badly, so an incorrect value enters the profile with high confidence. The police are now looking for the wrong person.
+- **Plant wrong data.** Deliberately let a _low-quality_ witness see you badly, so an incorrect value enters the profile with high confidence. The police are now looking for the wrong person.
 
 Consequences:
 
@@ -258,13 +258,14 @@ The strategic layer does not save the second-to-second game. Removing guns leave
 
 Ability ideas kept so far. The common thread is everyday, relatable annoyance played for comedy, readable from body language at this camera height:
 
-| Ability | Device | Effect | Comedic beat |
-|---|---|---|---|
-| Call the guard's mum | Desk phone | The guard walks to the phone and is stuck in the call, facing the wall | "Yes mum… no mum… I *am* eating vegetables" |
-| Page the guard | Store PA microphone | "Security to the loading dock, your car is being towed" sends the guard to the far end | Pats pockets for keys, then jogs off |
-| Leak the group chat | Router (staff Wi-Fi) | The guard stops and stares at his phone, head down; his vision cone shrinks while he scrolls | Gasps, types furiously, scrolls back up |
-| Clog the toilet | Staff restroom | The clerk or manager runs over with a plunger and stays to fix it | Plunger raised like a sword |
-| Car alarm | Key fob on a parked car | Staff and shoppers turn to the window and face away from the shop floor | Everyone pressed against the glass |
+| Ability              | Device                  | Effect                                                                                       | Comedic beat                                |
+| -------------------- | ----------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Call the guard's mum | Desk phone              | The guard walks to the phone and is stuck in the call, facing the wall                       | "Yes mum… no mum… I _am_ eating vegetables" |
+| Page the guard       | Store PA microphone     | "Security to the loading dock, your car is being towed" sends the guard to the far end       | Pats pockets for keys, then jogs off        |
+| Leak the group chat  | Router (staff Wi-Fi)    | The guard stops and stares at his phone, head down; his vision cone shrinks while he scrolls | Gasps, types furiously, scrolls back up     |
+| Clog the toilet      | Staff restroom          | The clerk or manager runs over with a plunger and stays to fix it                            | Plunger raised like a sword                 |
+| Car alarm            | Key fob on a parked car | Staff and shoppers turn to the window and face away from the shop floor                      | Everyone pressed against the glass          |
+
 - Tamper with a camera so it shows an empty aisle
 - Knock and hide
 - Non-lethal takedown, with somewhere to hide the body
@@ -297,15 +298,15 @@ Personality alone reads as random because the player cannot see it. Branch prima
 
 Reactions must differ in what they feed the witness model, so the reaction system connects to 6.2 instead of running parallel to it.
 
-| Reaction | Evidence produced |
-|---|---|
-| Freeze / comply | Long, calm, high-quality observation. The most dangerous outcome for the player. |
-| Discreet call | Starts a police timer. Phone is visible, so it is interruptible. |
-| Panic flee | Poor, error-prone description. Loud. Spreads. |
-| Avoid / walk away | Almost nothing. |
-| Pretend not to see | Keeps working, keeps observing secretly. |
-| Film the player | Camera-quality visual evidence. Must be stopped. |
-| Confront | Rare. A physical obstacle. |
+| Reaction           | Evidence produced                                                                |
+| ------------------ | -------------------------------------------------------------------------------- |
+| Freeze / comply    | Long, calm, high-quality observation. The most dangerous outcome for the player. |
+| Discreet call      | Starts a police timer. Phone is visible, so it is interruptible.                 |
+| Panic flee         | Poor, error-prone description. Loud. Spreads.                                    |
+| Avoid / walk away  | Almost nothing.                                                                  |
+| Pretend not to see | Keeps working, keeps observing secretly.                                         |
+| Film the player    | Camera-quality visual evidence. Must be stopped.                                 |
+| Confront           | Rare. A physical obstacle.                                                       |
 
 **The resulting inversion: calm witnesses are the dangerous ones.** Scaring a civilian degrades their description but adds noise and alarm. Keeping them calm is quiet but gives them a long clean look at you. A real strategic decision rather than a preference.
 
@@ -348,17 +349,17 @@ Clothing is functional, not cosmetic. Each piece occupies a feature slot the wit
 
 ### 7.3 Tools and gear
 
-| Tool | Effect |
-|---|---|
-| Lockpicks (tiers) | Silent, slow, skill-gated |
-| Drill | Fast, loud, distinctive method signature |
-| Glass cutter | Silent entry through windows, limited uses |
-| Crowbar | Fast, very loud, cheap |
-| Signal jammer | Delays alarm transmission |
-| Camera looper | Blinds one camera temporarily |
-| Grappling hook / rope | Opens vertical routes: roofs, mezzanines |
-| Bag upgrades | Carry capacity, directly converting to value per trip |
-| Device abilities | Used at an in-world device, a few uses per heist. Each sends an NPC on an errand or changes what NPCs perceive (6.7) |
+| Tool                  | Effect                                                                                                               |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Lockpicks (tiers)     | Silent, slow, skill-gated                                                                                            |
+| Drill                 | Fast, loud, distinctive method signature                                                                             |
+| Glass cutter          | Silent entry through windows, limited uses                                                                           |
+| Crowbar               | Fast, very loud, cheap                                                                                               |
+| Signal jammer         | Delays alarm transmission                                                                                            |
+| Camera looper         | Blinds one camera temporarily                                                                                        |
+| Grappling hook / rope | Opens vertical routes: roofs, mezzanines                                                                             |
+| Bag upgrades          | Carry capacity, directly converting to value per trip                                                                |
+| Device abilities      | Used at an in-world device, a few uses per heist. Each sends an NPC on an errand or changes what NPCs perceive (6.7) |
 
 ### 7.4 Skills
 
@@ -379,37 +380,44 @@ Better fence contacts; intel purchases revealing patrol routes or camera arcs pr
 ## 8. Recommended tools and packages
 
 ### Engine and rendering
+
 - **Unity 6 LTS**, 3D URP.
 - **Baked lightmaps** for static geometry plus a few realtime lights. Light Probes for characters.
 - **Dither-fade occluder shader** (Shader Graph, sphere mask on camera-to-player vector). Build this in Phase 1.
 - **ProBuilder** for greyboxing levels directly in Unity before any art exists. This is how you iterate on level design without waiting for models.
 
 ### Navigation
+
 - **Unity AI Navigation** (`com.unity.ai.navigation`) — NavMeshSurface with runtime rebaking, NavMeshObstacle with carving for doors (closed doors are walls to NPCs; a door the player opens opens the path), NavMeshLink for vaulting, vents, and stairs. In 3D this is the built-in answer and the A\* Pathfinding Project is no longer needed.
 - NavMeshLink is also how vertical routes become traversable for both the player's AI-facing state and for guards pursuing you.
 
 ### Characters and animation
+
 - **Mixamo** — free rigged animations. Walk, run, crouch-walk, idle variants, interact, panic, phone call. This is the single biggest time saver in the project; hand-animating humanoids is not realistic at this scale.
 - **Modular character setup** in Blender: one base mesh, sockets for head/torso/legs/hands. Export as FBX with a shared rig so animations retarget across all outfits.
 - **Animation Rigging package** if you want look-at behaviour for NPC heads. Worth it: an NPC visibly turning its head toward a noise is enormous for readability.
 
 ### Art
-- **Blender** for modelling. Flat shading, no UV unwrapping needed if you use vertex colours or palette atlases.
+
+- **Blender** for modelling. Flat shading, no UV unwrapping needed if you use vertex colors or palette atlases.
 - **Kenney** (CC0) and **Synty** low-poly asset packs as a base or placeholder. Use them without embarrassment; a consistent bought set beats an inconsistent handmade one.
 
 ### Architecture
+
 - **ScriptableObjects** for NPC archetypes, clothing, tools, skills, loot tables, reaction trees, and level configs. The highest-value architectural decision in the project.
 - **Newtonsoft JSON** (`com.unity.nuget.newtonsoft-json`) for saves: police profile, wardrobe, per-location security state, skills.
 - **Unity Input System.**
 - **Assembly definitions** from the start (Core, Player, NPC). They keep compile times sane, and they turn dependency direction (NPC → Player → Core) into a compiler error rather than a convention.
 
 ### Feel and polish
+
 - **Cinemachine** with a fixed-rotation virtual camera, a confiner, and a small amount of follow damping. Dolly slightly on alert state changes.
 - **PrimeTween** (free, allocation-free) or DOTween.
 - **UI Toolkit** for the briefing board, wardrobe, and skill screens.
 - **FMOD** if you want occlusion and adaptive music tied to alert state; Unity audio is acceptable, but audio is a large fraction of feeling finished either way.
 
 ### Workflow
+
 - **Git + Git LFS.** Set Asset Serialization to Force Text and Version Control Mode to Visible Meta Files before the first commit. In 3D you will have far more binary assets than in 2D, so LFS configuration matters more.
 - **Prefab-heavy structure** so two people rarely touch the same scene file.
 - **Unity Test Framework** for the witness confidence merge and the security budget allocator. Pure logic, easy to test, painful to debug through gameplay.
@@ -422,7 +430,7 @@ Better fence contacts; intel purchases revealing patrol routes or camera arcs pr
 
 **3D costs more than 2D.** Models, rigs, animations, navmesh, lighting. The mitigation is aggressive: asset packs, Mixamo, greybox-first level design, and fewer locations than the 2D plan called for. Cut content, never cut the systems that the courses grade.
 
-**Hand-author the levels.** Stealth depends on readable sightlines and learnable layouts. Procedural generation produces spaces that are legal but not interesting. Three hand-built locations, replayable because the *security* changes rather than the geometry, beats infinite generated stores.
+**Hand-author the levels.** Stealth depends on readable sightlines and learnable layouts. Procedural generation produces spaces that are legal but not interesting. Three hand-built locations, replayable because the _security_ changes rather than the geometry, beats infinite generated stores.
 
 **Detection must be recoverable.** Being seen should start a timer and a chase, not end the run. The loss condition is losing the take and burning the disguise.
 
