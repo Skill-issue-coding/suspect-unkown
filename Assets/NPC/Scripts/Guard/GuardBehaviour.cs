@@ -8,9 +8,8 @@ using UnityEngine.AI;
 // Reports presence to every POI it stands in. Alert state drives the 
 // activity each frame, so every reaction is interruptible; giving up is 
 // Idle, which patrols again.
-[RequireComponent(typeof(NavMeshAgent))]
-[RequireComponent(typeof(NpcSuspicion))]
-[RequireComponent(typeof(NpcPerception))]
+[RequireComponent(typeof(NavMeshAgent), typeof(NpcSuspicion))]
+[RequireComponent(typeof(NpcPerception), typeof(NpcAnomalySight))]
 public class GuardBehaviour : MonoBehaviour
 {
     // Below 0.25 m/s the guard keeps its facing: steering is noisy while starting and braking.
@@ -93,6 +92,7 @@ public class GuardBehaviour : MonoBehaviour
     private NpcSuspicion suspicion;
     private NpcPerception perception;
     private NpcHearing hearing;
+    private NpcAnomalySight anomalySight;
 
     private Vector3 glancePoint;
     private float glanceUntil = float.NegativeInfinity;
@@ -126,16 +126,30 @@ public class GuardBehaviour : MonoBehaviour
         suspicion = GetComponent<NpcSuspicion>();
         perception = GetComponent<NpcPerception>();
         hearing = GetComponent<NpcHearing>();
+        anomalySight = GetComponent<NpcAnomalySight>();
     }
 
-    private void OnEnable() { if (hearing != null) hearing.Heard += OnHeard; }
+    private void OnEnable()
+    {
+        if (hearing != null)
+            hearing.Heard += OnHeard;
+
+        if (anomalySight != null)
+            anomalySight.Noticed += OnNoticed;
+    }
 
     private void OnDisable()
     {
-        if (target != null) target.Release(this);
+        if (target != null)
+            target.Release(this);
+
         target = null;
 
-        if (hearing != null) hearing.Heard -= OnHeard;
+        if (hearing != null)
+            hearing.Heard -= OnHeard;
+
+        if (anomalySight != null)
+            anomalySight.Noticed -= OnNoticed;
     }
 
     private void Update()
@@ -234,9 +248,20 @@ public class GuardBehaviour : MonoBehaviour
                 nextChooseTime = gaveUp ? Time.time + giveUpPause : 0f;
                 if (gaveUp) agent.ResetPath();
                 break;
-            case GuardActivity.Watching: agent.ResetPath(); break;
-            case GuardActivity.Investigating: agent.speed = investigateSpeed; MoveTo(lastKnownPosition); break;
-            case GuardActivity.Pursuing: agent.speed = pursueSpeed; MoveTo(lastKnownPosition); break;
+
+            case GuardActivity.Watching:
+                agent.ResetPath();
+                break;
+
+            case GuardActivity.Investigating:
+                agent.speed = investigateSpeed;
+                if (hasLastKnown) MoveTo(lastKnownPosition);
+                break;
+
+            case GuardActivity.Pursuing:
+                agent.speed = pursueSpeed;
+                if (hasLastKnown) MoveTo(lastKnownPosition);
+                break;
         }
 
         ActivityChanged?.Invoke(from, next);
@@ -424,6 +449,23 @@ public class GuardBehaviour : MonoBehaviour
             || (noise.Position - lastKnownPosition).sqrMagnitude > repathDistance * repathDistance;
 
         lastKnownPosition = noise.Position;
+        hasLastKnown = true;
+
+        if (moved && (Activity == GuardActivity.Investigating || Activity == GuardActivity.Pursuing))
+            MoveTo(lastKnownPosition);
+    }
+
+    // A noticed anomaly becomes the last-known position while the player is out of sight, the same rule
+    // as an alarming sound. 2.4 turns arriving there into the confused look and the slam
+    private void OnNoticed(Anomaly anomaly)
+    {
+        if (!LostSight) return;
+
+        Vector3 point = anomaly.SightPoint;
+        bool moved = !hasLastKnown
+            || (point - lastKnownPosition).sqrMagnitude > repathDistance * repathDistance;
+
+        lastKnownPosition = point;
         hasLastKnown = true;
 
         if (moved && (Activity == GuardActivity.Investigating || Activity == GuardActivity.Pursuing))

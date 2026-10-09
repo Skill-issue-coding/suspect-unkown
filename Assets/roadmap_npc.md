@@ -250,7 +250,7 @@ An **anomaly** is a world object in a state that only the player causes: an open
 - NPCs check active anomalies on their perception tick, cheap to expensive like the player rays: range, then the cone, then one linecast to the anomaly's point. Noticing one raises an event; it does not go on the `Observation`, which is about the player (decision 14).
 - **Suspicion:** noticing sets a floor of `anomalySuspicion × kind weight`, per archetype, and makes the anomaly the stimulus and the guard's last-known position. Like sound, an anomaly alone never pushes past Investigating (decision 6).
 - **Resolution is an errand** (decision 20): one NPC of the right role claims the anomaly, walks to it, plays a reaction, and fixes it. The guard plays a confused animation and slams the open door shut; staff walk to the breaker and reset it. A claim works like a POI claim (decision 15), so two NPCs never fix the same thing.
-- **Witnesses:** being seen _causing_ an anomaly is conduct, a `ConductFlags` flag such as `OpeningDoor`. It feeds the Behaviour slot in M7, which is where the comedy lands: "they opened a door".
+- **Witnesses:** being seen _causing_ an anomaly is conduct. For doors that is the `Lockpicking` flag (decision 19), which feeds the Method slot in M7: "they picked a lock". An `OpeningDoor` flag for doors without a lock waits until a level needs one.
 
 **Why.** Only the robber opens doors or trips breakers, so these are the clearest evidence the game has, and they tell the player that their actions leave traces even when nobody saw them. One mechanism covers doors, the breaker, and later loot, instead of one special case each.
 
@@ -262,8 +262,11 @@ NPCs walk only in open areas and never use doors. A closed door is a wall to the
 - A guard who notices it plays a confused animation and slams it shut, which closes the path and clears the anomaly. The tone is comedic on purpose: the joke is the genre convention that only players open doors, made into a rule NPCs believe.
 - Doors are built with a `NavMeshObstacle` that carves while the door is closed. The door leaf is ignored by the NavMesh bake, or it would be baked in as a permanent wall.
 - The leaf is on `Occluder`, so a closed door also blocks sight and light.
+- **Locks have levels, 1 to 3, gated by skill.** All interactables are unlocked by buying skills, as in the Payday series. A lock above the player's Lockpicking level cannot be attempted at all; within it, a higher level is a harder minigame. Picks are unlimited and never break. A picked door stays unlocked for the heist.
+- **Lockpicking is a minigame in the style of Dying Light:** swing the pick to find a hidden sweet spot, apply tension to turn the lock, and force it at the wrong angle and the pick slips with a rattle. It is very suspicious when seen (the `Lockpicking` conduct flag, which every archetype weighs highly) and noisy when it goes wrong.
+- The guard never references `Door`: it resolves the door's **anomaly**, and the door slams itself in response. The same mechanism serves the breaker and staff errands.
 
-This replaces the earlier "jam a door" verb, which assumed NPCs walk through doors.
+This replaces the earlier "jam a door" verb, which assumed NPCs walk through doors. Full design and implementation steps: `Assets/doors-and-lockpicking.md`.
 
 ### 20. Verbs are abilities used at in-world devices
 
@@ -395,6 +398,7 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `NpcArchetype.cs`      | ScriptableObject        | Every tuning number for one archetype                                      | working (vision, light, hearing, suspicion) | M1, M2, M4, M7 |
 | `RegionWeights.cs`     | `[Serializable]` struct | Per-region attention weights for one observer (decision 13)                | working                                     | M1             |
 | `ConductWeights.cs`    | `[Serializable]` struct | Per-flag abnormality weights and the combine formula (decision 6)          | working                                     | M2             |
+| `AnomalyWeights.cs`    | `[Serializable]` struct | Per-kind anomaly weights for one observer (decision 18)                    | working                                     | M5             |
 | `NpcAlertState.cs`     | enum                    | Idle, Curious, Investigating, Alerted                                      | declared                                    | M2             |
 | `Observation.cs`       | struct                  | What a perceiver reports each tick it sees the player                      | working (M1, M2 fields)                     | M1, M2         |
 | `HeardNoise.cs`        | struct                  | A sound as one NPC heard it: position, loudness along the NavMesh, alarm   | working                                     | M4             |
@@ -411,7 +415,7 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `NpcSuspicion.cs`       | MonoBehaviour | Rise from strength × abnormality, delayed decay, alert states with hysteresis, skill multipliers | working | M2         |
 | `NpcHeadLook.cs`        | MonoBehaviour | Animation Rigging head and neck aim; executes `LookAt`/`ClearLook`, the role behaviour decides   | working | M3         |
 | `NpcHearing.cs`         | MonoBehaviour | `NoiseBus` subscriber, NavMesh path-length check, raises `Heard`; verdict readout and path gizmo | working | M4         |
-| `NpcAnomalySight.cs`    | MonoBehaviour | Checks active anomalies on the perception tick (range, cone, linecast); raises `Noticed`         | —       | M5         |
+| `NpcAnomalySight.cs`    | MonoBehaviour | Checks active anomalies on the perception tick (range, cone, linecast); raises `Noticed`         | working | M5         |
 
 ### NPC/Scripts/Guard/
 
@@ -436,12 +440,12 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 
 ### NPC/Scripts/UI/
 
-| File                           | Type          | Purpose                                                                                                          | Status  | Milestone |
-| ------------------------------ | ------------- | ---------------------------------------------------------------------------------------------------------------- | ------- | --------- |
-| `NpcSuspicionIndicator.cs`     | MonoBehaviour | World-space suspicion telegraph above the NPC: filling arc, state icon, arrow to last-known position             | working | M2        |
+| File                           | Type          | Purpose                                                                                                                                                 | Status  | Milestone |
+| ------------------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | --------- |
+| `NpcSuspicionIndicator.cs`     | MonoBehaviour | World-space suspicion telegraph above the NPC: filling arc, state icon, arrow to last-known position                                                    | working | M2        |
 | `NpcVisionCone.cs`             | MonoBehaviour | Player-facing cone drawn as light: static fan, rays written to `_RayData`, cut and softened in the shader, crouch-safe strip, alert color (decision 21) | working | M5        |
-| `OffscreenIndicatorHUD.cs`     | MonoBehaviour | Screen-space layer for edge indicators, one per scene; static `Instance`                                         | working | M2        |
-| `OffscreenIndicatorElement.cs` | MonoBehaviour | Draws one edge-of-screen indicator; placed by `NpcSuspicionIndicator`                                            | working | M2        |
+| `OffscreenIndicatorHUD.cs`     | MonoBehaviour | Screen-space layer for edge indicators, one per scene; static `Instance`                                                                                | working | M2        |
+| `OffscreenIndicatorElement.cs` | MonoBehaviour | Draws one edge-of-screen indicator; placed by `NpcSuspicionIndicator`                                                                                   | working | M2        |
 
 ### NPC/Scripts/Animation/ and Core/Animator/
 
@@ -481,8 +485,8 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `Volumes/ZoneType.cs`       | enum             | Public, Staff. Public first, so a forgotten zone is harmless                                                               | working | M2        |
 | `Volumes/Zone.cs`           | MonoBehaviour    | Trigger volume on the `Volume` layer, public or staff; several colliders make complex shapes. Zone id arrives with Phase 8 | working | M2        |
 | `Lighting/GameplayLight.cs` | MonoBehaviour    | Marks a Point or Spot light as one gameplay counts; static registry and unshadowed contribution at a point (decision 17)   | working | M4        |
-| `World/Anomaly.cs`          | MonoBehaviour    | World state only a robber causes; static registry, active flag, point to see, kind (decision 18)                           | —       | M5        |
-| `World/AnomalyKind.cs`      | enum             | OpenDoor, PowerOut. A kind is added only with its producer                                                                 | —       | M5        |
+| `World/Anomaly.cs`          | MonoBehaviour    | World state only a robber causes; static registry, active flag, point to see, kind (decision 18)                           | working | M5        |
+| `World/AnomalyKind.cs`      | enum             | OpenDoor; PowerOut joins with the breaker. A kind is added only with its producer                                          | working | M5        |
 | `World/Door.cs`             | MonoBehaviour    | Player-only door: carves the NavMesh while closed, raises an anomaly while open, can be slammed shut (decision 19)         | —       | M5        |
 | `World/Breaker.cs`          | MonoBehaviour    | Switches a set of lamps; an anomaly while tripped; reset by staff                                                          | —       | M5        |
 | `World/Device.cs`           | MonoBehaviour    | In-world object an ability is used at; names its `Ability`, exposes `Activate()`, raises `Activated` (decision 20)         | —       | M5        |
@@ -497,7 +501,7 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `Perception/PerceptionTargets.cs`     | MonoBehaviour  | Every body point, flat and by region. Fixed after `Awake`                                                   | working  | M1        |
 | `Perception/CharacterAppearance.cs`   | struct         | Placeholder for the player's feature vector. Shape to agree at the art and systems seam                     | declared | M7        |
 | `Editor/MapPlayerPerceptionPoints.cs` | static class   | Adds `PerceptionPoint` to the 17 bone colliders in `Player.prefab` by bone name                             | working  | M1        |
-| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea; `OpeningDoor` joins in M5. Powers of two; a flag is added only with its producer    | working  | M2, M5    |
+| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea; `Lockpicking` joins in M5. Powers of two; a flag is added only with its producer    | working  | M2, M5    |
 | `Perception/PlayerConduct.cs`         | MonoBehaviour  | What the player is doing right now, including the staff-area flag from zone triggers, counted per zone      | working  | M2        |
 | `Perception/PlayerLighting.cs`        | MonoBehaviour  | Light level at the player, sampled from every `GameplayLight` on a tick with shadow rays (decision 17)      | working  | M4        |
 | `Abilities/PlayerAbilities.cs`        | MonoBehaviour  | Remaining uses per owned ability for this heist; checks and spends a charge, then calls `Device.Activate()` | —        | M5        |
@@ -639,7 +643,12 @@ Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no 
 
 1. [x] **Vision cone overlay** (decision 21). `NpcVisionCone`: eye-height ray fan cut by walls, crouch-safe shading behind low cover, color by alert state, matching the archetype's range and angle. Readable without the debug view. Built in two passes: first a mesh cut per frame, then reworked so the mesh is static and the shader cuts it from a ray texture, which removed the per-frame mesh work and gave soft, straight edges. Passed on the test bench; corner flicker remains as a known issue in decision 21.
    - [x] **CPU pass.** Profiled with 8 guards in the editor, using the `NpcVisionCone.Rays` and `NpcVisionCone.Upload` profiler markers, which stay in the code. Baseline: 0.91 ms per frame for all 8 cones (0.86 ms rays, of which 0.4 ms was the script's own work rather than physics; 0.03 ms texture upload). Two changes: cones off screen cast no rays (`isVisible`), and ray directions are built once in `Start` and rotated by one quaternion per frame, instead of `Quaternion.Euler` and `TransformDirection` per ray. Result: 0.45–0.50 ms (rays 0.30–0.45 ms, upload 0.01–0.02 ms), roughly half. Batching the rays with `RaycastCommand` was not needed; revisit only if a full level with real NPC counts shows otherwise.
-2. [ ] **Anomalies and doors** (decisions 18, 19). `Anomaly` and `AnomalyKind` in Core, `NpcAnomalySight` on NPCs, and the archetype gains anomaly suspicion and per-kind weights. A player-only `Door` that carves the NavMesh while closed and is an anomaly while open. A guard who notices an open door claims it, walks over, plays a confused animation, and slams it shut. `OpeningDoor` conduct when the player is seen opening one.
+2. [ ] **Anomalies and doors** (decisions 18, 19). Full design and steps for 2.3–2.5 in `Assets/doors-and-lockpicking.md`.
+   - [x] 2.1 `Anomaly` and `AnomalyKind` in Core: a registry of raised anomalies only, so the usual case (nothing wrong) costs NPCs nothing.
+   - [x] 2.2 `NpcAnomalySight` on NPCs checks raised anomalies on the perception tick through `NpcPerception.InViewCone`. The archetype gains anomaly suspicion and per-kind weights (`AnomalyWeights`); a noticed anomaly sets a suspicion floor and becomes the stimulus and the guard's last-known position. The guard only moves to a position it actually knows.
+   - [ ] 2.3 A player-only `Door` with a lock level, reach, interaction, and the lockpicking minigame.
+   - [ ] 2.4 The guard's errand: claim the open door, walk over, look confused, slam it.
+   - [ ] 2.5 `Lockpicking` conduct when the player is seen picking a lock.
 3. [ ] **Breaker** (decisions 17, 18). Trips a set of lamps: `f_light` drops for everyone looking into the zone, and the tripped breaker is an anomaly. Staff notice the dark, walk to the breaker, and reset it. Breaker lamps must be Mixed or Realtime.
 4. [ ] **Abilities at devices** (decision 20). `Ability` and `Device` in Core, `PlayerAbilities` on the player with uses per heist, and the errand mechanism on the guard. One ability that acts on the guard, chosen from the ideas list, proves it end to end.
        Optional abilities, built after the first one proves the system. Each is a device plus an errand (decision 20):
@@ -804,3 +813,4 @@ Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no 
 - **2026-10-08** — Fix: a watching guard turned to face a quiet player through walls, because every footstep heard while alert moved the last-known position. Now only alarming sounds move it, in both `GuardBehaviour.OnHeard` and `NpcSuspicion.LastStimulus`; ordinary footsteps still earn a glance.
 - **2026-10-09** — M5 step 1 done: the vision cone (decision 21 rewritten as built). Static fan built once; the CPU writes wall, cover-start and shadow-end distances per ray into `_RayData`; the shader cuts, blends between rays, softens edges over a width in metres, dims the crouch-safe strip, and fades by the archetype's distance and angle curves. Corner flicker recorded as a known issue with its planned fix. CPU pass (profile, skip off-screen cones, batch rays) added under step 1.
 - **2026-10-09** — Vision cone CPU pass done: profiler markers added, off-screen cones skip their rays, and ray directions are cached. 8 cones went from 0.91 ms to 0.45–0.50 ms per frame in the editor. `RaycastCommand` batching not needed for now.
+- **2026-10-09** — M5 steps 2.1 and 2.2 done (anomalies, anomaly sight, the guard walking to a noticed anomaly). Doors redesigned: locks have levels 1–3 gated by a Lockpicking skill, opened through a Dying Light style minigame with unlimited picks; being seen picking is the new `Lockpicking` conduct flag (replacing `OpeningDoor`). Decision 19 extended. Steps 2.3–2.5 written up for implementation in `Assets/doors-and-lockpicking.md`.

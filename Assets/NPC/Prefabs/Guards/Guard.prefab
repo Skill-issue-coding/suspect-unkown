@@ -2286,6 +2286,7 @@ GameObject:
   - component: {fileID: 1867975804306738566}
   - component: {fileID: 509245131827645603}
   - component: {fileID: 2366553931734634579}
+  - component: {fileID: 8786211797238540667}
   m_Layer: 15
   m_Name: Guard
   m_TagString: NPC
@@ -2375,7 +2376,7 @@ MonoBehaviour:
     x: 10
     y: 10
     width: 220
-    height: 420
+    height: 480
 --- !u!114 &7572797309826588232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2489,6 +2490,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 253b3cb39911844929b5e240f6b92939, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcHearing
+--- !u!114 &8786211797238540667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6720325424012129814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16cf9062fd5088e41a9fe9c08cbca3c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcAnomalySight
+  occluderMask:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!1 &7060616932561885397
 GameObject:
   m_ObjectHideFlags: 0

@@ -74,6 +74,9 @@ MonoBehaviour:
   tickRate: 3
   hearingSensitivity: 0.4
   hearingSuspicion: 0.4
+  anomalySuspicion: 0.2
+  anomalyWeights:
+    openDoor: 0.2
   conductWeights:
     sprinting: 0.1
     inStaffArea: 0.1

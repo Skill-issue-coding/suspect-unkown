@@ -12,6 +12,7 @@ public class NpcSuspicion : MonoBehaviour
 {
     private NpcPerception perception;
     private NpcHearing hearing;
+    private NpcAnomalySight anomalySight;
 
     public float Suspicion { get; private set; }
     public NpcAlertState State { get; private set; }
@@ -50,10 +51,26 @@ public class NpcSuspicion : MonoBehaviour
     {
         perception = GetComponent<NpcPerception>();
         hearing = GetComponent<NpcHearing>();
+        anomalySight = GetComponent<NpcAnomalySight>();
     }
 
-    private void OnEnable() { if (hearing != null) hearing.Heard += OnHeard; }
-    private void OnDisable() { if (hearing != null) hearing.Heard -= OnHeard; }
+    private void OnEnable()
+    {
+        if (hearing != null)
+            hearing.Heard += OnHeard;
+
+        if (anomalySight != null)
+            anomalySight.Noticed += OnNoticed;
+    }
+
+    private void OnDisable()
+    {
+        if (hearing != null)
+            hearing.Heard -= OnHeard;
+
+        if (anomalySight != null)
+            anomalySight.Noticed -= OnNoticed;
+    }
 
     private void Start()
     {
@@ -129,6 +146,25 @@ public class NpcSuspicion : MonoBehaviour
 
         Suspicion = floor;
         lastAbnormalTime = Time.time;
+        UpdateState();
+    }
+
+    // An anomaly sets a floor like a sound does, so seeing one for many ticks doesn't stack. Noticed
+    // repeats every tick it is in view, which keeps resetting the decay delay: an open door in view
+    // keeps the NPC on edge until someone deals with it
+    private void OnNoticed(Anomaly anomaly)
+    {
+        if (!perception.TryGetLatest(out _))
+        {
+            LastStimulus = anomaly.SightPoint;
+            HasStimulus = true;
+        }
+
+        float floor = perception.Archetype.AnomalySuspicion * perception.Archetype.AnomalyWeight(anomaly.Kind) * riseMultiplier;
+        lastAbnormalTime = Time.time;
+        if (floor <= Suspicion) return;
+
+        Suspicion = floor;
         UpdateState();
     }
 }

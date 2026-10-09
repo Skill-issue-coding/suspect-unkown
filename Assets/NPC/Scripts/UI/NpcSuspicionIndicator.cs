@@ -29,11 +29,17 @@ public class NpcSuspicionIndicator : MonoBehaviour
     [SerializeField] private float fadeSpeed = 4f;
 
     [Header("Offscreen")]
-    [Tooltip("Pixels between the edge indicator and the screen border.")]
+    [Tooltip("Pixels between the edge indicator and the screen border")]
     [SerializeField] private float edgeMargin = 60f;
-    [Tooltip("Viewport fraction inside the screen edge where the world indicator hands over to the edge one.")]
+
+    [Tooltip("How fast the edge arrow fades in and out as the NPC gains or loses sight of the player, per second")]
+    [SerializeField] private float arrowFadeSpeed = 6f;
+
+    [Tooltip("Viewport fraction inside the screen edge where the world indicator hands over to the edge one")]
     [SerializeField] private float onScreenInset = 0.02f;
 
+    private NpcPerception perception;
+    private float arrowAlpha;
     private NpcSuspicion suspicion;
     private CanvasGroup group;
     private Camera mainCamera;
@@ -56,6 +62,8 @@ public class NpcSuspicionIndicator : MonoBehaviour
             enabled = false;
             return;
         }
+
+        perception = GetComponentInParent<NpcPerception>();
 
         if (fill == null || icon == null)
         {
@@ -115,7 +123,9 @@ public class NpcSuspicionIndicator : MonoBehaviour
         bool visible = displayedFill > 0.001f || suspicion.State != NpcAlertState.Idle;
         group.alpha = Mathf.MoveTowards(group.alpha, visible ? 1f : 0f, fadeSpeed * Time.deltaTime);
 
-        // Last, because it reads this frame's alpha and fill.
+        bool seesPlayer = perception != null && perception.TryGetLatest(out _);
+        arrowAlpha = Mathf.MoveTowards(arrowAlpha, seesPlayer ? 1f : 0f, arrowFadeSpeed * Time.deltaTime);
+
         UpdateOffscreen();
     }
 
@@ -182,7 +192,7 @@ public class NpcSuspicionIndicator : MonoBehaviour
 
         if (onScreen)
         {
-            offscreen.Place(Vector2.zero, 0f, displayedFill, 0f);
+            offscreen.Place(Vector2.zero, 0f, displayedFill, 0f, arrowAlpha);
             return;
         }
 
@@ -196,6 +206,6 @@ public class NpcSuspicionIndicator : MonoBehaviour
         Vector2 edge = center + direction * scale;
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        offscreen.Place(edge, angle, displayedFill, group.alpha);
+        offscreen.Place(edge, angle, displayedFill, group.alpha, arrowAlpha);
     }
 }

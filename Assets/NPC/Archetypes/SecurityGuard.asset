@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1f479f0caeb42399171ea0310394d8, type: 3}
   m_Name: SecurityGuard
   m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
-  viewDistance: 8
+  viewDistance: 15
   fovDegrees: 110
   eyeHeight: 1.7
   distanceFalloff:
@@ -91,7 +91,10 @@ MonoBehaviour:
     feet: 0.6
   tickRate: 10
   hearingSensitivity: 3
-  hearingSuspicion: 0.7
+  hearingSuspicion: 0.5
+  anomalySuspicion: 0.6
+  anomalyWeights:
+    openDoor: 1
   conductWeights:
     sprinting: 0.6
     inStaffArea: 0.8

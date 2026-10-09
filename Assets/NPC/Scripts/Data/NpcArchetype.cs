@@ -42,6 +42,13 @@ public class NpcArchetype : ScriptableObject
     [SerializeField, Range(0f, 1f), Tooltip("Suspicion added by a sound at full loudness and alarm 1")]
     private float hearingSuspicion = 0.5f;
 
+    [Header("Anomalies")]
+    [SerializeField, Range(0f, 1f), Tooltip("Suspicion floor set by noticing an anomaly of weight 1. Keep below alertedAt: an anomaly alone never alerts")]
+    private float anomalySuspicion = 0.6f;
+
+    [SerializeField, Tooltip("How much each kind of anomaly worries this observer")]
+    private AnomalyWeights anomalyWeights = new AnomalyWeights(1f);
+
     [Header("Suspicion")]
     [SerializeField, Tooltip("How abnormal each act looks to this observer")]
     private ConductWeights conductWeights = new ConductWeights(0.6f, 0.8f);
@@ -83,6 +90,8 @@ public class NpcArchetype : ScriptableObject
     public float Hysteresis => hysteresis;
     public float HearingSensitivity => hearingSensitivity;
     public float HearingSuspicion => hearingSuspicion;
+    public float AnomalySuspicion => anomalySuspicion;
+    public float AnomalyWeight(AnomalyKind kind) => anomalyWeights.Get(kind);
 
     // Light level 0 is darkness, 1 full light. Shadow lowers visibility but never to zero:
     // a figure in the dark is harder to see, not invisible.
@@ -114,5 +123,11 @@ public class NpcArchetype : ScriptableObject
 
         if (hysteresis >= curiousAt)
             Debug.LogWarning($"{name} hysteresis value greater (or equal) than curiousAt value, can never calm back to Idle", this);
+
+        if (hearingSuspicion >= alertedAt)
+            Debug.LogWarning($"{name} hearingSuspicion reaches alertedAt: a sound alone could alert", this);
+
+        if (anomalySuspicion >= alertedAt)
+            Debug.LogWarning($"{name} anomalySuspicion reaches alertedAt: an anomaly alone could alert", this);
     }
 }

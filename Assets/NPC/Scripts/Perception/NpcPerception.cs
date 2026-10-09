@@ -108,6 +108,20 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         }
     }
 
+    // Range, then the flattened FOV angle: the cone test every sight check shares. Flattened because
+    // targets sit low (the player's root is at the feet) and the eye sits high
+    public bool InViewCone(Vector3 point, out float angle)
+    {
+        angle = 0f;
+        Vector3 toPoint = point - EyePosition;
+        if (toPoint.sqrMagnitude > archetype.ViewDistance * archetype.ViewDistance) return false;
+
+        Vector3 flatToPoint = new Vector3(toPoint.x, 0f, toPoint.z);
+        Vector3 flatForward = new Vector3(transform.forward.x, 0f, transform.forward.z);
+        angle = Vector3.Angle(flatForward, flatToPoint);
+        return angle <= archetype.FovDegrees * 0.5f;
+    }
+
     private bool TryPerceive(out Observation observation)
     {
         observation = default;
@@ -118,15 +132,7 @@ public class NpcPerception : MonoBehaviour, IPerceiver
 
         Vector3 toPlayer = targets.transform.position - EyePosition;
 
-        if (toPlayer.sqrMagnitude > archetype.ViewDistance * archetype.ViewDistance)
-            return false;
-
-        Vector3 flatToPlayer = new Vector3(toPlayer.x, 0f, toPlayer.z);
-        Vector3 flatForward = new Vector3(transform.forward.x, 0f, transform.forward.z);
-
-        float angle = Vector3.Angle(flatForward, flatToPlayer);
-
-        if (angle > archetype.FovDegrees * 0.5f)
+        if (!InViewCone(targets.transform.position, out float angle))
             return false;
 
         Vector3 eye = EyePosition;

@@ -24,11 +24,12 @@ public class NpcPerceptionDebug : MonoBehaviour
 
     [Header("Readout")]
     [SerializeField] private bool readouts = true;
-    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 420f);
+    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 480f);
 
     private NpcPerception perception;
     private NpcSuspicion suspicion;
     private NpcHearing hearing;
+    private NpcAnomalySight anomalySight;
 
     private void OnDrawGizmosSelected()
     {
@@ -144,6 +145,7 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label($"state       {suspicion.State}");
         }
 
+#if UNITY_EDITOR
         if (hearing != null && Time.time - hearing.DebugTime < 3f)
         {
             string result = hearing.DebugVerdict == NpcHearing.Verdict.Heard
@@ -151,6 +153,10 @@ public class NpcPerceptionDebug : MonoBehaviour
                 : $"{hearing.DebugVerdict}  {hearing.DebugPathLength:F1} / {hearing.DebugReach:F1} m";
             GUILayout.Label($"sound  {result}");
         }
+
+        if (anomalySight != null && Time.time - anomalySight.DebugTime < 1f && anomalySight.DebugLastNoticed != null)
+            GUILayout.Label($"anomaly {anomalySight.DebugLastNoticed.Kind}");
+#endif
 
         if (suspicion != null && suspicion.HasStimulus)
             GUILayout.Label($"stimulus {Vector3.Distance(transform.position, suspicion.LastStimulus):F1} m away");
@@ -168,6 +174,9 @@ public class NpcPerceptionDebug : MonoBehaviour
 
         if (hearing == null)
             hearing = GetComponent<NpcHearing>();
+
+        if (anomalySight == null)
+            anomalySight = GetComponent<NpcAnomalySight>();
 
         return perception != null && perception.Archetype != null;
     }

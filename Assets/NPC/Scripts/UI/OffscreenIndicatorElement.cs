@@ -29,12 +29,14 @@ public class OffscreenIndicatorElement : MonoBehaviour
     }
 
     // angle is in maths convention: 0 points right, counter-clockwise positive. The arc sprite's tip
-    // points up (90), hence the offset. On an Overlay canvas, position is in screen pixels.
-    public void Place(Vector2 screenPosition, float angle, float fill, float alpha)
+    // points up (90), hence the offset. On an Overlay canvas, position is in screen pixels. arrowAlpha
+    // fades only the arrow, so the symbol can stay while the arrow goes
+    public void Place(Vector2 screenPosition, float angle, float fill, float alpha, float arrowAlpha)
     {
         rect.position = screenPosition;
         arrowPivot.localRotation = Quaternion.Euler(0f, 0f, angle - 90f);
         arrow.fillAmount = fill;
+        arrow.canvasRenderer.SetAlpha(arrowAlpha);
         group.alpha = alpha;
     }
 }
