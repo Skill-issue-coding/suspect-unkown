@@ -1304,6 +1304,7 @@ GameObject:
   - component: {fileID: 2539254286474842390}
   - component: {fileID: 1876262237866924067}
   - component: {fileID: 8681365460147532909}
+  - component: {fileID: 45324365434288496}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -1566,6 +1567,76 @@ MonoBehaviour:
   darkColor: {r: 0.1, g: 0.1, b: 0.4, a: 1}
   brightColor: {r: 1, g: 0.9, b: 0.3, a: 1}
   gizmoRadius: 0.2
+--- !u!114 &45324365434288496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22c745107bd21a0459e8360b27bb53df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterCustomizer
+  categories:
+  - categoryName: Head
+    parts:
+    - {fileID: 3273375717555293162}
+    - {fileID: 8196549091592551060}
+    - {fileID: 6639365870445531369}
+    - {fileID: 312862864295282821}
+    - {fileID: 7109871809149595497}
+    - {fileID: 6507559243233533594}
+    - {fileID: 403732178492782425}
+    - {fileID: 6822290129753530997}
+    - {fileID: 5819854702495564824}
+    - {fileID: 3047265441423509134}
+    - {fileID: 3640042274143040308}
+    - {fileID: 4503804082187226112}
+    - {fileID: 5887224983536251070}
+    - {fileID: 1386813031399317714}
+    - {fileID: 3075637283743086782}
+    - {fileID: 2690188302767654243}
+    - {fileID: 5251952884048509928}
+    currentIndex: 0
+  - categoryName: Chest
+    parts:
+    - {fileID: 5119136648458483493}
+    - {fileID: 5562237068078796514}
+    - {fileID: 837491060587052477}
+    - {fileID: 2962996025773781041}
+    - {fileID: 4113757685342839871}
+    - {fileID: 6902579720932704680}
+    - {fileID: 4919115595713992988}
+    - {fileID: 8708470515547480762}
+    - {fileID: 1272384720626206105}
+    currentIndex: 3
+  - categoryName: Legs
+    parts:
+    - {fileID: 1971967266315921835}
+    - {fileID: 3351602820252841851}
+    - {fileID: 609160616014663374}
+    - {fileID: 4353938506903498649}
+    currentIndex: 0
+  - categoryName: Feet
+    parts:
+    - {fileID: 6057946697602048677}
+    - {fileID: 7746374414228900601}
+    - {fileID: 8839044932341586734}
+    - {fileID: 2500761082595416654}
+    - {fileID: 4022952850368295326}
+    - {fileID: 3253504942707768151}
+    - {fileID: 2887162584393644427}
+    - {fileID: 5533120902970756495}
+    - {fileID: 4234715743807288348}
+    - {fileID: 4816693681558842083}
+    - {fileID: 2380527019954109708}
+    - {fileID: 1495546535423314}
+    - {fileID: 7464319428722304387}
+    - {fileID: 8410740807676206003}
+    - {fileID: 7094010648574860125}
+    currentIndex: 5
 --- !u!1 &1386813031399317714
 GameObject:
   m_ObjectHideFlags: 0
