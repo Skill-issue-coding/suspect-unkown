@@ -5,7 +5,8 @@ using System.Collections.Generic;
 // Draws what NpcPerception already found; never casts a ray of its own, so what you tune is what
 // the NPC used. Cone and rays show when the NPC is selected. Ray colors update at the perception
 // tick rate while their endpoints follow the player every frame, so a lag of one tick is expected.
-// Grey rays are points in regions the archetype ignores; no ray was cast.
+// Grey rays are points in regions the archetype ignores; no ray was cast. In the editor the readout
+// shows only for the selected NPC (or a child of it), so a room of NPCs doesn't draw on top of itself.
 [RequireComponent(typeof(NpcPerception))]
 public class NpcPerceptionDebug : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class NpcPerceptionDebug : MonoBehaviour
     private NpcSuspicion suspicion;
     private NpcHearing hearing;
     private NpcAnomalySight anomalySight;
+    private NpcWitness witness;
 
     private void OnDrawGizmosSelected()
     {
@@ -103,6 +105,9 @@ public class NpcPerceptionDebug : MonoBehaviour
     private void OnGUI()
     {
         if (!readouts || !TryGetSuspicionAndPerception()) return;
+#if UNITY_EDITOR
+        if (!IsSelected()) return;
+#endif
 
         GUILayout.BeginArea(readoutRect, GUI.skin.box);
         GUILayout.Label(name);
@@ -158,11 +163,23 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label($"anomaly {anomalySight.DebugLastNoticed.Kind}");
 #endif
 
+        if (witness != null)
+            GUILayout.Label($"witness  {witness.Exposure:F1} s  (seen {witness.SeenTime:F1} s, best {witness.BestQuality:F2})");
+
         if (suspicion != null && suspicion.HasStimulus)
             GUILayout.Label($"stimulus {Vector3.Distance(transform.position, suspicion.LastStimulus):F1} m away");
 
         GUILayout.EndArea();
     }
+
+#if UNITY_EDITOR
+    // Selecting the NPC's mesh or indicator counts too, since clicking it in the scene often picks a child
+    private bool IsSelected()
+    {
+        Transform selected = UnityEditor.Selection.activeTransform;
+        return selected != null && selected.IsChildOf(transform);
+    }
+#endif
 
     private bool TryGetSuspicionAndPerception()
     {
@@ -177,6 +194,9 @@ public class NpcPerceptionDebug : MonoBehaviour
 
         if (anomalySight == null)
             anomalySight = GetComponent<NpcAnomalySight>();
+
+        if (witness == null)
+            witness = GetComponent<NpcWitness>();
 
         return perception != null && perception.Archetype != null;
     }

@@ -525,6 +525,7 @@ MonoBehaviour:
   turnSmoothTime: 0.12
   fadeSpeed: 4
   edgeMargin: 60
+  arrowFadeSpeed: 6
   onScreenInset: 0.02
 --- !u!1 &819685089077814339
 GameObject:
@@ -2280,6 +2281,7 @@ GameObject:
   - component: {fileID: 283849134012785004}
   - component: {fileID: 8812113050130535251}
   - component: {fileID: 7572797309826588232}
+  - component: {fileID: 7567304483632521139}
   - component: {fileID: 4974712375049285301}
   - component: {fileID: 1194697038773332964}
   - component: {fileID: 8890725952143270588}
@@ -2287,6 +2289,7 @@ GameObject:
   - component: {fileID: 509245131827645603}
   - component: {fileID: 2366553931734634579}
   - component: {fileID: 8786211797238540667}
+  - component: {fileID: 7929661741115065216}
   m_Layer: 15
   m_Name: Guard
   m_TagString: NPC
@@ -2303,7 +2306,7 @@ Transform:
   m_GameObject: {fileID: 6720325424012129814}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.0000012516974, z: -0, w: -1}
-  m_LocalPosition: {x: 2.4999993, y: 0, z: -2.5000002}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2389,6 +2392,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4be932d1e9107416d882e7f9915e38d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcSuspicion
+--- !u!114 &7567304483632521139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6720325424012129814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8961d993ebde56440a4077ace8173868, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcFacing
+  turnSpeed: 240
+  turnSmoothTime: 0.2
 --- !u!114 &4974712375049285301
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2406,8 +2423,6 @@ MonoBehaviour:
   fullCoverage: 0.95
   maxDwellTime: 10
   retryInterval: 0.5
-  turnSpeed: 240
-  turnSmoothTime: 0.2
   investigateSpeed: 1.68
   pursueSpeed: 3.38
   repathDistance: 0.75
@@ -2505,6 +2520,18 @@ MonoBehaviour:
   occluderMask:
     serializedVersion: 2
     m_Bits: 1024
+--- !u!114 &7929661741115065216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6720325424012129814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cc06995a9084030bf6b7fd5b014282, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcWitness
 --- !u!1 &7060616932561885397
 GameObject:
   m_ObjectHideFlags: 0

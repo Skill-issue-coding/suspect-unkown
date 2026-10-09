@@ -1,6 +1,10 @@
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
+// Turns an NPC's head and neck toward a point through Animation Rigging aim constraints, so it can
+// glance at something without turning its body. Executes only: the role behaviour decides what to
+// look at with LookAt and ClearLook. Beyond maxAngle the look fades out and the body turn takes over.
+// Runs in LateUpdate so it follows the animated pose. Any NPC with a rig can use it.
 public class NpcHeadLook : MonoBehaviour
 {
     [SerializeField] private MultiAimConstraint headAim;

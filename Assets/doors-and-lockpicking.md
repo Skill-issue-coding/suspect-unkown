@@ -420,12 +420,12 @@ public void Resolve();                   // raises Resolved; the owner does the 
 | ------------------------------ | ----------- |
 | SecurityGuard                  | 1.0         |
 | CivilianRole.Manager           | 1.0         |
-| TiredClerk                     | 0.9         |
-| Civilian                       | 0.8         |
-| CivilianRole.DistractedShopper | 0.5         |
+| TiredClerk                     | 1.0         |
+| Civilian                       | 1.0         |
+| CivilianRole.DistractedShopper | 1.0         |
 | SecurityCamera                 | 1.0         |
 
-At abnormality 1 and full strength, the guard's rise rate of 0.5 per second takes it from calm to Investigating in about one second and to Alerted in under two. At a distance, in shadow, or partly hidden, `Strength` is lower and it takes longer, which is the stealth.
+Every archetype shares the rise rate of 0.5 (decision 22), so a civilian reacts to lockpicking exactly as fast as a guard at the same visibility. At abnormality 1 and full strength, that rate takes it from calm to Investigating in about one second and to Alerted in under two. At a distance, in shadow, or partly hidden, `Strength` is lower and it takes longer, which is the stealth.
 
 - **Witness (M7):** `Lockpicking` maps to the **Method** slot ("picked a lock"). Nothing to build now; note it in M7.
 
@@ -434,7 +434,7 @@ At abnormality 1 and full strength, the guard's rise rate of 0.5 per second take
 1. Pick a lock in a guard's view: the readout shows `conduct Lockpicking`, suspicion climbs fast, and the guard reaches Investigating within about a second at close range.
 2. Pick in its view but in deep shadow and crouched: noticeably slower.
 3. Stop picking: the flag clears, and suspicion decays after the delay.
-4. A distracted shopper watching: suspicion rises, but slowly.
+4. A customer watching from the same spot as a guard: suspicion rises just as fast. A distracted shopper reacts only if you are inside its small cone.
 
 ---
 
@@ -457,4 +457,4 @@ In `CLAUDE.md`: if a new physics layer is added, add it to the layer table. This
 - **Does the guard who slams the door look through it first?** Decided for now: no, only the confused beat and the slam. Revisit if playtests find it too forgiving.
 - **Controller feel.** The stick speed and the sweet spot sizes need tuning on a gamepad, not only with a mouse.
 - **The skill tree.** Phase 7 decides how Lockpicking levels are bought and saved. `PlayerSkills` is the only thing that changes when it arrives.
-- **Staff and open doors.** The clerk and the manager already care (step 2.2 weights). Their errand to close a door arrives with civilians in M6, using the same claim and `Resolve()`.
+- **Staff and open doors.** The tired clerk notices open doors but is not suspicious of them: it shuts them as a chore. The manager investigates and shuts them. Both errands arrive with civilians in M6 (step 3), using the same claim and `Resolve()` as the guard (decision 22).

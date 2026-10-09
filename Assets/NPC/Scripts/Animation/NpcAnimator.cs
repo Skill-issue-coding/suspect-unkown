@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.AI;
 
-// Poses an NPC from its NavMeshAgent. The agent owns position and GuardBehaviour owns rotation, so the
+// Poses an NPC from its NavMeshAgent. The agent owns position and NpcFacing owns rotation, so the
 // Animator is visual only and root motion stays off. Speed is in metres per second, matching the
-// thresholds NpcLocomotionBuilder measured from the clips. Shared by guards and, from M6, civilians.
+// thresholds the locomotion builder measured from the clips. TurnRate is read in LateUpdate, after
+// NpcFacing has turned the body this frame. Shared by guards and, from M6, civilians.
 [RequireComponent(typeof(NavMeshAgent))]
 public class NpcAnimator : MonoBehaviour
 {

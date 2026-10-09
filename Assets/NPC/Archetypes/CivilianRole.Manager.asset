@@ -78,8 +78,8 @@ MonoBehaviour:
   anomalyWeights:
     openDoor: 1
   conductWeights:
-    sprinting: 0.4
-    inStaffArea: 0.9
+    sprinting: 0.3
+    inStaffArea: 0.6
   riseRate: 0.35
   decayRate: 0.15
   decayDelay: 1.5

@@ -283,6 +283,12 @@ Ability ideas kept so far. The common thread is everyday, relatable annoyance pl
 
 When an NPC's suspicion crosses the threshold, a decision tree resolves what they do. Trees are the right tool: explainable, hand-tunable, and easy to justify alongside the route model since they solve a different problem.
 
+#### Civilians witness first
+
+Civilians are in the store for their own reasons: customers shop, the tired clerk works the register, the manager runs the place. They are not watching for thieves, so their main role is as **witnesses**: a civilian who can see you is remembering you, even while completely calm.
+
+Their suspicion rises only on clearly criminal acts: picking a lock (as fast as a guard would notice it), taking loot, smashing glass, a visible tool, or tampering with a device such as a router or a desk phone. Ordinary oddness barely registers: sprinting past a customer takes several seconds of full view before they even look up, and customers ignore an open door. Roles still differ: the tired clerk, almost fixed at the register, shuts an open door as a chore without a second thought, while the manager, halfway between a customer and a guard, investigates it. Civilians have no vision cones; their suspicion indicator is the signal. See decision 22 in `roadmap_npc.md`.
+
 #### Inputs
 
 Personality alone reads as random because the player cannot see it. Branch primarily on things the player influences or can observe:

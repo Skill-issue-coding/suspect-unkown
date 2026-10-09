@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1f479f0caeb42399171ea0310394d8, type: 3}
   m_Name: Civilian
   m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
-  viewDistance: 12
+  viewDistance: 10
   fovDegrees: 120
   eyeHeight: 1.65
   distanceFalloff:
@@ -85,10 +85,10 @@ MonoBehaviour:
   hearingSuspicion: 0.5
   anomalySuspicion: 0.3
   anomalyWeights:
-    openDoor: 0.5
+    openDoor: 0
   conductWeights:
-    sprinting: 0.3
-    inStaffArea: 0.2
+    sprinting: 0.1
+    inStaffArea: 0.1
   riseRate: 0.3
   decayRate: 0.2
   decayDelay: 1

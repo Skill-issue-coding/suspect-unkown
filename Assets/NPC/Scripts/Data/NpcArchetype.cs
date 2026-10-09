@@ -2,8 +2,10 @@ using System;
 using UnityEngine;
 
 // Tuning numbers for one kind of observer: guard, civilian, clerk, or camera. One block per
-// milestone (Vision now; Suspicion, Hearing, Witness later). Shared by every NPC using the asset,
-// so never write runtime state into it, and never branch on which archetype it is.
+// milestone: vision and light (M1, M4), suspicion (M2), hearing (M4), anomalies (M5); the witness
+// block arrives in M7. Every archetype shares the guard's rise rate, so a conduct weight means the
+// same thing for every observer (decision 22). Shared by every NPC using the asset, so never write
+// runtime state into it, and never branch on which archetype it is.
 [CreateAssetMenu(fileName = "NpcArchetype", menuName = "Suspect Unknown/NPC Archetype")]
 public class NpcArchetype : ScriptableObject
 {

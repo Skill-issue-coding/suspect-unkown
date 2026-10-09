@@ -1,5 +1,8 @@
 using UnityEngine;
 
+// Moves the player through the CharacterController: walk, sprint and crouch speeds with acceleration,
+// jumping with coyote time, and gravity. Owns IsSprinting, which NPCs read as conduct (decision 3:
+// sprinting is a speed, not a stance). Reads this frame's stance, since PlayerStance runs first.
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerStance))]
 [RequireComponent(typeof(PlayerInputs))]

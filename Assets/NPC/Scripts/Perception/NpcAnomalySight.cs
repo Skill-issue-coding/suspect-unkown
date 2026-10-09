@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Finds the raised anomalies this NPC can see, on its perception tick (decision 18): the shared cone
+// test, then one linecast to each anomaly's sight point. Stateless like NpcPerception: Noticed fires
+// on every tick an anomaly is in view, and consumers decide what it means (suspicion, an errand).
+// Only raised anomalies are registered, so while nothing is wrong this costs nothing.
 [RequireComponent(typeof(NpcPerception))]
 public class NpcAnomalySight : MonoBehaviour
 {
@@ -49,13 +53,13 @@ public class NpcAnomalySight : MonoBehaviour
         IReadOnlyList<Anomaly> raised = Anomaly.Raised;
         if (raised.Count == 0) return;
 
-        NpcArchetype archetype = perception.Archetype;
         Vector3 eye = perception.EyePosition;
 
+        // Every raised anomaly is checked, whatever its weight: weight 0 means "not suspicious", not
+        // "not noticed" (the tired clerk shuts open doors without suspicion, decision 18)
         for (int i = raised.Count - 1; i >= 0; i--)
         {
             Anomaly anomaly = raised[i];
-            if (archetype.AnomalyWeight(anomaly.Kind) <= 0f) continue;
             Vector3 point = anomaly.SightPoint;
             if (!perception.InViewCone(point, out _)) continue;
             if (Physics.Linecast(eye, point, occluderMask, QueryTriggerInteraction.Ignore)) continue;

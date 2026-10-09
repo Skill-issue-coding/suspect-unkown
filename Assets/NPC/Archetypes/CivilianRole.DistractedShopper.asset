@@ -76,7 +76,7 @@ MonoBehaviour:
   hearingSuspicion: 0.4
   anomalySuspicion: 0.2
   anomalyWeights:
-    openDoor: 0.2
+    openDoor: 0
   conductWeights:
     sprinting: 0.1
     inStaffArea: 0.1

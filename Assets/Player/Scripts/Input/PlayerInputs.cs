@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+// The player's input as plain values other scripts read, filled by PlayerInput's Send Messages
+// (OnMove, OnAim, …). The only place input arrives: never read devices or the legacy Input class
+// elsewhere. Input is ignored while the window is unfocused.
 [RequireComponent(typeof(PlayerInput))]
 public class PlayerInputs : MonoBehaviour
 {

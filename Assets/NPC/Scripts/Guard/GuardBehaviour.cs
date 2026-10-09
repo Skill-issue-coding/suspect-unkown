@@ -7,14 +7,13 @@ using UnityEngine.AI;
 // discounted by path length, walk there, dwell until covered, repeat. 
 // Reports presence to every POI it stands in. Alert state drives the 
 // activity each frame, so every reaction is interruptible; giving up is 
-// Idle, which patrols again.
+// Idle, which patrols again. Asks NpcFacing for a facing; never turns 
+// the body itself
 [RequireComponent(typeof(NavMeshAgent), typeof(NpcSuspicion))]
 [RequireComponent(typeof(NpcPerception), typeof(NpcAnomalySight))]
+[RequireComponent(typeof(NpcFacing))]
 public class GuardBehaviour : MonoBehaviour
 {
-    // Below 0.25 m/s the guard keeps its facing: steering is noisy while starting and braking.
-    private const float MinFacingSpeedSqr = 0.25f * 0.25f;
-
     [Header("Patrol")]
     [SerializeField, Tooltip("Metres per second while serving points of interest")]
     private float patrolSpeed = 1.5f;
@@ -32,12 +31,6 @@ public class GuardBehaviour : MonoBehaviour
     private float retryInterval = 0.5f;
 
     [Header("Alert")]
-    [SerializeField, Tooltip("Maximum degrees per second the guard turns")]
-    private float turnSpeed = 240f;
-
-    [SerializeField, Range(0f, 2f), Tooltip("Seconds to catch up with a new facing. Higher is lazier")]
-    private float turnSmoothTime = 0.2f;
-
     [SerializeField, Tooltip("Metres per second while walking to the last-known position")]
     private float investigateSpeed = 2.5f;
 
@@ -89,6 +82,7 @@ public class GuardBehaviour : MonoBehaviour
     private float dwellTimer;
     private float nextChooseTime;
 
+    private NpcFacing facing;
     private NpcSuspicion suspicion;
     private NpcPerception perception;
     private NpcHearing hearing;
@@ -101,9 +95,6 @@ public class GuardBehaviour : MonoBehaviour
     private bool hasLastKnown;
     private Vector3 lastKnownPosition;
 
-    private float desiredYaw;
-    private bool hasDesiredYaw;
-    private float yawVelocity;
     private float searchBaseYaw;
 
     private float searchTimer;
@@ -117,7 +108,6 @@ public class GuardBehaviour : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         path = new NavMeshPath();
-        agent.updateRotation = false;
 
         // Guards start in Patrolling without an activity change, so its speed is set here once;
         // SetActivity sets it on every later return to patrol.
@@ -127,6 +117,7 @@ public class GuardBehaviour : MonoBehaviour
         perception = GetComponent<NpcPerception>();
         hearing = GetComponent<NpcHearing>();
         anomalySight = GetComponent<NpcAnomalySight>();
+        facing = GetComponent<NpcFacing>();
     }
 
     private void OnEnable()
@@ -169,32 +160,6 @@ public class GuardBehaviour : MonoBehaviour
         }
 
         UpdateHead();
-        UpdateRotation();
-    }
-
-    private void LookAt(Vector3 point) => LookDirection(point - transform.position);
-
-    private void LookDirection(Vector3 direction)
-    {
-        direction.y = 0f;
-        if (direction.sqrMagnitude < 0.0001f) return;
-
-        desiredYaw = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
-        hasDesiredYaw = true;
-    }
-
-    private void UpdateRotation()
-    {
-        if (!hasDesiredYaw && agent.desiredVelocity.sqrMagnitude > MinFacingSpeedSqr)
-            LookDirection(agent.desiredVelocity);
-
-        if (hasDesiredYaw)
-        {
-            float yaw = Mathf.SmoothDampAngle(transform.eulerAngles.y, desiredYaw, ref yawVelocity, turnSmoothTime, turnSpeed);
-            transform.rotation = Quaternion.Euler(0f, yaw, 0f);
-        }
-
-        hasDesiredYaw = false;
     }
 
     private static GuardActivity ActivityFor(NpcAlertState state) => state switch
@@ -281,13 +246,13 @@ public class GuardBehaviour : MonoBehaviour
                 poi.Occupy();
     }
 
-    private void UpdateWatching() { if (hasLastKnown) LookAt(lastKnownPosition); }
+    private void UpdateWatching() { if (hasLastKnown) facing.LookAt(lastKnownPosition); }
 
     private void UpdateInvestigating()
     {
         if (!arrived)
         {
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            if (agent.HasArrived())
             {
                 arrived = true;
                 searchBaseYaw = transform.eulerAngles.y;
@@ -302,8 +267,7 @@ public class GuardBehaviour : MonoBehaviour
     private void Search()
     {
         searchTimer += Time.deltaTime;
-        desiredYaw = searchBaseYaw + Mathf.Sin(searchTimer * searchSweepSpeed) * searchSweepAngle;
-        hasDesiredYaw = true;
+        facing.FaceYaw(searchBaseYaw + Mathf.Sin(searchTimer * searchSweepSpeed) * searchSweepAngle);
     }
 
     private void UpdatePursuing()
@@ -347,7 +311,7 @@ public class GuardBehaviour : MonoBehaviour
 
         if (!arrived)
         {
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            if (agent.HasArrived())
             {
                 arrived = true;
                 dwellTimer = 0f;
@@ -356,7 +320,7 @@ public class GuardBehaviour : MonoBehaviour
         }
 
         dwellTimer += Time.deltaTime;
-        LookDirection(target.transform.forward);
+        facing.LookDirection(target.transform.forward);
 
         bool dwelledEnough = dwellTimer >= target.DwellTime;
         bool covered = target.Coverage >= fullCoverage;

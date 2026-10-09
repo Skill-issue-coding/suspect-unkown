@@ -94,10 +94,10 @@ MonoBehaviour:
   hearingSuspicion: 0.4
   anomalySuspicion: 0.4
   anomalyWeights:
-    openDoor: 0.8
+    openDoor: 0
   conductWeights:
-    sprinting: 0.2
-    inStaffArea: 0.6
+    sprinting: 0.1
+    inStaffArea: 0.25
   riseRate: 0.2
   decayRate: 0.3
   decayDelay: 0.5

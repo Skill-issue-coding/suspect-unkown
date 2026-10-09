@@ -154,13 +154,18 @@ public class NpcSuspicion : MonoBehaviour
     // keeps the NPC on edge until someone deals with it
     private void OnNoticed(Anomaly anomaly)
     {
+        // Weight 0: noticed but not suspicious. No stimulus and no decay reset, or a customer near an
+        // open door would stay on edge forever; what the NPC does about it is its role's business
+        float weight = perception.Archetype.AnomalyWeight(anomaly.Kind);
+        if (weight <= 0f) return;
+
         if (!perception.TryGetLatest(out _))
         {
             LastStimulus = anomaly.SightPoint;
             HasStimulus = true;
         }
 
-        float floor = perception.Archetype.AnomalySuspicion * perception.Archetype.AnomalyWeight(anomaly.Kind) * riseMultiplier;
+        float floor = perception.Archetype.AnomalySuspicion * weight * riseMultiplier;
         lastAbnormalTime = Time.time;
         if (floor <= Suspicion) return;
 

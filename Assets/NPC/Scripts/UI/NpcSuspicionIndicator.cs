@@ -7,9 +7,10 @@ using UnityEngine.UI;
 // room shows nothing. Icon and color follow AlertStateChanged; the fill
 // follows Suspicion every frame. Billboards by copying the fixed camera's
 // rotation. The arrow rolls in the screen plane toward the NPC's last stimulus 
-// (NpcSuspicion.LastStimulus): what it last saw or heard, never the live player, 
-// never the live player, so it does not leak where the player really is. 
-// Off screen, an OffscreenIndicatorElement on the HUD takes over at the screen edge.
+// (NpcSuspicion.LastStimulus): what it last saw, heard or noticed, never the live
+// player, so it does not leak where the player really is. Off screen, an
+// OffscreenIndicatorElement on the HUD takes over at the screen edge: the symbol
+// always, the arrow only while the NPC sees the player.
 [RequireComponent(typeof(CanvasGroup))]
 public class NpcSuspicionIndicator : MonoBehaviour
 {

@@ -247,9 +247,11 @@ It stays explainable for the course: the level is a sum of named terms, and the 
 An **anomaly** is a world object in a state that only the player causes: an open door, a tripped breaker, later an emptied display case. NPCs notice anomalies the way they notice the player, and react to the world instead of only to the player's body.
 
 - `Anomaly` (Core) is a passive component with a static registry, like `GameplayLight`. It exposes whether it is active, the point an NPC must see, and its kind (`AnomalyKind`). The object that owns it (a `Door`, a `Breaker`) switches it on and off.
-- NPCs check active anomalies on their perception tick, cheap to expensive like the player rays: range, then the cone, then one linecast to the anomaly's point. Noticing one raises an event; it does not go on the `Observation`, which is about the player (decision 14).
+- NPCs check every raised anomaly on their perception tick, cheap to expensive like the player rays: the cone, then one linecast to the anomaly's point. Noticing one raises an event; it does not go on the `Observation`, which is about the player (decision 14).
+- **Noticing and suspicion are separate.** Every NPC notices raised anomalies; how suspicious one makes it is the archetype's kind weight. A weight of 0 means "notices, but is not suspicious": the tired clerk sees an open door and shuts it as a chore without growing suspicious. Do not skip weight-0 kinds in the sight check; the list of raised anomalies is almost always empty, so checking all of them costs nothing.
 - **Suspicion:** noticing sets a floor of `anomalySuspicion × kind weight`, per archetype, and makes the anomaly the stimulus and the guard's last-known position. Like sound, an anomaly alone never pushes past Investigating (decision 6).
-- **Resolution is an errand** (decision 20): one NPC of the right role claims the anomaly, walks to it, plays a reaction, and fixes it. The guard plays a confused animation and slams the open door shut; staff walk to the breaker and reset it. A claim works like a POI claim (decision 15), so two NPCs never fix the same thing.
+- **What an NPC does about an anomaly is its role's business** (decision 1). Open doors: the guard slams them; the manager investigates and shuts them; the tired clerk shuts them as a chore; customers ignore them.
+- **Resolution is an errand** (decision 20): one NPC of the right role claims the anomaly, walks to it, plays a reaction, and fixes it through `Resolve()`. A claim works like a POI claim (decision 15), so two NPCs never fix the same thing.
 - **Witnesses:** being seen _causing_ an anomaly is conduct. For doors that is the `Lockpicking` flag (decision 19), which feeds the Method slot in M7: "they picked a lock". An `OpeningDoor` flag for doors without a lock waits until a level needs one.
 
 **Why.** Only the robber opens doors or trips breakers, so these are the clearest evidence the game has, and they tell the player that their actions leave traces even when nobody saw them. One mechanism covers doors, the breaker, and later loot, instead of one special case each.
@@ -284,6 +286,8 @@ Abilities that act on civilians (disable the internet, so shoppers go and compla
 
 The vision cone is a player-facing gameplay element, not a debug view: a glowing cone on the floor, like a torch beam, colored by alert state. The player reads danger from it at a glance.
 
+- **Guards and cameras only.** Civilians have no cone; their suspicion indicator is enough, and a room of customers with cones would be unreadable (decision 22).
+
 - **The mesh is a static fan, built once** at full range from the archetype's range and FOV. **Cutting happens in the shader** (`NPC/Shaders/VisionCone.shadergraph` with a Custom Function in `VisionCone.hlsl`). Each frame the CPU casts the rays and writes one pixel per ray into a small float texture, `_RayData`: R is the wall distance, G where low cover starts, B where its shadow ends, all as fractions of range. A is free, reserved for the corner refinement in the known issue below. No mesh is rebuilt per frame.
 - **Walls:** rays at eye height against `Occluder`. The shader blends the two nearest rays, so slanted wall faces read as straight lines, and fades over a width in metres (`edgeSoftness`, about a body's width) by averaging samples on both sides. The fade is centred on the wall line, so the cone shows neither less nor much more than the guard sees. Partial visibility near corners is real in perception too (some body points blocked, some not).
 - **Low cover is shown, not hidden.** An eye-height ray passes over a counter, but a crouched player behind it is hidden. A second ray at crouched-head height finds the cover's front, a short ray down finds its top, and similar triangles give where its shadow ends: `e = s × (eye − crouchHead) / (eye − coverTop)`. The shader dims that strip (`_SafeDim`) instead of cutting it out. Using the cover's front edge is conservative: the strip can be shorter than the truly safe area, never longer. The strip blends between rays only where both see cover; next to open floor it uses the nearer ray, or it would smear into a sliver.
@@ -293,6 +297,20 @@ The vision cone is a player-facing gameplay element, not a debug view: a glowing
 - It updates in `LateUpdate`, after the NPC has turned. Measure the cost before lowering the update rate or the ray count; lowering the update rate makes walls wobble while the guard turns.
 - **CPU:** a cone off screen casts no rays. `isVisible` comes from last frame's culling, so a cone entering the screen shows last frame's walls for one frame, at the edge. Ray directions are built once in `Start` and shared with the fan, so the drawn cone and the cast rays never disagree; range and FOV are therefore fixed after `Start` and changes need a restart. In the editor the Scene view counts as a camera, so close it when profiling.
 - **Known issue: corners flicker** while the guard turns or walks. The rays are fixed to the cone and sweep across the world; at a corner, neighbouring rays disagree sharply and the blended wedge changes shape as a ray passes the corner. Planned fix: where two neighbouring rays differ by more than a threshold, binary-search the exact corner angle with a few extra rays and store it in A, and have the shader step exactly there. A few extra raycasts per corner.
+
+### 22. Civilians witness; they rarely alarm
+
+Civilians are in the store for their own reasons: customers shop, the tired clerk works the register, the manager runs the place. They are not watching for thieves. Their importance to the player is **what they remember**, not how alarmed they get.
+
+- **Perception runs all the time and feeds the witness.** A calm civilian who can see the player is collecting evidence. This is concept 6.8's inversion, "calm witnesses are the dangerous ones", and it depends on decision 7 keeping evidence and suspicion apart.
+- **Suspicion only rises on clearly criminal acts,** and only the decision window at Alerted turns it into a reaction (call, flee, freeze…). Criminal acts, each added as a conduct flag together with what produces it: lockpicking (M5), taking loot, smashing glass, a visible tool, and using a device that is not a door (a router, a car alarm, a desk phone). A mask would be suspicious if masks are ever added.
+- **Ordinary oddness barely registers.** Sprinting in front of a customer takes about 5 seconds of full view to make them Curious. Open doors do not make customers suspicious at all.
+- **One rise rate for everyone.** Every archetype uses the guard's rise rate of 0.5, so a conduct weight means the same thing for every observer (weight × 0.5 is suspicion per second at full visibility). That is how lockpicking is exactly as fast for a civilian as for a guard, and it keeps the numbers explainable for the report. Civilians still notice less in practice, because they see less far and fade faster with distance.
+- **Roles differ in data and in what they do** (decisions 1 and 18): customers ignore open doors; the tired clerk, almost fixed at the register, shuts them as a chore without suspicion; the manager, a middle step between a civilian and a guard, investigates and shuts them.
+- **The alert ladder means less for civilians:** Curious is a glance while carrying on; Investigating is stopping to look; Alerted opens the decision window.
+- **No vision cones** (decision 21). The suspicion indicator is enough.
+- **Hearing stays as tuned in M4:** a nearby sprint gives a small floor but never Curious; a lockpick slip next to a customer makes them Curious.
+- **A thin slice of the witness model comes with civilians** (M6 step 2): `NpcWitness` accumulates exposure, how long and how well each NPC has seen the player, with a debug readout. Without it, "which civilian is dangerous" cannot be tested. Feature slots, confusion matrices and the report stay in M7.
 
 ---
 
@@ -365,18 +383,29 @@ Vision block starting values. Region weights are head / upper body / hands / low
 
 The guard's hand weight is high because tool use is conduct guards read. The camera's feet weight is low because a ceiling camera sees headwear well and footwear badly. Lower tick rates for civilians make them slower to notice and cheaper to run.
 
-Suspicion block starting values. Conduct weights are sprinting / in staff area.
+Suspicion block values. Conduct weights are sprinting / in staff area; `lockpicking` joins with M5 step 2.5 at 1.0 for every archetype. **Every archetype shares the guard's rise rate of 0.5** (decision 22), so a weight means the same thing everywhere: weight × 0.5 is suspicion per second at full visibility.
 
-| Archetype         | Conduct   | Rise   | Decay  | Delay  | Curious | Investigating | Alerted | Hysteresis |
-| ----------------- | --------- | ------ | ------ | ------ | ------- | ------------- | ------- | ---------- |
-| SecurityGuard     | 0.6 / 0.8 | 0.5    | 0.1    | 2.0    | 0.2     | 0.5           | 0.9     | 0.05       |
-| Civilian          | 0.3 / 0.2 | 0.3    | 0.2    | 1.0    | 0.25    | 0.55          | 0.9     | 0.05       |
-| TiredClerk        | 0.2 / 0.6 | 0.2    | 0.3    | 0.5    | 0.3     | 0.6           | 0.9     | 0.05       |
-| Manager           | 0.4 / 0.9 | 0.35   | 0.15   | 1.5    | 0.2     | 0.5           | 0.9     | 0.08       |
-| DistractedShopper | 0.1 / 0.1 | 0.15   | 0.4    | 0.5    | 0.3     | 0.6           | 0.95    | 0.03       |
-| SecurityCamera    | 0.5 / 0.8 | unused | unused | unused | unused  | unused        | unused  | unused     |
+| Archetype         | Conduct    | Rise   | Decay  | Delay  | Curious | Investigating | Alerted | Hysteresis |
+| ----------------- | ---------- | ------ | ------ | ------ | ------- | ------------- | ------- | ---------- |
+| SecurityGuard     | 0.6 / 0.8  | 0.5    | 0.1    | 2.0    | 0.2     | 0.5           | 0.9     | 0.05       |
+| Civilian          | 0.1 / 0.1  | 0.5    | 0.2    | 1.0    | 0.25    | 0.55          | 0.9     | 0.05       |
+| TiredClerk        | 0.1 / 0.25 | 0.5    | 0.3    | 0.5    | 0.3     | 0.6           | 0.9     | 0.05       |
+| Manager           | 0.3 / 0.6  | 0.5    | 0.15   | 1.5    | 0.2     | 0.5           | 0.9     | 0.08       |
+| DistractedShopper | 0.1 / 0.1  | 0.5    | 0.4    | 0.5    | 0.3     | 0.6           | 0.95    | 0.03       |
+| SecurityCamera    | 0.5 / 0.8  | unused | unused | unused | unused  | unused        | unused  | unused     |
 
-The clerk barely notices running but is staff, so a stranger in the back room stands out. The manager cares most about the staff area. The camera has no `NpcSuspicion` (decision 11), so only its conduct weights matter: they define what the guard at the monitor reads through the feed. Its other suspicion values copy the guard's so the asset stays valid.
+Anomaly block values (decision 18). The floor a noticed open door sets is `anomalySuspicion × openDoor`; weight 0 means the NPC still notices the door but is not suspicious of it.
+
+| Archetype         | anomalySuspicion | openDoor | Floor | What it does about an open door   |
+| ----------------- | ---------------- | -------- | ----- | --------------------------------- |
+| SecurityGuard     | 0.6              | 1.0      | 0.6   | Investigates, slams it            |
+| Manager           | 0.55             | 1.0      | 0.55  | Investigates, shuts it            |
+| TiredClerk        | 0.4              | 0        | 0     | Shuts it as a chore               |
+| Civilian          | 0.3              | 0        | 0     | Ignores it                        |
+| DistractedShopper | 0.2              | 0        | 0     | Ignores it                        |
+| SecurityCamera    | 0.6              | 1.0      | 0.6   | What the monitor guard reads (M8) |
+
+Civilians barely react to running (about 5 seconds of sprinting right in front of a customer before they are Curious) and react to lockpicking exactly as fast as a guard at the same visibility. The clerk is staff, so a stranger in the back room stands out a little. The manager sits between a civilian and a guard. The camera has no `NpcSuspicion` (decision 11), so only its conduct weights matter: they define what the guard at the monitor reads through the feed. Its other suspicion values copy the guard's so the asset stays valid.
 
 Hearing and light block values, as tuned in M4. Sensitivity multiplies how far a sound carries to this NPC (decision 10); hearing suspicion is the floor a sound at full loudness and alarm 1 sets. Dark factor is `fLight` in full darkness (decision 17). The last two columns use the formula in the M4 notes: a sprint is radius 9, alarm 0.3; a "crash" is a reference loud sound of radius 12 and alarm 1, such as a noisy ability effect or panic (M6). Nothing publishes one yet.
 
@@ -429,14 +458,16 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 
 ### NPC/Scripts/Civilian/
 
-| File                   | Type             | Purpose                                                           | Status   | Milestone |
-| ---------------------- | ---------------- | ----------------------------------------------------------------- | -------- | --------- |
-| `CivilianBehaviour.cs` | MonoBehaviour    | Idle routine, decision window, executing the outcome              | stub     | M6        |
-| `CivilianActivity.cs`  | enum             | Roaming, Working, Deliberating, the reactions, PretendingNotToSee | declared | M6        |
-| `CivilianRole.cs`      | enum             | Customer, Employee, Manager                                       | declared | M6        |
-| `ReactionTree.cs`      | ScriptableObject | Root of a decision tree                                           | stub     | M6        |
-| `ReactionNode.cs`      | ScriptableObject | Becomes abstract, with branch and leaf subclasses                 | stub     | M6        |
-| `PanicContagion.cs`    | MonoBehaviour    | Spreads panic with distance falloff and a depth cap               | stub     | M6        |
+| File                   | Type             | Purpose                                                                        | Status   | Milestone |
+| ---------------------- | ---------------- | ------------------------------------------------------------------------------ | -------- | --------- |
+| `CivilianBehaviour.cs` | MonoBehaviour    | Idle routine, decision window, executing the outcome                           | working (idle routine) | M6        |
+| `CivilianRandomOutfit.cs` | MonoBehaviour  | Picks a random outfit for the civilian's role at spawn; cosmetic only | working  | M6        |
+| `CivilianSpot.cs`      | MonoBehaviour    | A place where civilians of one role browse or work; static registry and claims | working        | M6        |
+| `CivilianActivity.cs`  | enum             | Roaming, Working, Deliberating, the reactions, PretendingNotToSee              | declared | M6        |
+| `CivilianRole.cs`      | enum             | Customer, Employee, Manager                                                    | declared | M6        |
+| `ReactionTree.cs`      | ScriptableObject | Root of a decision tree                                                        | stub     | M6        |
+| `ReactionNode.cs`      | ScriptableObject | Becomes abstract, with branch and leaf subclasses                              | stub     | M6        |
+| `PanicContagion.cs`    | MonoBehaviour    | Spreads panic with distance falloff and a depth cap                            | stub     | M6        |
 
 ### NPC/Scripts/UI/
 
@@ -449,11 +480,13 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 
 ### NPC/Scripts/Animation/ and Core/Animator/
 
-| File                                   | Type          | Purpose                                                                            | Status  | Milestone |
-| -------------------------------------- | ------------- | ---------------------------------------------------------------------------------- | ------- | --------- |
-| `Animation/NpcAnimator.cs`             | MonoBehaviour | Feeds `Speed` (agent velocity) and `TurnRate` (yaw change) to every NPC's animator | working | M3        |
-| `Core/Animator/NpcAnimatorParams.cs`   | static class  | Parameter names every NPC shares: `Speed`, `TurnRate`                              | working | M3        |
-| `Core/Animator/GuardAnimatorParams.cs` | static class  | Guard-only parameters and variant counts                                           | working | M3        |
+| File                                   | Type          | Purpose                                                                                              | Status  | Milestone |
+| -------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------- | ------- | --------- |
+| `Animation/NpcAnimator.cs`             | MonoBehaviour | Feeds `Speed` (agent velocity) and `TurnRate` (yaw change) to every NPC's animator                   | working | M3        |
+| `Animation/NpcFacing.cs`               | MonoBehaviour | Turns the body toward a requested facing, else the walking direction; shared by guards and civilians | working       | M6        |
+| `Animation/NavMeshAgentExtensions.cs`  | static class  | `HasArrived()`: the one arrival check every NPC behaviour uses                     | working | M6        |
+| `Core/Animator/NpcAnimatorParams.cs`   | static class  | Parameter names every NPC shares: `Speed`, `TurnRate`                                                | working | M3        |
+| `Core/Animator/GuardAnimatorParams.cs` | static class  | Guard-only parameters and variant counts                                                             | working | M3        |
 
 ### NPC/Scripts/Editor/ and Core/Editor/ (animator builders)
 
@@ -468,12 +501,12 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 
 ### NPC/Scripts/Witness/
 
-| File                 | Type             | Purpose                                                             | Status   | Milestone |
-| -------------------- | ---------------- | ------------------------------------------------------------------- | -------- | --------- |
-| `NpcWitness.cs`      | MonoBehaviour    | Turns observations into beliefs; owns `f_duration` and memory decay | stub     | M7        |
-| `FeatureBelief.cs`   | class            | Log-odds belief over one feature slot                               | declared | M7        |
-| `WitnessReport.cs`   | class            | One witness's statement at job end                                  | declared | M7        |
-| `ConfusionMatrix.cs` | ScriptableObject | Wrong-value table for one feature slot                              | stub     | M7        |
+| File                 | Type             | Purpose                                                                            | Status   | Milestone |
+| -------------------- | ---------------- | ---------------------------------------------------------------------------------- | -------- | --------- |
+| `NpcWitness.cs`      | MonoBehaviour    | Exposure in M6 (time seen × quality); beliefs, `f_duration` and memory decay in M7 | working (exposure, check pending) | M6, M7    |
+| `FeatureBelief.cs`   | class            | Log-odds belief over one feature slot                                              | declared | M7        |
+| `WitnessReport.cs`   | class            | One witness's statement at job end                                                 | declared | M7        |
+| `ConfusionMatrix.cs` | ScriptableObject | Wrong-value table for one feature slot                                             | stub     | M7        |
 
 ### Core/Scripts/
 
@@ -513,8 +546,8 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 
 | Prefab   | Components                                                                                                                                                                                                                                                       |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Guard    | `NpcPerception`, `NpcPerceptionDebug`, `NpcSuspicion`, `NpcHeadLook`, `GuardBehaviour`, `GuardAnimation`, `NpcAnimator`, `NpcHearing`, `NavMeshAgent`; the model has an Animator and a `RigBuilder` with head and neck aim constraints. `NpcWitness` joins in M7 |
-| Civilian | `NpcPerception`, `NpcSuspicion`, `NpcHearing`, `NpcWitness`, `CivilianBehaviour`, `NavMeshAgent`                                                                                                                                                                 |
+| Guard    | `NpcPerception`, `NpcPerceptionDebug`, `NpcSuspicion`, `NpcHeadLook`, `GuardBehaviour`, `GuardAnimation`, `NpcAnimator`, `NpcHearing`, `NpcAnomalySight`, `NpcFacing`, `NpcWitness`, `NavMeshAgent`; the model has an Animator and a `RigBuilder` with head and neck aim constraints |
+| Civilian | `NpcPerception`, `NpcPerceptionDebug`, `NpcSuspicion`, `NpcHearing`, `NpcAnomalySight`, `NpcFacing`, `NpcWitness`, `CivilianBehaviour`, `CivilianRandomOutfit`, `NavMeshAgent`, the suspicion indicator; no vision cone (decision 22)                                                                                                                                                                 |
 | Clerk    | Same as Civilian with the `TiredClerk` archetype and no patrol                                                                                                                                                                                                   |
 | Camera   | `NpcPerception`, `NpcWitness` — nothing else                                                                                                                                                                                                                     |
 | Monitor  | `SecurityMonitor`, linked to cameras; a guard is posted at it                                                                                                                                                                                                    |
@@ -665,8 +698,18 @@ Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no 
 
 ### M6 — Civilians (Phase 5)
 
+**Started before the M5 gate, deliberately (2026-10-09).** M5 is not finished: doors (2.3–2.5, written up in `Assets/doors-and-lockpicking.md`), the breaker, abilities, vault pursuit and the near-miss pass remain, and the Phase 4 gate has not been played. Civilians are built in parallel so both team members have independent work. The gate still applies: if the loop turns out flat when M5 is done, fixing it comes before finishing M6.
+
+Civilians follow decision 22: they witness all the time and alarm only on criminal acts.
+
+1. [x] **A civilian that exists.** Body rotation moves out of `GuardBehaviour` into a shared `NpcFacing`. `CivilianSpot` marks where civilians browse or work (not POIs: those are security coverage for Phase 8). `CivilianBehaviour` runs the idle routine: pick a free spot for the role, walk there, stay, repeat. The tired clerk has one register spot with a long dwell. Until the decision window exists, Curious means a glance while carrying on and Investigating or above means stopping to look. The prefab has the shared perception components and no vision cone. Customers get a random outfit for their role (`CivilianRandomOutfit`), so staff read as staff. Passed on the test bench.
+2. [ ] **Witness slice.** `NpcWitness` accumulates exposure per NPC from each `Observation`: time seen, weighted by observation quality. A debug readout per civilian. M7 builds the full model on top. Built on 2026-10-09 (`NpcWitness` on guards and civilians, readout line in `NpcPerceptionDebug`); the play-mode check is still to run.
+3. [ ] **Door chores.** The tired clerk shuts open doors without suspicion; the manager investigates and shuts them. Same claim and `Resolve()` as the guard (decision 18, `Assets/doors-and-lockpicking.md`).
+
+Then the reactions:
+
 - `ReactionTree` and `ReactionNode` as ScriptableObjects, with `ReactionNode` split into branch and leaf subclasses, so archetypes are data rather than code.
-- Tree inputs from concept 6.8, in priority order: **severity** (from the conduct reading in decision 6), role, whether they think the player saw them, social proof, distance to the player and to an exit, and personality only as a tiebreaker.
+- Tree inputs from concept 6.8, in priority order: **severity** (from the conduct reading in decision 6; the criminal acts in decision 22), role, whether they think the player saw them, social proof, distance to the player and to an exit, and personality only as a tiebreaker.
 - Coarse branching in the tree, weighted scores at the leaves, then sample softly instead of taking the top result.
 - The decision window as the `Deliberating` state: a pending reaction, a timer, an indicator showing which way the civilian is leaning, and body language (reaching for a phone, backing away, freezing) as the primary signal.
 - Three outcomes first — call, flee, walk away — and one player counter-action during the window. `PretendingNotToSee` and the rest follow.
@@ -814,3 +857,7 @@ Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no 
 - **2026-10-09** — M5 step 1 done: the vision cone (decision 21 rewritten as built). Static fan built once; the CPU writes wall, cover-start and shadow-end distances per ray into `_RayData`; the shader cuts, blends between rays, softens edges over a width in metres, dims the crouch-safe strip, and fades by the archetype's distance and angle curves. Corner flicker recorded as a known issue with its planned fix. CPU pass (profile, skip off-screen cones, batch rays) added under step 1.
 - **2026-10-09** — Vision cone CPU pass done: profiler markers added, off-screen cones skip their rays, and ray directions are cached. 8 cones went from 0.91 ms to 0.45–0.50 ms per frame in the editor. `RaycastCommand` batching not needed for now.
 - **2026-10-09** — M5 steps 2.1 and 2.2 done (anomalies, anomaly sight, the guard walking to a noticed anomaly). Doors redesigned: locks have levels 1–3 gated by a Lockpicking skill, opened through a Dying Light style minigame with unlimited picks; being seen picking is the new `Lockpicking` conduct flag (replacing `OpeningDoor`). Decision 19 extended. Steps 2.3–2.5 written up for implementation in `Assets/doors-and-lockpicking.md`.
+- **2026-10-09** — M6 started in parallel with the rest of M5, recorded as a deliberate exception to the Phase 4 gate order.
+- **2026-10-09** — Civilians designed (decision 22): they witness all the time and alarm only on criminal acts. Every archetype shares the guard's rise rate of 0.5; civilian sprint weights 0.1, lockpicking 1.0 everywhere. Decision 18: noticing an anomaly is separate from being suspicious of it, and roles decide what to do (clerk shuts doors as a chore, manager investigates). Decision 21: cones for guards and cameras only. M6 gains three first steps: a civilian that exists (`NpcFacing`, `CivilianSpot`), a thin witness slice (exposure), and door chores.
+- **2026-10-09** — M6 step 1 done: `NpcFacing` extracted from `GuardBehaviour` and shared, `CivilianSpot`, `CivilianBehaviour` idle routine with the placeholder reaction, `HasArrived()` shared by guard and civilians, and `CivilianRandomOutfit` picking a role outfit per civilian.
+- **2026-10-09** — M6 step 2 built: `NpcWitness` counts exposure (seconds of a perfect view) per perception tick from the observation's strength, on guards and civilians, with a readout line. Play-mode check pending. Work paused at M6 step 3 (door chores), which waits for Marcus's doors.

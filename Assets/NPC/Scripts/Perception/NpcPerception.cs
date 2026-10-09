@@ -5,11 +5,11 @@ using System.Collections.Generic;
 // Answers "what can I see right now, and how well" once per tick, and accumulates nothing.
 // Alarm is NpcSuspicion, memory and f_duration are NpcWitness (M7). Checks run cheap to
 // expensive and bail at the first failure: range, then flattened FOV angle, then one linecast 
-// per body point in each attended region. Visibility is the weighted fraction of regions with 
-// a clear line, which is the partial detection Phase 2 asks for. Quality factors stay separate 
-// so the debug readout can print each one. Visibility is the weighted average of region fractions.
-// Conduct is read at tick time and judged by this NPC's archetype.
-// "Light is read from PlayerLighting, not sampled here: it is the player's property, computed once.
+// per body point in each attended region. Visibility is the weighted average of region fractions,
+// which is the partial detection Phase 2 asks for. Quality factors stay separate so the debug
+// readout can print each one. Conduct is read at tick time and judged by this NPC's archetype.
+// Light is read from PlayerLighting, not sampled here: it is the player's property, computed once.
+// InViewCone is the one cone test every sight check shares (player, anomalies, later cameras).
 public class NpcPerception : MonoBehaviour, IPerceiver
 {
     private static readonly BodyRegion[] Regions = (BodyRegion[])Enum.GetValues(typeof(BodyRegion));
