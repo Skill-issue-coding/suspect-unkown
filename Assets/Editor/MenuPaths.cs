@@ -20,8 +20,12 @@ public static class MenuPaths
 
     public const string GuardRebuildLocomotion = Npc + "Guard/" + "Rebuild Locomotion";
 
+    public const string MainMenu = Root + "Main Menu/";
+    public const string MainMenuBuildConcept = MainMenu + "Build Concept Scene";
+
     // Priorities: blocks of 100 so there is always a separator between groups
     public const int WindowsPriority = 0;
     public const int PlayerPriority = 100;
     public const int NpcPriority = 200;
+    public const int MainMenuPriority = 300;
 }
