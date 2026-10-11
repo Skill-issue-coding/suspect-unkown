@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
+using PrimeTween;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 // Concept main menu: the safehouse in daylight. Each menu entry is a station in the room;
 // switching station activates that station's Cinemachine camera (the brain blends the pan)
@@ -20,6 +23,10 @@ public class MainMenuConcept : MonoBehaviour
         public CinemachineCamera camera;
         [Tooltip("Panels shown only while this station is active")]
         public CanvasGroup[] panels;
+        [Tooltip("Metres from the camera where the background blur starts")]
+        public float focusStart;
+        [Tooltip("Metres from the camera where the background blur is full")]
+        public float focusEnd;
     }
 
     [Header("Stations")]
@@ -27,6 +34,8 @@ public class MainMenuConcept : MonoBehaviour
     [SerializeField] private StationView[] stations;
     [Tooltip("Station shown when the scene starts")]
     [SerializeField] private MenuStation startStation = MenuStation.Main;
+    [SerializeField] private Volume postProcessingVolume;
+
 
     [Header("Transitions")]
     [Tooltip("Seconds to wait after a camera switch before panels fade in, roughly the brain's blend time")]
@@ -42,7 +51,20 @@ public class MainMenuConcept : MonoBehaviour
     private Coroutine panelRoutine;
     private InputAction backAction;
 
+    private DepthOfField depthOfField;
+    private float fromStart, fromEnd, toStart, toEnd;
+    private Tween focusTween;
+
     public MenuStation Current => current;
+
+    private void OnValidate()
+    {
+        if (stations == null) return;
+        foreach (StationView stationView in stations)
+            if (stationView.focusEnd <= stationView.focusStart)
+                Debug.LogWarning($"{name}: station {stationView.station} needs focusEnd greater than focusStart", this);
+
+    }
 
     private void Awake()
     {
@@ -52,6 +74,11 @@ public class MainMenuConcept : MonoBehaviour
             enabled = false;
             return;
         }
+
+        if (postProcessingVolume == null || !postProcessingVolume.profile.TryGet(out depthOfField))
+            Debug.LogWarning($"{name} has no Depth Of Field on its volume; focus stays fixed", this);
+        else
+            depthOfField.mode.Override(DepthOfFieldMode.Gaussian);
 
         // Escape or right mouse steps back, so every station can be left without the mouse
         backAction = new InputAction("Back", InputActionType.Button);
@@ -122,6 +149,7 @@ public class MainMenuConcept : MonoBehaviour
                 view.camera.gameObject.SetActive(false);
         if (target.camera != null) target.camera.gameObject.SetActive(true);
 
+        BlendFocus(target, instant);
         bool night = station == MenuStation.Map;
         if (dayNight != null)
         {
@@ -183,9 +211,36 @@ public class MainMenuConcept : MonoBehaviour
         return false;
     }
 
+    private void BlendFocus(StationView target, bool instant)
+    {
+        if (depthOfField == null) return;
+
+        focusTween.Stop();
+        fromStart = depthOfField.gaussianStart.value;
+        fromEnd = depthOfField.gaussianEnd.value;
+        toStart = target.focusStart;
+        toEnd = target.focusEnd;
+
+        if (instant) ApplyFocus(1f);
+        else focusTween = Tween.Custom(this, 0f, 1f, panelDelay, (menu, t) => menu.ApplyFocus(t), Ease.InOutSine);
+    }
+
+    private void ApplyFocus(float t)
+    {
+        depthOfField.gaussianStart.Override(Mathf.Lerp(fromStart, toStart, t));
+        depthOfField.gaussianEnd.Override(Mathf.Lerp(fromEnd, toEnd, t));
+    }
+
     private static void SetPanel(CanvasGroup panel, float alpha)
     {
         panel.alpha = alpha;
         panel.interactable = panel.blocksRaycasts = alpha > 0.99f;
+    }
+
+    private void OnDestroy()
+    {
+        focusTween.Stop();
+        if (postProcessingVolume != null && postProcessingVolume.HasInstantiatedProfile())
+            Destroy(postProcessingVolume.profile);
     }
 }
