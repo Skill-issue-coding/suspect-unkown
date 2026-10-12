@@ -28,6 +28,7 @@ public class PlayerMotor : MonoBehaviour
     [Tooltip("Time after walking off a ledge during which a jump still works.")]
     [SerializeField] private float _coyoteTime = 0.1f;
 
+    public bool IsMovementSuspended { get; set; }
     public bool IsSprinting { get; private set; }
     public Vector3 Velocity => _horizontalVelocity + Vector3.up * _verticalVelocity;
     public bool IsGrounded => _controller.isGrounded;
@@ -65,6 +66,11 @@ public class PlayerMotor : MonoBehaviour
 
     private void Update()
     {
+        if (IsMovementSuspended) 
+        {
+            return; 
+        }
+        
         UpdateHorizontal();
         UpdateVertical();
 

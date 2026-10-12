@@ -14,6 +14,10 @@ public class PlayerInputs : MonoBehaviour
     public bool sprint;
     public bool crouch;
 
+    [Header("Lockpicking Input Values")]
+    public bool tension;
+    public bool cancel;
+
     [Header("Mouse Cursor Settings")]
     public bool cursorLocked = false;
 
@@ -49,6 +53,10 @@ public class PlayerInputs : MonoBehaviour
     public void SprintInput(bool newSprintState) { sprint = newSprintState; }
 
     public void CrouchInput(bool newCrouchState) { crouch = newCrouchState; }
+
+    public void OnTension(InputValue value) { tension = value.isPressed; }
+    
+    public void OnCancel(InputValue value) { cancel = value.isPressed; }
 
     private void OnApplicationFocus(bool hasFocus)
     {
