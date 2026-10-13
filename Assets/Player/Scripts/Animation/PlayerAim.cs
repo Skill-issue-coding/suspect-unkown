@@ -72,6 +72,11 @@ public class PlayerAim : MonoBehaviour
     private void Update()
     {
         if (_camera == null) return;
+
+        // While suspended (lockpicking) the cursor is locked to the screen centre; aiming at it would
+        // turn the body away from the door
+        if (_motor.IsMovementSuspended) return;
+
         if (!UpdateAim()) return;
 
         float speed = Vector3.ProjectOnPlane(_motor.Velocity, Vector3.up).magnitude;

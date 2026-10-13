@@ -23,9 +23,13 @@ public static class MenuPaths
     public const string MainMenu = Root + "Main Menu/";
     public const string MainMenuBuildConcept = MainMenu + "Build Concept Scene";
 
+    public const string Interactables = Root + "Interactables/";
+    public const string InteractablesBuildLockpickHud = Interactables + "Build Lockpick HUD";
+
     // Priorities: blocks of 100 so there is always a separator between groups
     public const int WindowsPriority = 0;
     public const int PlayerPriority = 100;
     public const int NpcPriority = 200;
     public const int MainMenuPriority = 300;
+    public const int InteractablesPriority = 400;
 }

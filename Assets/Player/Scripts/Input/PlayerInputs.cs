@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +11,7 @@ public class PlayerInputs : MonoBehaviour
     [Header("Character Input Values")]
     public Vector2 move;
     public Vector2 aim;
+    public Vector2 look;   // pointer delta or right stick, this frame. Still moves while the cursor is locked
     public bool jump;
     public bool sprint;
     public bool crouch;
@@ -38,6 +40,8 @@ public class PlayerInputs : MonoBehaviour
 
     public void OnAim(InputValue value) { AimInput(value.Get<Vector2>()); }
 
+    public void OnLook(InputValue value) { look = value.Get<Vector2>(); }
+
     public void OnJump(InputValue value) { JumpInput(value.isPressed); }
 
     public void OnSprint(InputValue value) { SprintInput(value.isPressed); }
@@ -54,9 +58,25 @@ public class PlayerInputs : MonoBehaviour
 
     public void CrouchInput(bool newCrouchState) { crouch = newCrouchState; }
 
+    // An event rather than a bool: a press is a moment, and readers would otherwise have to poll and
+    // consume it every frame
+    public event Action InteractPressed;
+
+    public void OnInteract(InputValue value)
+    {
+        if (value.isPressed) InteractPressed?.Invoke();
+    }
+
     public void OnTension(InputValue value) { tension = value.isPressed; }
     
     public void OnCancel(InputValue value) { cancel = value.isPressed; }
+
+    // The one place the cursor is locked or freed, so regaining window focus restores the right state
+    public void SetCursorLocked(bool locked)
+    {
+        cursorLocked = locked;
+        SetCursorState(locked);
+    }
 
     private void OnApplicationFocus(bool hasFocus)
     {

@@ -1,9 +1,14 @@
 fileFormatVersion: 2
-guid: bcf9c880504d67a4cbe4563faf8936a2
+guid: fa655225312b03d4c96cccd96350230f
 ModelImporter:
   serializedVersion: 24600
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: PolyTexture
+    second: {fileID: 2100000, guid: 8faeae0a3329f6e47ba84615e9a30424, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
