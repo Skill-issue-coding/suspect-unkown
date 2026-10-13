@@ -73,6 +73,7 @@ Material:
     - _Fade_Radius: 2
     - _Fade_Softness: 0.4
     - _Fade_Transparency: 0.85
+    - _Hide: 0
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Smoothness: 0.5
