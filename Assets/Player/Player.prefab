@@ -1305,6 +1305,9 @@ GameObject:
   - component: {fileID: 1876262237866924067}
   - component: {fileID: 8681365460147532909}
   - component: {fileID: 45324365434288496}
+  - component: {fileID: -818215352608075208}
+  - component: {fileID: -1011108268404151007}
+  - component: {fileID: -9086269151619823552}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -1470,6 +1473,8 @@ MonoBehaviour:
   jump: 0
   sprint: 0
   crouch: 0
+  tension: 0
+  cancel: 0
   cursorLocked: 0
 --- !u!114 &8683267482955256226
 MonoBehaviour:
@@ -1637,6 +1642,48 @@ MonoBehaviour:
     - {fileID: 8410740807676206003}
     - {fileID: 7094010648574860125}
     currentIndex: 5
+--- !u!114 &-818215352608075208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 169ab8478e7387e40a951ab7a80dfda7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkills
+  lockpickingLevel: 1
+--- !u!114 &-1011108268404151007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d30f7521ea75a55498240c89e9253a69, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLockpicking
+  tuning: {fileID: 11400000, guid: 9eddadc2fae627343b962ab73e045ce6, type: 2}
+  view: {fileID: 3634014369099963101, guid: f7201b8c2c93a9b43b53845d0c4f4996, type: 3}
+  playerMotor: {fileID: 0}
+--- !u!114 &-9086269151619823552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 200fdce656a4ed54f957ca266ed9d836, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerDoorInteraction
+  prompt: {fileID: 0}
+  useText: E
 --- !u!1 &1386813031399317714
 GameObject:
   m_ObjectHideFlags: 0
