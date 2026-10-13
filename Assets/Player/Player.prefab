@@ -1470,6 +1470,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputs
   move: {x: 0, y: 0}
   aim: {x: 0, y: 0}
+  look: {x: 0, y: 0}
   jump: 0
   sprint: 0
   crouch: 0
@@ -1668,8 +1669,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLockpicking
   tuning: {fileID: 11400000, guid: 9eddadc2fae627343b962ab73e045ce6, type: 2}
-  view: {fileID: 3634014369099963101, guid: f7201b8c2c93a9b43b53845d0c4f4996, type: 3}
-  playerMotor: {fileID: 0}
+  view: {fileID: 0}
+  successHold: 0.45
 --- !u!114 &-9086269151619823552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1682,7 +1683,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 200fdce656a4ed54f957ca266ed9d836, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDoorInteraction
-  prompt: {fileID: 0}
   useText: E
 --- !u!1 &1386813031399317714
 GameObject:

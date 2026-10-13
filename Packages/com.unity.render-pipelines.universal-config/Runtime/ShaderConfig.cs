@@ -20,7 +20,7 @@ namespace UnityEngine.Rendering.Universal
         public const int k_MaxVisibleLightCountMobile = 32;
 
         /// <summary>Max number of lights supported on desktop platforms.</summary>
-        public const int k_MaxVisibleLightCountDesktop = 32;
+        public const int k_MaxVisibleLightCountDesktop = 64;
 
         /// <summary> Switch fog keywords (FOG_LINEAR, FOG_EXP and FOG_EXP2) to dynamic branching.</summary>
         /// <remarks> For more information on dynamic branches, refer to [Shader Branching](https://docs.unity3d.com/Manual/shader-branching.html).</remarks>

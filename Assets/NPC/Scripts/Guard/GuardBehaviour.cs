@@ -295,6 +295,7 @@ public class GuardBehaviour : MonoBehaviour
         caught = true;
         agent.ResetPath();
         Caught?.Invoke();
+        JobOutcome.Fail(FailReason.Caught);
     }
 
     private void UpdatePatrol()
