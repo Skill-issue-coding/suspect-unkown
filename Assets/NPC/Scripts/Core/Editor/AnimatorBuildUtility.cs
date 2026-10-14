@@ -143,7 +143,7 @@ public static class AnimatorBuildUtility
     // Shared setup for every code-built transition. Fixed duration means seconds, not a fraction of the
     // clip, so a blend takes the same time whatever the clip length. Interruption by the destination lets
     // a transition reverse mid-blend when its condition flips back, instead of finishing and then popping.
-    private static void Configure(AnimatorStateTransition transition, float duration, bool hasExitTime, float exitTime = 0f)
+    public static void Configure(AnimatorStateTransition transition, float duration, bool hasExitTime, float exitTime = 0f)
     {
         transition.duration = duration;
         transition.hasFixedDuration = true;

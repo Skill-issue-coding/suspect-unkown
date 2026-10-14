@@ -7,7 +7,7 @@ using UnityEngine.UI;
 // LockpickModel. It teaches without interrupting: the hint for what the player can do right now lights
 // up, the status line names the lock's state, and a tip appears only after repeated slips. Draws only;
 // the model decides. An overlay canvas of its own inside the scene's PlayerHud prefab; LockpickView finds
-// it through Current, so the two need no reference to each other. Built by LockpickHudBuilder
+// it through Current, so the two need no reference to each other
 public class LockpickHud : MonoBehaviour
 {
     // The scene's lockpicking HUD. Set in Awake and cleared on destroy, so a reloaded scene never keeps
@@ -91,7 +91,7 @@ public class LockpickHud : MonoBehaviour
 
         if (group == null || moveHint == null || turnHint == null || status == null || meterFill == null || levelLabel == null)
         {
-            Debug.LogWarning($"{name} is missing parts; rebuild it with Tools/Suspect Unknown/Interactables", this);
+            Debug.LogWarning($"{name} is missing parts; assign them in LockpickHud.prefab", this);
             enabled = false;
         }
 

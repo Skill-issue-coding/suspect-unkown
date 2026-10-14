@@ -73,7 +73,9 @@ public class NpcSuspicionIndicator : MonoBehaviour
             return;
         }
 
-        if (arrowPivot == null)
+        // The arrow turns toward suspicion.LastStimulus, so the pivot is all it needs
+        canRotate = arrowPivot != null;
+        if (!canRotate)
             Debug.LogWarning($"{name} has no ArrowPivot; indicator rotation disabled.", this);
     }
 

@@ -121,26 +121,26 @@ The **Curious** state is where the game lives. Detection must not be binary. A g
 
 **The centerpiece mechanic.**
 
-When an NPC perceives you, it does not record "the player." It records a **feature vector with per-feature confidence**:
+When an NPC perceives you, it does not record "the player." It records a **feature vector with per-feature confidence**. The witness model is about **appearance only**; what you *do* (your entry, your route, the door you always pick) is recorded in the job log and drives adaptive security instead (6.4, and decision 23 in `roadmap_npc.md`).
 
-| Feature        | Example values                                                           |
-| -------------- | ------------------------------------------------------------------------ |
-| Headwear       | beanie, cap, hood, none                                                  |
-| Upper body     | jacket color, hoodie, coat                                               |
-| Lower body     | jeans, work trousers, color                                              |
-| Face covering  | mask, balaclava, scarf, none                                             |
-| Build / height | short, average, tall                                                     |
-| Gait           | limping, fast, casual                                                    |
-| Behaviour      | moved abnormally, avoided eye contact, entered staff area, opened a door |
-| Method         | picked lock, drilled, smashed glass, roof entry                          |
+The feature slots are the categories of the modular character, and each part is remembered as a **style and a colour separately**, so a witness can get the colour right and the cut wrong:
+
+| Feature    | Example values                                  |
+| ---------- | ----------------------------------------------- |
+| Head       | hair or headwear style, and its colour          |
+| Chest      | jacket, hoodie or shirt style, and its colour   |
+| Legs       | jeans or trousers style, and its colour         |
+| Feet       | shoe style, and its colour                      |
+
+Face covering, build and gait are candidates for later slots once the character has content for them.
 
 3D helps here: every one of these visual features corresponds to a visible mesh or material on the character, so what the witness reports and what the player saw on screen are the same thing.
 
 Observer types differ meaningfully:
 
 - **Tired clerk** — low base confidence, fast decay, obvious visual features only.
-- **Civilian** — moderate visual observation, no behavioural reading, observes poorly under stress.
-- **Security guard** — trained. Registers behavioural features civilians never notice, retains longer.
+- **Civilian** — moderate visual observation, observes poorly under stress.
+- **Security guard** — trained. Sees more detail and retains longer. Guards also read behaviour, but as suspicion in the moment (6.1), not as witness evidence.
 - **Camera** — perfect retention, zero decay, visual features only, and only within its arc and at its mounted height. A camera has no suspicion of its own: in-job alarms come from a guard watching the feed at a security monitor. With nobody at the monitor it still records evidence, but raises no alarm.
 
 #### Implementation: Bayesian evidence accumulation, not machine learning
@@ -159,7 +159,7 @@ q = f_dist · f_angle · f_light · f_duration · f_stance · observerSkill · f
 - `f_duration` — accumulated across frames. A glance and a ten-second stare must not produce the same evidence. This factor matters most.
 - `f_stance` — crouching behind cover occludes lower-body features specifically. Partial visibility should produce partial descriptions.
 - `observerSkill` — per archetype: tired clerk ~0.4, civilian ~0.6, guard 1.0
-- `featureVisibility` — per-observer, per-feature mask. A camera is 1.0 on visual, 0.0 on behaviour. A ceiling camera sees headwear well and footwear badly.
+- `featureVisibility` — per-observer, per-feature mask. A ceiling camera sees headwear well and footwear badly.
 
 **Let witnesses be wrong.** Below a quality threshold, sample the reported value from a confusion distribution rather than reporting the truth, so a red jacket gets described as orange. Store confusion matrices per feature slot in a ScriptableObject. Cheap to build, and it buys a great deal: low-quality witnesses become actively misleading, corroboration becomes meaningful, the post-job report becomes fun to read, and section 6.6 becomes possible at all.
 
@@ -170,7 +170,7 @@ Mid-job outfit changes work automatically, since each report keys on the appeara
 Resolved features accumulate into a persistent profile. Once a feature is confirmed:
 
 - Wearing that item again means being recognised faster, at greater distance, by anyone.
-- The item is **burned** and must be discarded or replaced.
+- The item is **burned**: wearing it is risky until the burn wears off. Burns are **temporary**: an item stays burned for one or two jobs, or until newer witness evidence describes something different.
 - Enough confirmed features and you cross a heat threshold that forces an expensive identity reset or triggers harder policing.
 
 **Present it as a 3D suspect lineup.** Because characters are modular, the profile screen can render a mannequin assembled from confirmed features, with unknown slots left as featureless grey geometry that fills in as evidence accumulates. This is a strong visual hook, it is nearly free given the modular character system, and it communicates the entire mechanic without text.

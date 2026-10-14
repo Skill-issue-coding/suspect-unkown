@@ -17,6 +17,10 @@ public class JobObjectives : MonoBehaviour
     public int Required => required.Length;
     public bool IsComplete => Collected >= Required;
 
+    // One slot of the required list, for the job card's checklist. Index from 0 to Required - 1
+    public LootItem RequiredItem(int index) => required[index];
+    public bool IsTaken(int index) => taken[index];
+
     private void Awake() => taken = new bool[required.Length];
 
     private void OnEnable() => LootPickup.Taken += OnTaken;

@@ -65,9 +65,11 @@ Material:
     m_Floats:
     - _Dim: 1
     - _EdgeVisibility: 0
+    - _FovScale: 1
     - _HalfFov: 50
     - _QueueControl: 0
     - _QueueOffset: 0
+    - _RangeScale: 1
     - _RayCount: 128
     - _SafeDim: 0.3
     - _Softness: 0.02

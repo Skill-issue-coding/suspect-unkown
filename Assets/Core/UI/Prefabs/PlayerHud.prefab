@@ -248,7 +248,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6690645213616297800, guid: 5e0721015a855d742a66f8da3d5362e7, type: 3}
       propertyPath: m_Name
-      value: LootBagHud
+      value: JobHud
       objectReference: {fileID: 0}
     - target: {fileID: 6742772369498472440, guid: 5e0721015a855d742a66f8da3d5362e7, type: 3}
       propertyPath: m_Pivot.x

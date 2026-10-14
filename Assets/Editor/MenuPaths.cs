@@ -19,17 +19,16 @@ public static class MenuPaths
     public const string NpcRebuildLocomotion = Npc + "Rebuild Locomotion";
 
     public const string GuardRebuildLocomotion = Npc + "Guard/" + "Rebuild Locomotion";
+    public const string ClerkRebuildLocomotion = Npc + "Clerk/" + "Rebuild Locomotion";
 
-    public const string MainMenu = Root + "Main Menu/";
-    public const string MainMenuBuildConcept = MainMenu + "Build Concept Scene";
-
-    public const string Interactables = Root + "Interactables/";
-    public const string InteractablesBuildLockpickHud = Interactables + "Build Lockpick HUD";
+    public const string Progress = Root + "Progress/";
+    public const string ProgressLog = Progress + "Log Save";
+    public const string ProgressReveal = Progress + "Reveal Save Folder";
+    public const string ProgressDelete = Progress + "Delete Save";
 
     // Priorities: blocks of 100 so there is always a separator between groups
     public const int WindowsPriority = 0;
     public const int PlayerPriority = 100;
     public const int NpcPriority = 200;
-    public const int MainMenuPriority = 300;
-    public const int InteractablesPriority = 400;
+    public const int ProgressPriority = 300;
 }

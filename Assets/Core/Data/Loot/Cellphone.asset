@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LootItem
   displayName: Cellphone
   takeSeconds: 0.6
+  progressUnlock: 2
+  value: 150

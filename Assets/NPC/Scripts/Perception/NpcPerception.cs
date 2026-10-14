@@ -27,6 +27,8 @@ public class NpcPerception : MonoBehaviour, IPerceiver
 
     private Observation latest;
     private bool hasLatest;
+    private float rangeScale = 1f;
+    private float fovScale = 1f;
     private static int spawnIndex = 0;
 
     private bool[] pointClear;
@@ -39,6 +41,16 @@ public class NpcPerception : MonoBehaviour, IPerceiver
     public IReadOnlyList<bool> DebugPointClear => pointClear;
     public IReadOnlyList<float> DebugRegionFraction => regionFraction;
     public Vector3 EyePosition => transform.position + Vector3.up * archetype.EyeHeight;
+    public float RangeScale => rangeScale;
+    public float FovScale => fovScale;
+    public float ViewDistance => archetype.ViewDistance * rangeScale;
+    public float FovDegrees => archetype.FovDegrees * fovScale;
+
+    public void SetViewScale(float range, float fov)
+    {
+        rangeScale = Mathf.Clamp01(range);
+        fovScale = Mathf.Clamp01(fov);
+    }
 
     public bool TryGetLatest(out Observation observation)
     {
@@ -114,12 +126,12 @@ public class NpcPerception : MonoBehaviour, IPerceiver
     {
         angle = 0f;
         Vector3 toPoint = point - EyePosition;
-        if (toPoint.sqrMagnitude > archetype.ViewDistance * archetype.ViewDistance) return false;
+        if (toPoint.sqrMagnitude > ViewDistance * ViewDistance) return false;
 
         Vector3 flatToPoint = new Vector3(toPoint.x, 0f, toPoint.z);
         Vector3 flatForward = new Vector3(transform.forward.x, 0f, transform.forward.z);
         angle = Vector3.Angle(flatForward, flatToPoint);
-        return angle <= archetype.FovDegrees * 0.5f;
+        return angle <= FovDegrees * 0.5f;
     }
 
     private bool TryPerceive(out Observation observation)
@@ -175,8 +187,8 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         if (visibility <= 0)
             return false;
 
-        observation.fDistance = archetype.EvaluateDistance(toPlayer.magnitude / archetype.ViewDistance);
-        observation.fAngle = archetype.EvaluateAngle(angle / (archetype.FovDegrees * 0.5f));
+        observation.fDistance = archetype.EvaluateDistance(toPlayer.magnitude / ViewDistance);
+        observation.fAngle = archetype.EvaluateAngle(angle / (FovDegrees * 0.5f));
         observation.fLight = archetype.LightFactor(playerLighting != null ? playerLighting.Level : 1f);
         observation.fStance = playerStance.Current == Stance.Crouching ? archetype.CrouchVisibilityFactor : 1f;
         observation.perceiver = this;

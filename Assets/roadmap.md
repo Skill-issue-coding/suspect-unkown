@@ -74,7 +74,7 @@ Three phases are marked **GATE** (1, 4, and 9), and Phases 3 and 6 carry a light
 
 The apartment level (`Assets/apartment-level.md`) is where loot, the bag indicator, the fail state, the results newspaper, saved progress, and the getaway van are first built, on a single civilian, the clerk at home. Every job ends at the van: stand at its back doors for a few seconds once the required loot is taken, then it drives off.
 
-**Status (2026-10-14):** the apartment has built loot with hold-to-take timers, the bag indicator, the fail state and the results newspaper (steps A1–A5). Saved progress and the getaway van are next. The apartment has no carry weight.
+**Status (2026-10-14):** the apartment has built loot with hold-to-take timers, optional cash, the job HUD (objectives, bag contents, pocket cash, job clock), the fail state, the results newspaper and saved progress (steps A1–A6). The getaway van is next. The bag holds two items in every job (a hard limit, shown as two slots); refusing a third item and round trips to the van arrive with the thrift shop. There is no carry weight.
 
 The prototype job uses a guard. Tier 1's only opposition is civilians, whose behaviour does not exist until Phase 5, so tier 1 content is built after that.
 
@@ -115,6 +115,8 @@ The prototype job uses a guard. Tier 1's only opposition is civilians, whose beh
 
 The art side and the systems side of the same feature. Build them together.
 
+The witness model is about appearance only (Head, Chest, Legs, Feet, each as style and colour); what the player does goes to the job log and adaptive security (decision 23 in `roadmap_npc.md`). It is built first in the apartment level (`Assets/apartment-level.md` 3.6, Track W), right after the clerk, with the newspaper as the report.
+
 - **Modular character rig**: base mesh with head/torso/legs/hands sockets, shared skeleton, animations retargeting across all outfits
 - Three to five wardrobe pieces as swappable meshes with material tints
 - Feature slots, per-observer per-feature visibility masks, the quality function including `f_stance`
@@ -131,7 +133,7 @@ The art side and the systems side of the same feature. Build them together.
 ## Phase 7 — Meta layer (9%)
 
 - Save/load via JSON: police profile, wardrobe, money, per-location state
-- Persistent profile with burn status per item
+- Persistent profile with burn status per item. Burns are temporary: one or two jobs, or until newer witness evidence describes something different
 - **The 3D suspect lineup screen** — a mannequin assembled from confirmed features, unknown slots left as grey geometry. Nearly free given the modular character work in Phase 6, and it communicates the whole mechanic wordlessly.
 - Laundering, shop, two to three tools or device abilities
 - Pre-job briefing board
