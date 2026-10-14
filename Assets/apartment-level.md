@@ -23,7 +23,7 @@ Read `CLAUDE.md` first, then decisions 6, 9, 18, 19, 21 and 22 in `roadmap_npc.m
 | Hallway | Pools of light from the room lights, dark gaps between them | Light makes you easier to see |
 | Living room | The clerk dozes on the couch; the laptop is next to them | The vision cone, suspicion, the sleep rhythm, the decision window |
 | Bedroom | The cellphone; reaching it crosses the clerk's line of sight | Timing a crossing with the sleep rhythm |
-| Exit | Back out through the front door to the street | Leaving is part of the job |
+| Getaway | Back out through the front door to the `GetawayVan` on the street; stand at its back doors for 2.5 s | Leaving is part of the job; every job ends at the van |
 
 Text is limited to small world-space control prompts on the street (move, crouch, sprint). Everything else is taught by what the player sees happen.
 
@@ -108,13 +108,41 @@ The window runs on sight rather than on suspicion dropping, because suspicion on
 - **`LootItem`** (Core, ScriptableObject): display name and what it unlocks (`ProgressUnlock`: `Shop`, `Targets`). Data only.
 - **`LootPickup`** (Core, interactables): the world object. Reach trigger, outline and `WorldPrompt`, the same pattern as the door. `Take()` hides it and raises a static `Taken(LootItem)` event.
 - **`PlayerLootInteraction`** (Player): hold E for about 1 s to take an item in reach. The player carries the new `Stealing` conduct flag during the hold.
-- **`JobObjectives`** (Core, one per level): lists the required items, counts the ones taken, and raises `Changed`. Exposes `Collected` and `Required`.
+- **`JobObjectives`** (Core, one per level): lists the required items, counts the ones taken, and raises `Changed`. Exposes `Collected`, `Required` and `IsComplete` (every required item taken). Required items are the minimum to leave: in this level that is both items. Later levels require less and let the player take as much extra loot as they dare; a level with nothing required is complete from the start.
 - **`LootBagHud`** (bottom-left of the screen): a bag icon shown as an outline when the level starts, filling as items are taken. Fill is `Collected / Required`, so in this level the laptop fills half and the cellphone fills the rest. The fill eases toward the new value (smooth what is displayed). The items themselves are hidden; carrying is not visible on the character for now.
-- **`JobExit`** (Core): a trigger on the `Volume` layer outside the front door. With every required item taken, entering it completes the job. Without them it does nothing.
-
 Carry weight and bag capacity from Phase 3 come later; the fill formula then changes to space used over capacity.
 
-### 3.3 Results screen: the newspaper
+### 3.3 The getaway van
+
+Every job ends at the `GetawayVan`, as in Payday: the player stands at its open back doors for a few seconds, the doors close with the player inside, and the van drives off while the newspaper slides in.
+
+**The extraction zone.**
+
+- A trigger on the `Volume` layer at the van's back doors. Only the player's CharacterController counts, as for zones and the roof fade.
+- **Locked until the objectives are complete** (`JobObjectives.IsComplete`). In this level that means both items. Standing in a locked zone does nothing.
+- **The timer:** while the player is inside an unlocked zone, progress rises from 0 to 1 over about 2.5 s. Outside, it **drains back down at the same speed**, so stepping out briefly costs a little, not everything.
+- **The job can still fail during the countdown.** A guard's catch or the clerk's call still ends it. The moment progress reaches 1 the job is won: the van calls `JobOutcome.Complete()` right away, so any failure after that is ignored (only the first outcome counts).
+
+**The indicator.** The player must see where to stand and how far along they are.
+
+- A marking on the ground behind the van, the size of the zone: a world-space canvas lying flat, with a dashed outline in the same style as the interaction prompt, and a fill that grows with progress.
+- **Locked:** dim and grey, with the lock icon from the door prompt.
+- **Unlocked:** bright and gently pulsing, so a player with a full bag notices it from the street.
+- **Counting:** the fill follows progress; it eases on display only (smooth what is displayed, never the timer itself).
+- State changes happen on events (objectives completed, player entered or left), never by polling every frame. Only the fill updates per frame, and only while progress is changing.
+
+**The departure.** One sequence, run once:
+
+1. **Lock in:** `JobOutcome.Complete()`. The player's controls are suspended.
+2. **Into the van:** the player is moved to a cargo point inside the van over about 0.4 s, then hidden. The CharacterController is switched off before moving, or it fights the move. The player object stays active, so nothing that refers to it breaks.
+3. **Doors close:** the two back doors swing shut. They need hinge pivots in the model, the same problem the house doors had: set the origin at the hinge in Blender, or put each door under an empty at the hinge.
+4. **Drive away:** the van accelerates along its forward axis (or a short list of waypoints) out of the street.
+5. **Camera follows the van:** a second Cinemachine camera aimed at the van, with a higher priority, takes over when the doors close. Cinemachine blends to it, and the player's camera setup is never touched.
+6. **Newspaper:** `JobOutcomeScreen` waits a success delay (about 1.5 s, a new field) before the paper comes in, so it slides in over the driving van.
+
+**Where it lives.** `GetawayVan` (Core) owns the zone, the timer, the doors, the drive and the van camera, and raises a `Departed` event at lock-in. `PlayerExtraction` (Player) listens to that event and does the player's part: suspend controls, move into the cargo point, hide. Dependencies stay Player → Core: the van never looks up the player.
+
+### 3.4 Results screen: the newspaper
 
 One newspaper, two outcomes. `JobOutcomeScreen` listens to both events.
 
@@ -125,7 +153,7 @@ One newspaper, two outcomes. `JobOutcomeScreen` listens to both events.
 - The newspaper slides and rotates in over the screen as an overlay canvas, with a random headline for the reason.
 - A restart button or key reloads the scene. Set the time scale back to 1 before reloading.
 
-**On success:** no greyscale and no slow motion. The same newspaper comes in with a positive headline for the robber, then a continue button returns to the main menu.
+**On success:** no greyscale and no slow motion. The newspaper waits a success delay while the van drives away (3.3), then comes in with a positive headline for the robber, and a continue button returns to the main menu.
 
 Headlines come from a `HeadlineSet` ScriptableObject per outcome, picked at random:
 
@@ -136,7 +164,7 @@ Headlines come from a `HeadlineSet` ScriptableObject per outcome, picked at rand
 
 Phase 6 reuses this newspaper prefab for the witness report, so build it as a prefab with replaceable text from the start.
 
-### 3.4 Saved progress
+### 3.5 Saved progress
 
 A small JSON file, `progress.json` in `Application.persistentDataPath`, written with `JsonUtility`:
 
@@ -168,11 +196,17 @@ The work splits into two tracks that can run side by side. **Track A** is the jo
 **A4. Loot.** `LootItem`, `LootPickup` and `PlayerLootInteraction`. Create the laptop and cellphone assets and place both pickups.
 *Check:* holding E takes each item, it disappears, and `Stealing` shows during the hold only.
 
-**A5. `JobObjectives`, `LootBagHud` and `JobExit`.**
-*Check:* the bag starts as an outline, is half full after one item and full after both. The exit does nothing with one item and plays the success newspaper with both.
+**A5. `JobObjectives` and `LootBagHud`.**
+*Check:* the bag starts as an outline, is half full after one item and full after both, and `IsComplete` turns true with the second item.
 
 **A6. `ProgressSave` and `ProgressStore`.**
-*Check:* after a success, `progress.json` exists with both unlocks. After a failure, it is unchanged.
+*Check:* a `[ContextMenu]` success writes `progress.json` with both unlocks. After a failure, it is unchanged.
+
+**A7. The getaway van, part 1: zone, timer and indicator.** `GetawayVan` with the locked or unlocked zone, the rising and draining timer, and the ground indicator. For now, reaching 1 just calls `JobOutcome.Complete()`.
+*Check:* with one item the marking is grey and locked and standing in it does nothing. With both it pulses; standing in it fills it in about 2.5 s; stepping out drains it; a full timer plays the success newspaper. The clerk calling during the countdown still fails the job.
+
+**A8. The getaway van, part 2: the departure.** `Departed` event, `PlayerExtraction`, door hinges, door close, the drive, the van camera, and the success delay on `JobOutcomeScreen`.
+*Check:* at lock-in the player steps into the van and disappears, the doors swing shut, the camera follows the van out of the street, and the newspaper slides in over it. No errors from NPCs or the camera while the player is hidden.
 
 ### Track B — the clerk
 

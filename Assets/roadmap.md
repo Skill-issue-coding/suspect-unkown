@@ -72,7 +72,7 @@ Three phases are marked **GATE** (1, 4, and 9), and Phases 3 and 6 carry a light
 
 **Done when:** you can enter, steal, and leave, and you can also get caught.
 
-The apartment level (`Assets/apartment-level.md`) is where loot, the bag indicator, the fail state, the results newspaper, and saved progress are first built, on a single civilian, the clerk at home.
+The apartment level (`Assets/apartment-level.md`) is where loot, the bag indicator, the fail state, the results newspaper, saved progress, and the getaway van are first built, on a single civilian, the clerk at home. Every job ends at the van: stand at its back doors for a few seconds once the required loot is taken, then it drives off.
 
 The prototype job uses a guard. Tier 1's only opposition is civilians, whose behaviour does not exist until Phase 5, so tier 1 content is built after that.
 
