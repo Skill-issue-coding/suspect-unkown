@@ -51,24 +51,27 @@ public class NpcPerceptionDebug : MonoBehaviour
     {
         if (!gizmos) return;
 
-        NpcArchetype archetype = perception.Archetype;
-
         Gizmos.color = gizmosColor;
         Gizmos.DrawWireSphere(perception.EyePosition, eyeGizmoRadius);
 
+        // The scaled range and FOV, the ones perception tests against, not the archetype's full values
+        float range = perception.ViewDistance;
+        float fov = perception.FovDegrees;
+
         Vector3 origin = transform.position;
         Vector3 flatForward = new Vector3(transform.forward.x, 0f, transform.forward.z).normalized;
-        float halfFov = archetype.FovDegrees * 0.5f;
-        int segments = Mathf.CeilToInt(archetype.FovDegrees / 2f);
-        float step = archetype.FovDegrees / segments;
+        float halfFov = fov * 0.5f;
+        // At least one segment, so a very narrow cone never divides by zero below
+        int segments = Mathf.Max(1, Mathf.CeilToInt(fov / 2f));
+        float step = fov / segments;
 
-        Vector3 previous = origin + Quaternion.AngleAxis(-halfFov, Vector3.up) * flatForward * archetype.ViewDistance;
+        Vector3 previous = origin + Quaternion.AngleAxis(-halfFov, Vector3.up) * flatForward * range;
         Gizmos.DrawLine(origin, previous);
 
         for (int i = 1; i <= segments; i++)
         {
             float angle = -halfFov + i * step;
-            Vector3 point = origin + Quaternion.AngleAxis(angle, Vector3.up) * flatForward * archetype.ViewDistance;
+            Vector3 point = origin + Quaternion.AngleAxis(angle, Vector3.up) * flatForward * range;
             Gizmos.DrawLine(previous, point);
             previous = point;
         }
@@ -144,6 +147,8 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label("no observation");
         }
 
+        GUILayout.Label($"view        {perception.RangeScale:P0} range, {perception.FovScale:P0} fov");
+
         if (suspicion != null)
         {
             GUILayout.Label($"suspicion   {suspicion.Suspicion:F2}");
@@ -170,6 +175,19 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label($"stimulus {Vector3.Distance(transform.position, suspicion.LastStimulus):F1} m away");
 
         GUILayout.EndArea();
+    }
+
+    // Test hooks until ResidentBehaviour drives the scale (B4): the dozing values from apartment-level.md 2.2
+    [ContextMenu("Test: Dozing View")]
+    private void TestDozingView()
+    {
+        if (TryGetSuspicionAndPerception()) perception.SetViewScale(0.35f, 0.5f);
+    }
+
+    [ContextMenu("Test: Full View")]
+    private void TestFullView()
+    {
+        if (TryGetSuspicionAndPerception()) perception.SetViewScale(1f, 1f);
     }
 
 #if UNITY_EDITOR

@@ -18,6 +18,7 @@ public class PlayerInputs : MonoBehaviour
 
     [Header("Lockpicking Input Values")]
     public bool tension;
+    public bool interact;
     public bool cancel;
 
     [Header("Mouse Cursor Settings")]
@@ -64,11 +65,13 @@ public class PlayerInputs : MonoBehaviour
 
     public void OnInteract(InputValue value)
     {
+        interact = value.isPressed;
         if (value.isPressed) InteractPressed?.Invoke();
     }
 
+
     public void OnTension(InputValue value) { tension = value.isPressed; }
-    
+
     public void OnCancel(InputValue value) { cancel = value.isPressed; }
 
     // The one place the cursor is locked or freed, so regaining window focus restores the right state

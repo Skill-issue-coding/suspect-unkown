@@ -12,5 +12,6 @@ public enum CivilianActivity
     Filming,
     Confronting,
     Avoiding,
-    PretendingNotToSee
+    PretendingNotToSee,
+    Dozing,
 }

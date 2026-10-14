@@ -2283,13 +2283,13 @@ GameObject:
   - component: {fileID: 7572797309826588232}
   - component: {fileID: 7567304483632521139}
   - component: {fileID: 4974712375049285301}
-  - component: {fileID: 1194697038773332964}
   - component: {fileID: 8890725952143270588}
   - component: {fileID: 1867975804306738566}
   - component: {fileID: 509245131827645603}
   - component: {fileID: 2366553931734634579}
   - component: {fileID: 8786211797238540667}
   - component: {fileID: 7929661741115065216}
+  - component: {fileID: 6652728458607151797}
   m_Layer: 15
   m_Name: Guard
   m_TagString: NPC
@@ -2434,18 +2434,6 @@ MonoBehaviour:
   headLook: {fileID: 0}
   glanceDuration: 1.5
   debug: 1
---- !u!114 &1194697038773332964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6720325424012129814}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28a9ba23b6024544181161dc42a7c9d1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ReloadOnCaught
 --- !u!114 &8890725952143270588
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2532,6 +2520,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5cc06995a9084030bf6b7fd5b014282, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcWitness
+--- !u!114 &6652728458607151797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6720325424012129814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc3810c5da02a6c448e92746e93214ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcAlertReporter
 --- !u!1 &7060616932561885397
 GameObject:
   m_ObjectHideFlags: 0

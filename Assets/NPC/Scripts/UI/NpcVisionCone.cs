@@ -16,6 +16,8 @@ public class NpcVisionCone : MonoBehaviour
     private static readonly int RayDataId = Shader.PropertyToID("_RayData");
     private static readonly int RayCountId = Shader.PropertyToID("_RayCount");
     private static readonly int SoftnessId = Shader.PropertyToID("_Softness");
+    private static readonly int RangeScaleId = Shader.PropertyToID("_RangeScale");
+    private static readonly int FovScaleId = Shader.PropertyToID("_FovScale");
 
     [Header("Shape")]
     [SerializeField, Range(8, 128), Tooltip("Rays across the cone. More rays give cleaner wall cuts and cost more raycasts, Changes need a restart")]
@@ -129,11 +131,14 @@ public class NpcVisionCone : MonoBehaviour
         Vector3 low = transform.position + Vector3.up * crouchHeadHeight;
         Quaternion rotation = transform.rotation;
 
+        // Rays stop at the scaled range; the data stays a fraction of the full range the fan was built at
+        float reach = range * perception.RangeScale;
+
         for (int i = 0; i <= rayCount; i++)
         {
             Vector3 world = rotation * localDirections[i];
 
-            float w = CastDistance(eye, world, range);
+            float w = CastDistance(eye, world, reach);
             float s = w;
             float e = w;
 
@@ -158,6 +163,8 @@ public class NpcVisionCone : MonoBehaviour
         block.SetFloat(SoftnessId, edgeSoftness / range);
         displayColor = Color.Lerp(displayColor, targetColor, 1f - Mathf.Exp(-colorSpeed * Time.deltaTime));
         block.SetColor(BaseColorId, displayColor);
+        block.SetFloat(RangeScaleId, perception.RangeScale);
+        block.SetFloat(FovScaleId, perception.FovScale);
         coneRenderer.SetPropertyBlock(block);
     }
 

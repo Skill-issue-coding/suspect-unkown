@@ -11,11 +11,15 @@ public struct ConductWeights
     private static readonly ConductFlags[] AllFlags = (ConductFlags[])Enum.GetValues(typeof(ConductFlags));
     [Range(0f, 1f)] public float sprinting;
     [Range(0f, 1f)] public float inStaffArea;
+    [Range(0f, 1f)] public float lockpicking;
+    [Range(0f, 1f)] public float stealing;
 
     public readonly float Get(ConductFlags flag) => flag switch
     {
         ConductFlags.Sprinting => sprinting,
         ConductFlags.InStaffArea => inStaffArea,
+        ConductFlags.Lockpicking => lockpicking,
+        ConductFlags.Stealing => stealing,
         _ => throw new ArgumentOutOfRangeException(nameof(flag))
     };
 
@@ -32,9 +36,11 @@ public struct ConductWeights
         return 1f - normal;
     }
 
-    public ConductWeights(float sprinting, float inStaffArea)
+    public ConductWeights(float sprinting, float inStaffArea, float lockpicking, float stealing)
     {
         this.sprinting = sprinting;
         this.inStaffArea = inStaffArea;
+        this.lockpicking = lockpicking;
+        this.stealing = stealing;
     }
 }

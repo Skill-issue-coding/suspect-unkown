@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1f479f0caeb42399171ea0310394d8, type: 3}
   m_Name: ApartmentClerk
   m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
-  viewDistance: 15
+  viewDistance: 18
   fovDegrees: 110
   eyeHeight: 1.65
   distanceFalloff:
@@ -27,6 +27,15 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0
+    - serializedVersion: 3
+      time: 0.7
+      value: 1
+      inSlope: -0.0006800067
+      outSlope: -0.0006800067
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.38442114
+      outWeight: 0.30417493
     - serializedVersion: 3
       time: 1
       value: 0
@@ -72,14 +81,16 @@ MonoBehaviour:
     lowerBody: 1
     feet: 1
   tickRate: 10
-  hearingSensitivity: 1
-  hearingSuspicion: 0.5
+  hearingSensitivity: 12
+  hearingSuspicion: 0.85
   anomalySuspicion: 0.6
   anomalyWeights:
     openDoor: 1
   conductWeights:
     sprinting: 0.4
     inStaffArea: 0.8
+    lockpicking: 1
+    stealing: 1
   riseRate: 0.5
   decayRate: 0.1
   decayDelay: 2

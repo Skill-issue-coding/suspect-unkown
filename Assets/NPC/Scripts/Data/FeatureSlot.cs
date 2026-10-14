@@ -1,12 +1,9 @@
-// Witness feature slots from concept 6.2. Six to eight slots; more becomes bookkeeping.
+// The parts of an outfit a witness can describe: PlayerCustomization's categories (decision 23).
+// Appearance only; what the player does is the job log's business
 public enum FeatureSlot
 {
-    Headwear,
-    UpperBody,
-    LowerBody,
-    FaceCovering,
-    Build,
-    Gait,
-    Behaviour,
-    Method
+    Head,
+    Chest,
+    Legs,
+    Feet,
 }

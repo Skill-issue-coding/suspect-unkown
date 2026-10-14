@@ -53,7 +53,7 @@ public class NpcArchetype : ScriptableObject
 
     [Header("Suspicion")]
     [SerializeField, Tooltip("How abnormal each act looks to this observer")]
-    private ConductWeights conductWeights = new ConductWeights(0.6f, 0.8f);
+    private ConductWeights conductWeights = new ConductWeights(0.6f, 0.8f, 1f, 1f);
 
     [SerializeField, Tooltip("Suspicion per second at full strength and abnormality 1. 0.5 means two seconds from empty to full"), Range(0f, 1f)]
     private float riseRate = 0.5f;

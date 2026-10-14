@@ -1,0 +1,79 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+// How alarmed the job is right now: the highest level any NPC reports, and the fullest decision window
+// any NPC has open (how close someone is to calling the police). Each NPC reports for itself
+// (NpcAlertReporter, ResidentWindowReporter, NPC side) and withdraws when it goes away; the HUD listens to
+// Changed and reads the window while one is open. Core never knows about NPCs, and one clerk or a store
+// full of guards works the same way. Cleared on play-mode entry; on a scene load the NPCs withdraw as they
+// are destroyed
+public static class JobAlert
+{
+    private static readonly Dictionary<object, JobAlertLevel> reports = new();
+    private static readonly Dictionary<object, float> windows = new();
+    private static readonly HashSet<object> callers = new();
+
+    public static JobAlertLevel Level { get; private set; }
+
+    public static event Action<JobAlertLevel, JobAlertLevel> Changed;
+
+    public static void Report(object source, JobAlertLevel level)
+    {
+        reports[source] = level;
+        Recount();
+    }
+
+    public static void Withdraw(object source)
+    {
+        if (reports.Remove(source)) Recount();
+    }
+
+    // A handful of NPCs and only on a state change, so a plain scan beats keeping a sorted structure
+    private static void Recount()
+    {
+        JobAlertLevel highest = JobAlertLevel.Undetected;
+        foreach (JobAlertLevel level in reports.Values)
+            if (level > highest) highest = level;
+
+        if (highest == Level) return;
+        JobAlertLevel from = Level;
+        Level = highest;
+        Changed?.Invoke(from, highest);
+    }
+
+    public static bool AnyWindowOpen => windows.Count > 0;
+
+    // progress: 0 to 1 while deciding. calling: the window is full and the call is under way
+    public static void ReportWindow(object source, float progress, bool calling)
+    {
+        windows[source] = calling ? 1f : progress;
+        if (calling) callers.Add(source);
+        else callers.Remove(source);
+    }
+
+    public static void CloseWindow(object source)
+    {
+        windows.Remove(source);
+        callers.Remove(source);
+    }
+
+    // The fullest open window, read by the HUD each frame while one is open. A plain scan over a handful
+    public static void Window(out float progress, out bool calling)
+    {
+        progress = 0f;
+        foreach (float p in windows.Values)
+            if (p > progress) progress = p;
+        calling = callers.Count > 0;
+    }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetOnPlay()
+    {
+        windows.Clear();
+        callers.Clear();
+        reports.Clear();
+        Level = JobAlertLevel.Undetected;
+        Changed = null;
+    }
+}

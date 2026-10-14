@@ -252,7 +252,7 @@ An **anomaly** is a world object in a state that only the player causes: an open
 - **Suspicion:** noticing sets a floor of `anomalySuspicion × kind weight`, per archetype, and makes the anomaly the stimulus and the guard's last-known position. Like sound, an anomaly alone never pushes past Investigating (decision 6).
 - **What an NPC does about an anomaly is its role's business** (decision 1). Open doors: the guard slams them; the manager investigates and shuts them; the tired clerk shuts them as a chore; customers ignore them.
 - **Resolution is an errand** (decision 20): one NPC of the right role claims the anomaly, walks to it, plays a reaction, and fixes it through `Resolve()`. A claim works like a POI claim (decision 15), so two NPCs never fix the same thing.
-- **Witnesses:** being seen _causing_ an anomaly is conduct. For doors that is the `Lockpicking` flag (decision 19), which feeds the Method slot in M7: "they picked a lock". An `OpeningDoor` flag for doors without a lock waits until a level needs one.
+- **Witnesses:** being seen _causing_ an anomaly is conduct. For doors that is the `Lockpicking` flag (decision 19), which raises suspicion in whoever sees it. The pick itself goes to the job log for adaptive security, not to the witness model (decision 23). An `OpeningDoor` flag for doors without a lock waits until a level needs one.
 
 **Why.** Only the robber opens doors or trips breakers, so these are the clearest evidence the game has, and they tell the player that their actions leave traces even when nobody saw them. One mechanism covers doors, the breaker, and later loot, instead of one special case each.
 
@@ -307,11 +307,20 @@ Civilians are in the store for their own reasons: customers shop, the tired cler
 - **Ordinary oddness barely registers.** Sprinting in front of a customer takes about 5 seconds of full view to make them Curious. Open doors do not make customers suspicious at all.
 - **One rise rate for everyone.** Every archetype uses the guard's rise rate of 0.5, so a conduct weight means the same thing for every observer (weight × 0.5 is suspicion per second at full visibility). That is how lockpicking is exactly as fast for a civilian as for a guard, and it keeps the numbers explainable for the report. Civilians still notice less in practice, because they see less far and fade faster with distance.
 - **Roles differ in data and in what they do** (decisions 1 and 18): customers ignore open doors; the tired clerk, almost fixed at the register, shuts them as a chore without suspicion; the manager, a middle step between a civilian and a guard, investigates and shuts them.
-- **At home, the same clerk is the opposite of calm** (`Assets/apartment-level.md`). The apartment interior is a `Staff` zone, and the `TiredClerkHome` archetype weighs `InStaffArea` heavily, so a stranger seen inside is alarming on its own. Still the shared rise rate; only the weights differ. Their role behaviour, `ResidentBehaviour`, runs a sleep rhythm and a fixed reaction: a decision window that fills while they can see the player, then a police call that fails the job.
+- **At home, the same clerk is the opposite of calm** (`Assets/apartment-level.md`). The apartment interior is a `Staff` zone, and the `ApartmentClerk` archetype weighs `InStaffArea` heavily, so a stranger seen inside is alarming on its own. Still the shared rise rate; only the weights differ. Their role behaviour, `ResidentBehaviour`, runs a sleep rhythm in an armchair, an occasional snack run to the kitchen along the NavMesh, and a fixed reaction: a decision window that fills while they can see the player, then a police call that fails the job.
 - **The alert ladder means less for civilians:** Curious is a glance while carrying on; Investigating is stopping to look; Alerted opens the decision window.
 - **No vision cones** (decision 21). The suspicion indicator is enough.
 - **Hearing stays as tuned in M4:** a nearby sprint gives a small floor but never Curious; a lockpick slip next to a customer makes them Curious.
 - **A thin slice of the witness model comes with civilians** (M6 step 2): `NpcWitness` accumulates exposure, how long and how well each NPC has seen the player, with a debug readout. Without it, "which civilian is dangerous" cannot be tested. Feature slots, confusion matrices and the report stay in M7.
+
+### 23. The witness model is appearance only; behaviour goes to the job log
+
+Two models, two questions. The **witness model** (M7) answers "what did the burglar look like?" from what NPCs saw. **Adaptive security** (Phase 8) answers "what does the burglar do?" from the job log: entry points, routes, the doors they always pick, and it moves guard POIs to match. Behaviour and method are therefore not witness slots, even though concept 6.2 first listed them there.
+
+- **Why two:** the job log records what the player did whether or not anyone saw it, which a witness-fed behaviour model could never learn; and keeping the witness model to appearance keeps its evidence one kind, combined one way (log-odds). Two separate models, a Bayesian evidence model and a Markov route model with an optimiser, are also clearer to explain in the AI report.
+- **Slots** are the player's customization categories: **Head, Chest, Legs, Feet**. Each part is remembered as a **style and a colour separately** (`Chest_002_Black` is style 002, colour Black), each with its own belief and its own confusion table, so a witness can get the colour right and the cut wrong.
+- **Burns are temporary** (Phase 7): an item confirmed into the police profile counts as burned for one or two jobs, or until newer witness evidence describes something different. Never permanently.
+- **First built in the apartment level** (`Assets/apartment-level.md` 3.6, Track W), right after the clerk, with the clerk as the only witness and the newspaper as the report.
 
 ---
 
@@ -384,7 +393,7 @@ Vision block starting values. Region weights are head / upper body / hands / low
 
 The guard's hand weight is high because tool use is conduct guards read. The camera's feet weight is low because a ceiling camera sees headwear well and footwear badly. Lower tick rates for civilians make them slower to notice and cheaper to run.
 
-Suspicion block values. Conduct weights are sprinting / in staff area; `lockpicking` joins with M5 step 2.5 at 1.0 for every archetype. **Every archetype shares the guard's rise rate of 0.5** (decision 22), so a weight means the same thing everywhere: weight × 0.5 is suspicion per second at full visibility.
+Suspicion block values. Conduct weights are sprinting / in staff area; `lockpicking` (M5 step 2.5) and `stealing` (apartment step A4) follow, both 1.0 for every archetype. **Every archetype shares the guard's rise rate of 0.5** (decision 22), so a weight means the same thing everywhere: weight × 0.5 is suspicion per second at full visibility.
 
 | Archetype         | Conduct    | Rise   | Decay  | Delay  | Curious | Investigating | Alerted | Hysteresis |
 | ----------------- | ---------- | ------ | ------ | ------ | ------- | ------------- | ------- | ---------- |
@@ -465,7 +474,7 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `CivilianRandomOutfit.cs` | MonoBehaviour  | Picks a random outfit for the civilian's role at spawn; cosmetic only | working  | M6        |
 | `CivilianSpot.cs`      | MonoBehaviour    | A place where civilians of one role browse or work; static registry and claims | working        | M6        |
 | `CivilianActivity.cs`  | enum             | Roaming, Working, Deliberating, the reactions, PretendingNotToSee; `Dozing` planned for the resident | declared | M6        |
-| `ResidentBehaviour.cs` | MonoBehaviour    | The clerk at home: sleep rhythm driving the view scale, sight-driven decision window, police call (`Assets/apartment-level.md`) | —        | Apartment |
+| `ResidentBehaviour.cs` | MonoBehaviour    | The clerk at home: sleep rhythm in the armchair driving the view scale, the snack run to the kitchen, sight-driven decision window, police call (`Assets/apartment-level.md`) | —        | Apartment |
 | `CivilianRole.cs`      | enum             | Customer, Employee, Manager                                                    | declared | M6        |
 | `ReactionTree.cs`      | ScriptableObject | Root of a decision tree                                                        | stub     | M6        |
 | `ReactionNode.cs`      | ScriptableObject | Becomes abstract, with branch and leaf subclasses                              | stub     | M6        |
@@ -534,9 +543,9 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `Perception/BodyRegion.cs`            | enum           | Head, UpperBody, Hands, LowerBody, Feet. No explicit values: the region bitmask indexes by `(int)region`    | working  | M1        |
 | `Perception/PerceptionPoint.cs`       | MonoBehaviour  | One body point: its region, and its collider's bounds centre                                                | working  | M1        |
 | `Perception/PerceptionTargets.cs`     | MonoBehaviour  | Every body point, flat and by region. Fixed after `Awake`                                                   | working  | M1        |
-| `Perception/CharacterAppearance.cs`   | struct         | Placeholder for the player's feature vector. Shape to agree at the art and systems seam                     | declared | M7        |
+| `Perception/CharacterAppearance.cs`   | struct         | The player's appearance: style and colour per slot (Head, Chest, Legs, Feet), read from `PlayerCustomization` | declared | M7        |
 | `Editor/MapPlayerPerceptionPoints.cs` | static class   | Adds `PerceptionPoint` to the 17 bone colliders in `Player.prefab` by bone name                             | working  | M1        |
-| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea; `Lockpicking` joins in M5. Powers of two; a flag is added only with its producer    | working  | M2, M5    |
+| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea, Lockpicking, Stealing. Powers of two; a flag is added only with its producer        | working  | M2, M5    |
 | `Perception/PlayerConduct.cs`         | MonoBehaviour  | What the player is doing right now, including the staff-area flag from zone triggers, counted per zone      | working  | M2        |
 | `Perception/PlayerLighting.cs`        | MonoBehaviour  | Light level at the player, sampled from every `GameplayLight` on a tick with shadow rays (decision 17)      | working  | M4        |
 | `Abilities/PlayerAbilities.cs`        | MonoBehaviour  | Remaining uses per owned ability for this heist; checks and spends a charge, then calls `Device.Activate()` | —        | M5        |
@@ -683,7 +692,7 @@ Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no 
    - [x] 2.2 `NpcAnomalySight` on NPCs checks raised anomalies on the perception tick through `NpcPerception.InViewCone`. The archetype gains anomaly suspicion and per-kind weights (`AnomalyWeights`); a noticed anomaly sets a suspicion floor and becomes the stimulus and the guard's last-known position. The guard only moves to a position it actually knows.
    - [ ] 2.3 A player-only `Door` with a lock level, reach, interaction, and the lockpicking minigame.
    - [ ] 2.4 The guard's errand: claim the open door, walk over, look confused, slam it.
-   - [ ] 2.5 `Lockpicking` conduct when the player is seen picking a lock.
+   - [x] 2.5 `Lockpicking` conduct when the player is seen picking a lock. Built as apartment step A3: `PlayerConduct` reads `PlayerLockpicking.IsPicking`.
 3. [ ] **Breaker** (decisions 17, 18). Trips a set of lamps: `f_light` drops for everyone looking into the zone, and the tripped breaker is an anomaly. Staff notice the dark, walk to the breaker, and reset it. Breaker lamps must be Mixed or Realtime.
 4. [ ] **Abilities at devices** (decision 20). `Ability` and `Device` in Core, `PlayerAbilities` on the player with uses per heist, and the errand mechanism on the guard. One ability that acts on the guard, chosen from the ideas list, proves it end to end.
        Optional abilities, built after the first one proves the system. Each is a device plus an errand (decision 20):
@@ -722,12 +731,14 @@ Then the reactions:
 
 ### M7 — The witness model (Phase 6)
 
-- `FeatureSlot` and `FeatureVisibility` filled in. `NpcArchetype` gains its witness block: observer skill, feature mask, and **memory retention** (the clerk forgets fast, the guard retains longer, the camera never forgets — concept 6.2).
-- `NpcWitness` consumes each `Observation` into one `FeatureBelief` per slot, combined in log-odds. It accumulates `f_duration` per encounter and applies memory decay between encounters.
+First built in the apartment level as Track W (`Assets/apartment-level.md` 3.6), with the clerk as the only witness. Appearance only (decision 23).
+
+- `FeatureSlot` (Head, Chest, Legs, Feet) and `FeatureVisibility` filled in, and `CharacterAppearance` on the player: each slot's style and colour, read from `PlayerCustomization`. `NpcArchetype` gains its witness block: observer skill, feature mask, and **memory retention** (the clerk forgets fast, the guard retains longer, the camera never forgets — concept 6.2).
+- `NpcWitness` consumes each `Observation` into `FeatureBelief`s per slot, one over styles and one over colours, combined in log-odds. It accumulates `f_duration` per encounter and applies memory decay between encounters.
 - Quality is the full product from concept 6.2: `f_dist · f_angle · f_light · f_duration · f_stance · observerSkill · featureVisibility`.
 - The region bitmask from M1 decides which slots were actually seen: feet blocked means lower-body features go unobserved. This is what `f_stance` means in practice, and it is also why a ceiling camera sees headwear well and footwear badly. The region fractions on `NpcPerception` can later scale quality per slot, if a glimpse and a full view need to differ.
-- The **Behaviour** slot is filled from the conduct reading (decision 6), and only by observers whose mask includes it.
-- `ConfusionMatrix` per feature slot. Below a quality threshold, the reported value is sampled from the confusion distribution, so a red jacket gets described as orange.
+- No Behaviour or Method slot: what the player does goes to the job log and adaptive security (decision 23).
+- `ConfusionMatrix` per feature slot, for styles and colours. Below a quality threshold, the reported value is sampled from the confusion distribution, so a red jacket gets described as orange.
 - `WitnessReport` at job end, with the log-odds merge across witnesses.
 - Reactions feed evidence differently: a frozen civilian gets a long, clean look; a fleeing one gives a poor, error-prone description.
 - A hook for a player-side confidence multiplier (concept 7.4 Face: "witnesses observe you at reduced confidence"). No skill logic here.
@@ -804,7 +815,7 @@ Then the reactions:
 - **Does `NpcStance` exist?** Only if civilians crouch or hide as part of a reaction.
 - **Decision window length.** Likely 1.5–3 seconds, probably different per reaction. A playtest question.
 - **Social proof.** Is the contagion broadcast enough for a civilian to know someone else is panicking, or do NPCs need to perceive each other?
-- ~~**Reading conduct through a feed.**~~ Answered by decision 6: yes for suspicion. The camera's own conduct weights define what the monitor guard reads. The camera's visual-only mask still keeps behaviour out of the evidence (M7).
+- ~~**Reading conduct through a feed.**~~ Answered by decision 6: yes for suspicion. The camera's own conduct weights define what the monitor guard reads. Behaviour never becomes witness evidence for any observer (decision 23).
 - ~~**Cameras and light.**~~ Answered by decision 17: yes. Cameras use `NpcPerception`, so `f_light` applies to them automatically, and the breaker counters them too. The camera archetype's `darkVisibilityFactor` sets how much.
 - **Baked lights in builds.** Not yet verified in this Unity version: does a Baked light keep its `Light` component and parameters in a player build? `GameplayLight` assumes it does.
 - **Which abilities ship.** Kept so far (concept 6.7, and optional in M5 step 4): disable the internet, call the guard's mum, page the guard, leak the group chat, clog the toilet, car alarm. "Call the guard's mum" and "page the guard" act on the guard alone, so one of them is the M5 ability. The car alarm is the one that changes facing rather than position: everyone turns to the window.
@@ -864,3 +875,13 @@ Then the reactions:
 - **2026-10-09** — M6 step 1 done: `NpcFacing` extracted from `GuardBehaviour` and shared, `CivilianSpot`, `CivilianBehaviour` idle routine with the placeholder reaction, `HasArrived()` shared by guard and civilians, and `CivilianRandomOutfit` picking a role outfit per civilian.
 - **2026-10-09** — M6 step 2 built: `NpcWitness` counts exposure (seconds of a perfect view) per perception tick from the observation's strength, on guards and civilians, with a readout line. Play-mode check pending. Work paused at M6 step 3 (door chores), which waits for Marcus's doors.
 - **2026-10-13** — Apartment level planned in `Assets/apartment-level.md`: the tutorial job, with a tired clerk at home who is quick to alarm (`TiredClerkHome`, the interior as a `Staff` zone), a sleep rhythm, a sight-driven decision window, and a police call that fails the job. Decision 21: the clerk at home is the one civilian with a cone, semi-dynamic through a runtime view scale on `NpcPerception`. Decision 22 gains the resident line. `ResidentBehaviour` and `Dozing` added to the civilian table; the "caught without a guard" question is partly answered.
+- **2026-10-14** — Apartment job flow steps A1–A5 done (`Assets/apartment-level.md`, handover in `handovers/apartment-job-flow.md`). On the NPC side: `GuardBehaviour.Catch()` now calls `JobOutcome.Fail(Caught)`, replacing `ReloadOnCaught`. The `Lockpicking` conduct flag (M5 step 2.5) is in, and so is the new `Stealing` flag, set while the player holds E on loot (`PlayerLootInteraction.IsTaking`). Each flag has a `ConductWeights` field that defaults to 1.0. The archetype assets do not serialize the two new weights yet and rely on that default.
+- **2026-10-14** — The clerk-at-home archetype is `ApartmentClerk` (planned as `TiredClerkHome`), with `inStaffArea` 0.8 and `sprinting` 0.4: full view inside the apartment reaches Alerted in about 2.3 s. `Assets/apartment-level.md` 2.1 updated to match.
+- **2026-10-14** — Apartment clerk redesigned: mostly asleep in an armchair in the corner of the living room, with an occasional snack run to the kitchen (a tell before getting up, full cone on the walk, back to the room while snacking). The Apartment gains a NavMesh; the route must cross no closable door (decision 19). Track B gains step B5, the snack run (`Assets/apartment-level.md` 2.2, 4).
+- **2026-10-14** — Decision 23: the witness model is appearance only (Head, Chest, Legs, Feet, each remembered as style and colour separately); behaviour and method go to the job log and adaptive security instead. Burns in the Phase 7 profile are temporary. The full witness model is built first in the apartment level as Track W, right after the clerk. M7 and the `CharacterAppearance` row updated.
+- **2026-10-14** — Apartment clerk B1–B3 done: `ApartmentClerk` prefab variant in the armchair; view scale on `NpcPerception` (`SetViewScale`, scaled `ViewDistance` and `FovDegrees` used by every sight check, debug cone and readout follow it, test context menus); the vision cone follows the scale through new `_RangeScale` and `_FovScale` shader inputs, with `_HalfFov` kept at the full angle for the ray lookup. The clerk has a cone (decision 21).
+- **2026-10-14** — Apartment clerk B4–B5 done: `ResidentBehaviour` (with `ResidentPhase`) runs the doze rhythm in the armchair with an eased view scale, wakes on anything above Idle (a scare pauses the routine and looks toward the stimulus, and shortens later dozes), and makes snack runs to a `SnackPoint` by the fridge along the NavMesh. `CivilianActivity` gains `Dozing`. The clerk's hearing is raised (sensitivity 12, suspicion 0.85) so a sprint anywhere in the open flat wakes them.
+- **2026-10-14** — Apartment clerk B6 done: the decision window opens on reaching Alerted (not on being Alerted, so it does not reopen while suspicion lingers), fills while the clerk sees the player and drains while not; full starts an uninterruptible call that fails the job with `PoliceCalled` after 1.5 s. Works in the armchair and on the snack run. Exposes `WindowProgress` and `IsCalling` for the ring and the HUD.
+- **2026-10-14** — Apartment clerk B7 animations: ten hand-made clips in `NPC.blend` (sleep, stir, awake, stand up, tired walk, snack at the counter, sit down, standing idle, phone reach, phone call), exported to `Assets/NPC/Art/Clerk/Animations/Clerk_Animations.fbx` with a rest-pose `Clerk_Rig.fbx` that defines the avatar (the animation file's own default skeleton is posed). Root baked based on Original, so seated and leaning poses keep their place. `ClerkLocomotionBuilder` builds `ClerkAnimator`: a base layer following `ResidentPhase` and a Phone layer masked to head and arms, faded in by `ResidentAnimation` (a Humanoid layer at full weight with no clip holds its masked parts in the neutral muscle pose).
+- **2026-10-14** — Track B complete. `ResidentWindowRing` draws the decision window around the clerk's suspicion indicator (red and pulsing while calling). The HUD's status tag is live: every NPC reports its alert state through `NpcAlertReporter` to the Core board `JobAlert`, which keeps the highest (`JobAlertLevel`: Undetected, Suspicious, Searching, Alarm), and `AlertStatusHud` shows it. Dependencies stay NPC to Core, and any number of NPCs works the same way.
+- **2026-10-14** — The decision-window ring moved from above the clerk's head to the HUD, so it shows while the clerk is off screen: `ResidentWindowReporter` (NPC) reports the open window to `JobAlert`, and `DecisionWindowHud` (Core) draws the fullest open window as a ring at the end of the status tag. `ResidentWindowRing` removed.

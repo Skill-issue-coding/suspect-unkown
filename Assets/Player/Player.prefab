@@ -1308,6 +1308,8 @@ GameObject:
   - component: {fileID: -818215352608075208}
   - component: {fileID: -1011108268404151007}
   - component: {fileID: -9086269151619823552}
+  - component: {fileID: 5916406596137029354}
+  - component: {fileID: 428061494250804744}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -1475,6 +1477,7 @@ MonoBehaviour:
   sprint: 0
   crouch: 0
   tension: 0
+  interact: 0
   cancel: 0
   cursorLocked: 0
 --- !u!114 &8683267482955256226
@@ -1684,6 +1687,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDoorInteraction
   useText: E
+--- !u!114 &5916406596137029354
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3ffb1ccdcc2a7c40bde706e10612170, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerJobEnd
+--- !u!114 &428061494250804744
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1f8d338f47a5ef4291a12843b05472a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLootInteraction
 --- !u!1 &1386813031399317714
 GameObject:
   m_ObjectHideFlags: 0
