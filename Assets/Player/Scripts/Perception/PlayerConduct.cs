@@ -7,7 +7,7 @@ using UnityEngine;
 // CharacterController: adding a Rigidbody to the player would make all 17 bone 
 // triggers fire zone events too. A zone disabled while the player is inside never 
 // sends OnTriggerExit; zones are static level geometry, so that is accepted.
-// Lockpicking comes from PlayerLockpicking.
+// Lockpicking comes from PlayerLockpicking, Stealing from PlayerLootInteraction.
 [RequireComponent(typeof(PlayerMotor))]
 public class PlayerConduct : MonoBehaviour
 {
@@ -15,6 +15,7 @@ public class PlayerConduct : MonoBehaviour
 
     private PlayerMotor motor;
     private PlayerLockpicking lockpicking;
+    private PlayerLootInteraction loot;
 
     public ConductFlags Current
     {
@@ -24,6 +25,7 @@ public class PlayerConduct : MonoBehaviour
             if (motor.IsSprinting) flags |= ConductFlags.Sprinting;
             if (IsInStaffArea()) flags |= ConductFlags.InStaffArea;
             if (lockpicking != null && lockpicking.IsPicking) flags |= ConductFlags.Lockpicking;
+            if (loot != null && loot.IsTaking) flags |= ConductFlags.Stealing;
             return flags;
         }
     }
@@ -60,6 +62,7 @@ public class PlayerConduct : MonoBehaviour
     {
         motor = GetComponent<PlayerMotor>();
         lockpicking = GetComponent<PlayerLockpicking>();
+        loot = GetComponent<PlayerLootInteraction>();
     }
 
 }

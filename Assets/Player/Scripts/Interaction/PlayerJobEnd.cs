@@ -41,6 +41,7 @@ public class PlayerJobEnd : MonoBehaviour
         motor.IsMovementSuspended = true;
         inputs.MoveInput(Vector2.zero);
         inputs.SprintInput(false);
+        inputs.interact = false;
 
         inputs.SetCursorLocked(false);
 

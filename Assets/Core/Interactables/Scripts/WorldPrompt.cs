@@ -45,6 +45,10 @@ public class WorldPrompt : MonoBehaviour
     [SerializeField, Tooltip("Label colour while blocked")]
     private Color blockedLabelColor = Color.white;
 
+    [Header("Hold")]
+    [SerializeField, Tooltip("Optional. Filled image over the box showing hold progress; doors never fill it")]
+    private Image holdFill;
+
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
     private Tween fade;
@@ -100,6 +104,10 @@ public class WorldPrompt : MonoBehaviour
         label.text = text;
         SetBlocked(blocked);
 
+        label.text = text;
+        SetBlocked(blocked);
+        SetProgress(0f);
+
         if (visible) return;
         visible = true;
 
@@ -125,6 +133,11 @@ public class WorldPrompt : MonoBehaviour
             }
             else boxBackground.SetPropertyBlock(null);
         }
+    }
+
+    public void SetProgress(float progress)
+    {
+        if (holdFill != null) holdFill.fillAmount = progress;
     }
 
     public void Hide()

@@ -3,9 +3,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
-// Builds the lockpicking HUD prefab from scratch and wires it, plus a key and a rim light, into the
-// LockpickMinigameView prefab. In code rather than by hand so the layout is reviewable in git and a bad
-// tweak is one menu click from undone. Safe to run again: it rebuilds the HUD and updates the lights
+// Builds the lockpicking HUD prefab from scratch, and wires the lock camera plus a key and a rim light
+// into the LockpickMinigameView prefab. The HUD is nested in PlayerHud, which picks up the rebuild by
+// itself. In code rather than by hand so the layout is reviewable in git and a bad tweak is one menu
+// click from undone. Safe to run again: it rebuilds the HUD and updates the lights
 public static class LockpickHudBuilder
 {
     private const string HudPath = "Assets/Core/Interactables/Prefabs/LockpickHud.prefab";
@@ -35,8 +36,8 @@ public static class LockpickHudBuilder
             return;
         }
 
-        LockpickHud hud = BuildHud(move, turn, leave, font);
-        WireView(hud);
+        BuildHud(move, turn, leave, font);
+        WireView();
         Debug.Log($"Lockpick HUD built at {HudPath} and wired into {ViewPath}");
     }
 
@@ -55,7 +56,7 @@ public static class LockpickHudBuilder
         return AssetDatabase.LoadAssetAtPath<Sprite>(path);
     }
 
-    private static LockpickHud BuildHud(Sprite moveIcon, Sprite turnIcon, Sprite leaveIcon, TMP_FontAsset font)
+    private static void BuildHud(Sprite moveIcon, Sprite turnIcon, Sprite leaveIcon, TMP_FontAsset font)
     {
         Sprite panel = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
         Sprite knob = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/Knob.psd");
@@ -115,9 +116,8 @@ public static class LockpickHudBuilder
             pipList.GetArrayElementAtIndex(i).objectReferenceValue = pips[i];
         so.ApplyModifiedPropertiesWithoutUndo();
 
-        GameObject saved = PrefabUtility.SaveAsPrefabAsset(root, HudPath);
+        PrefabUtility.SaveAsPrefabAsset(root, HudPath);
         Object.DestroyImmediate(root);
-        return saved.GetComponent<LockpickHud>();
     }
 
     // Icon and label side by side, faded as one through its CanvasGroup
@@ -170,7 +170,7 @@ public static class LockpickHudBuilder
         return label;
     }
 
-    private static void WireView(LockpickHud hudPrefab)
+    private static void WireView()
     {
         GameObject contents = PrefabUtility.LoadPrefabContents(ViewPath);
         try
@@ -184,7 +184,6 @@ public static class LockpickHudBuilder
             }
 
             var so = new SerializedObject(view);
-            so.FindProperty("hudPrefab").objectReferenceValue = hudPrefab;
             so.FindProperty("lockCamera").objectReferenceValue = lockCamera;
             so.ApplyModifiedPropertiesWithoutUndo();
 

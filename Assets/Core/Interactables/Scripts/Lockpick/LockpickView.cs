@@ -28,9 +28,6 @@ public class LockpickView : MonoBehaviour
     private float blurDuration = 0.25f;
 
     [Header("Presentation")]
-    [SerializeField, Tooltip("HUD prefab with hints, status and meter. Created once, as its own overlay canvas")]
-    private LockpickHud hudPrefab;
-
     [SerializeField, Tooltip("Camera that films the lock; its field of view narrows as the lock turns")]
     private Camera lockCamera;
 
@@ -60,18 +57,14 @@ public class LockpickView : MonoBehaviour
         if (pickMesh != null) initialPickRotation = pickMesh.localRotation;
         if (cylinderMesh != null) initialCylinderRotation = cylinderMesh.localRotation;
         if (lockCamera != null) baseFov = lockCamera.fieldOfView;
-
-        // Unparented on purpose: a root overlay canvas sizes itself to the screen wherever this view sits
-        if (hudPrefab != null) hud = Instantiate(hudPrefab);
-    }
-
-    private void OnDestroy()
-    {
-        if (hud != null) Destroy(hud.gameObject);
     }
 
     public void Begin(LockpickModel model, int lockLevel)
     {
+        // The HUD lives in the scene's PlayerHud and registers itself; fetched here, on first use,
+        // so the order of the two objects' Awake calls does not matter
+        if (hud == null) hud = LockpickHud.Current;
+
         if (currentModel != null)
         {
             currentModel.Slipped -= OnSlipped;

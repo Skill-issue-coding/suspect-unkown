@@ -10,4 +10,5 @@ public enum ConductFlags
     Sprinting = 1 << 0,
     InStaffArea = 1 << 1,
     Lockpicking = 1 << 2,
+    Stealing = 1 << 3,
 }
