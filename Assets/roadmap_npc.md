@@ -384,7 +384,7 @@ Vision block starting values. Region weights are head / upper body / hands / low
 
 The guard's hand weight is high because tool use is conduct guards read. The camera's feet weight is low because a ceiling camera sees headwear well and footwear badly. Lower tick rates for civilians make them slower to notice and cheaper to run.
 
-Suspicion block values. Conduct weights are sprinting / in staff area; `lockpicking` joins with M5 step 2.5 at 1.0 for every archetype. **Every archetype shares the guard's rise rate of 0.5** (decision 22), so a weight means the same thing everywhere: weight × 0.5 is suspicion per second at full visibility.
+Suspicion block values. Conduct weights are sprinting / in staff area; `lockpicking` (M5 step 2.5) and `stealing` (apartment step A4) follow, both 1.0 for every archetype. **Every archetype shares the guard's rise rate of 0.5** (decision 22), so a weight means the same thing everywhere: weight × 0.5 is suspicion per second at full visibility.
 
 | Archetype         | Conduct    | Rise   | Decay  | Delay  | Curious | Investigating | Alerted | Hysteresis |
 | ----------------- | ---------- | ------ | ------ | ------ | ------- | ------------- | ------- | ---------- |
@@ -536,7 +536,7 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `Perception/PerceptionTargets.cs`     | MonoBehaviour  | Every body point, flat and by region. Fixed after `Awake`                                                   | working  | M1        |
 | `Perception/CharacterAppearance.cs`   | struct         | Placeholder for the player's feature vector. Shape to agree at the art and systems seam                     | declared | M7        |
 | `Editor/MapPlayerPerceptionPoints.cs` | static class   | Adds `PerceptionPoint` to the 17 bone colliders in `Player.prefab` by bone name                             | working  | M1        |
-| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea; `Lockpicking` joins in M5. Powers of two; a flag is added only with its producer    | working  | M2, M5    |
+| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea, Lockpicking, Stealing. Powers of two; a flag is added only with its producer        | working  | M2, M5    |
 | `Perception/PlayerConduct.cs`         | MonoBehaviour  | What the player is doing right now, including the staff-area flag from zone triggers, counted per zone      | working  | M2        |
 | `Perception/PlayerLighting.cs`        | MonoBehaviour  | Light level at the player, sampled from every `GameplayLight` on a tick with shadow rays (decision 17)      | working  | M4        |
 | `Abilities/PlayerAbilities.cs`        | MonoBehaviour  | Remaining uses per owned ability for this heist; checks and spends a charge, then calls `Device.Activate()` | —        | M5        |
@@ -683,7 +683,7 @@ Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no 
    - [x] 2.2 `NpcAnomalySight` on NPCs checks raised anomalies on the perception tick through `NpcPerception.InViewCone`. The archetype gains anomaly suspicion and per-kind weights (`AnomalyWeights`); a noticed anomaly sets a suspicion floor and becomes the stimulus and the guard's last-known position. The guard only moves to a position it actually knows.
    - [ ] 2.3 A player-only `Door` with a lock level, reach, interaction, and the lockpicking minigame.
    - [ ] 2.4 The guard's errand: claim the open door, walk over, look confused, slam it.
-   - [ ] 2.5 `Lockpicking` conduct when the player is seen picking a lock.
+   - [x] 2.5 `Lockpicking` conduct when the player is seen picking a lock. Built as apartment step A3: `PlayerConduct` reads `PlayerLockpicking.IsPicking`.
 3. [ ] **Breaker** (decisions 17, 18). Trips a set of lamps: `f_light` drops for everyone looking into the zone, and the tripped breaker is an anomaly. Staff notice the dark, walk to the breaker, and reset it. Breaker lamps must be Mixed or Realtime.
 4. [ ] **Abilities at devices** (decision 20). `Ability` and `Device` in Core, `PlayerAbilities` on the player with uses per heist, and the errand mechanism on the guard. One ability that acts on the guard, chosen from the ideas list, proves it end to end.
        Optional abilities, built after the first one proves the system. Each is a device plus an errand (decision 20):
@@ -864,3 +864,4 @@ Then the reactions:
 - **2026-10-09** — M6 step 1 done: `NpcFacing` extracted from `GuardBehaviour` and shared, `CivilianSpot`, `CivilianBehaviour` idle routine with the placeholder reaction, `HasArrived()` shared by guard and civilians, and `CivilianRandomOutfit` picking a role outfit per civilian.
 - **2026-10-09** — M6 step 2 built: `NpcWitness` counts exposure (seconds of a perfect view) per perception tick from the observation's strength, on guards and civilians, with a readout line. Play-mode check pending. Work paused at M6 step 3 (door chores), which waits for Marcus's doors.
 - **2026-10-13** — Apartment level planned in `Assets/apartment-level.md`: the tutorial job, with a tired clerk at home who is quick to alarm (`TiredClerkHome`, the interior as a `Staff` zone), a sleep rhythm, a sight-driven decision window, and a police call that fails the job. Decision 21: the clerk at home is the one civilian with a cone, semi-dynamic through a runtime view scale on `NpcPerception`. Decision 22 gains the resident line. `ResidentBehaviour` and `Dozing` added to the civilian table; the "caught without a guard" question is partly answered.
+- **2026-10-14** — Apartment job flow steps A1–A5 done (`Assets/apartment-level.md`, handover in `handovers/apartment-job-flow.md`). On the NPC side: `GuardBehaviour.Catch()` now calls `JobOutcome.Fail(Caught)`, replacing `ReloadOnCaught`. The `Lockpicking` conduct flag (M5 step 2.5) is in, and so is the new `Stealing` flag, set while the player holds E on loot (`PlayerLootInteraction.IsTaking`). Each flag has a `ConductWeights` field that defaults to 1.0. The archetype assets do not serialize the two new weights yet and rely on that default.

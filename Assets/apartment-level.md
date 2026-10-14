@@ -184,6 +184,8 @@ The work splits into two tracks that can run side by side. **Track A** is the jo
 
 ### Track A — the job flow
 
+**Status (2026-10-14):** A1–A5 are done and checked in play mode. A6 is next. Progress notes are in `handovers/apartment-job-flow.md`.
+
 **A1. `JobOutcome` and `FailReason`.** The static events from 3.1, the scene-load reset, and `GuardBehaviour.Caught` raising `Fail(Caught)`. Delete `ReloadOnCaught`.
 *Check:* on the test bench, the guard catches the player and one failure is logged. A second catch logs nothing.
 

@@ -2,7 +2,8 @@ using PrimeTween;
 using UnityEngine;
 
 // Shows or hides the highlight rim around an interactable. Holds renderers that draw only the
-// outline material; the player side decides when. Starts hidden
+// outline material; the player side decides when. Starts hidden, unless alwaysVisible keeps it shown
+// at full strength and makes SetVisible do nothing
 public class InteractOutline : MonoBehaviour
 {
     private static readonly int FadeId = Shader.PropertyToID("_Fade");
@@ -13,22 +14,24 @@ public class InteractOutline : MonoBehaviour
     [SerializeField, Tooltip("Renderers that draw only the outline material")]
     private Renderer[] outlines;
 
+    [SerializeField, Tooltip("Shown at full strength from the start; the player side can no longer hide it")]
+    private bool alwaysVisible = false;
+
     private MaterialPropertyBlock block;
     private Tween fade;
     private float current;
 
     private void Awake()
     {
-        foreach (Renderer outline in outlines)
-            outline.enabled = false;
-
         block = new MaterialPropertyBlock();
-        Apply(0f);
-        SetRenderers(false);
+        Apply(alwaysVisible ? 1f : 0f);
+        SetRenderers(alwaysVisible);
     }
 
     public void SetVisible(bool visible)
     {
+        if (alwaysVisible) return;
+
         fade.Stop();
         if (visible) SetRenderers(true);
 

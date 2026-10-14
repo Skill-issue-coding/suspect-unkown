@@ -74,6 +74,8 @@ Three phases are marked **GATE** (1, 4, and 9), and Phases 3 and 6 carry a light
 
 The apartment level (`Assets/apartment-level.md`) is where loot, the bag indicator, the fail state, the results newspaper, saved progress, and the getaway van are first built, on a single civilian, the clerk at home. Every job ends at the van: stand at its back doors for a few seconds once the required loot is taken, then it drives off.
 
+**Status (2026-10-14):** the apartment has built loot with hold-to-take timers, the bag indicator, the fail state and the results newspaper (steps A1–A5). Saved progress and the getaway van are next. The apartment has no carry weight.
+
 The prototype job uses a guard. Tier 1's only opposition is civilians, whose behaviour does not exist until Phase 5, so tier 1 content is built after that.
 
 **Gate check:** play it ten times. Is there ever tension? If not, the Curious state is almost certainly too short. Lengthen it before doing anything else.

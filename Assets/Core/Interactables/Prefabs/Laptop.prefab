@@ -67,6 +67,7 @@ MonoBehaviour:
   fadeDuration: 0.12
   outlines:
   - {fileID: 3298935579978246829}
+  alwaysVisible: 1
 --- !u!135 &1108453073155920058
 SphereCollider:
   m_ObjectHideFlags: 0
