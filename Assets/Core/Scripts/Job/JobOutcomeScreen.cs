@@ -211,7 +211,7 @@ public class JobOutcomeScreen : MonoBehaviour
         entry.Stop();
         Time.timeScale = 1f;
 
-        SceneManager.LoadScene(scene);
+        SceneTransition.Load(scene);
     }
 
     // The context menu freezes the game while it is open, and that wait arrives as one long frame of

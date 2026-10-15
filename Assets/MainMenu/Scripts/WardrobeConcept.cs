@@ -59,8 +59,7 @@ public class WardrobeConcept : MonoBehaviour
             r.next.onClick.AddListener(() => { customization.NextPart(r.category); Refresh(); });
         }
 
-        // PlayerCustomization loads the saved look in its own Start, which may run after this one
-        customization.LoadAppearance();
+        // PlayerCustomization has already loaded the saved look in its Awake
         Refresh();
     }
 

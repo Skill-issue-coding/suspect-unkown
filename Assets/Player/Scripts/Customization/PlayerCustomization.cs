@@ -2,10 +2,17 @@ using System;
 using UnityEngine;
 
 // The player's outfit: one active part per category (Head, Chest, Legs, Feet), switched by turning
-// the part meshes on and off, and remembered between sessions in PlayerPrefs. The wardrobe's arrows call
-// NextPart and PreviousPart. Raises Changed once per change, so readers (PlayerAppearance) rebuild only then
+// the part meshes on and off, and remembered between sessions in PlayerPrefs by part name, so reordering
+// or adding parts on the prefab never dresses a saved player in something else. Loaded in Awake, so the
+// first frame and every reader's Start already see the saved outfit. The wardrobe's arrows call NextPart
+// and PreviousPart. Raises Changed once per change, so readers (PlayerAppearance) rebuild only then
 public class PlayerCustomization : MonoBehaviour
 {
+    // One key per category holding the part's name. The old keys held a position in the parts list;
+    // they are read once if no name is saved yet, so outfits saved before the change carry over
+    private const string NameKey = "PlayerLookPart_";
+    private const string OldIndexKey = "PlayerLook_";
+
     [System.Serializable]
     public class CustomizationCategory
     {
@@ -19,14 +26,14 @@ public class PlayerCustomization : MonoBehaviour
 
     public event Action Changed;
 
-    void Start() => LoadAppearance();
+    private void Awake() => LoadAppearance();
 
     public void LoadAppearance()
     {
+        if (categories == null) return;
         for (int i = 0; i < categories.Length; i++)
         {
-            // Save using the category name for accuracy
-            categories[i].currentIndex = PlayerPrefs.GetInt("PlayerLook_" + categories[i].categoryName, 0);
+            categories[i].currentIndex = SavedIndex(categories[i]);
             UpdateCategoryVisibility(i);
         }
 
@@ -36,11 +43,29 @@ public class PlayerCustomization : MonoBehaviour
 
     public void SaveAppearance()
     {
-        for (int i = 0; i < categories.Length; i++)
+        foreach (CustomizationCategory category in categories)
         {
-            PlayerPrefs.SetInt("PlayerLook_" + categories[i].categoryName, categories[i].currentIndex);
+            GameObject part = category.parts.Length > 0 ? category.parts[category.currentIndex] : null;
+            if (part != null) PlayerPrefs.SetString(NameKey + category.categoryName, part.name);
         }
         PlayerPrefs.Save();
+    }
+
+    // The saved part's position in this prefab's list: by name, else the old saved position, else the first part
+    private int SavedIndex(CustomizationCategory category)
+    {
+        string nameKey = NameKey + category.categoryName;
+        if (PlayerPrefs.HasKey(nameKey))
+        {
+            string saved = PlayerPrefs.GetString(nameKey);
+            for (int j = 0; j < category.parts.Length; j++)
+                if (category.parts[j] != null && category.parts[j].name == saved) return j;
+            Debug.LogWarning($"{name}: saved {category.categoryName} part {saved} no longer exists; wearing the first one", this);
+            return 0;
+        }
+
+        int old = PlayerPrefs.GetInt(OldIndexKey + category.categoryName, 0);
+        return old >= 0 && old < category.parts.Length ? old : 0;
     }
 
     public void NextPart(string categoryName)

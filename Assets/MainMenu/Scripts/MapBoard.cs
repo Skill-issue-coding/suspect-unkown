@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.Serialization;
 
@@ -85,11 +84,7 @@ public class MapBoard : MonoBehaviour
     public void StartHeist()
     {
         if (selected == null || !IsOpen(selected)) return;
-        if (!Application.CanStreamedLevelBeLoaded(selected.SceneName))
-        {
-            Debug.LogWarning($"{name}: scene '{selected.SceneName}' is not in the build scene list, so Start Heist cannot load it", this);
-            return;
-        }
-        SceneManager.LoadScene(selected.SceneName);
+        // Warns by itself when the scene is not in the build scene list
+        SceneTransition.Load(selected.SceneName);
     }
 }
