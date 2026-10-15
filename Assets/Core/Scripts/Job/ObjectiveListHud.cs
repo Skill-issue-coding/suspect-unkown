@@ -21,6 +21,9 @@ public class ObjectiveListHud : MonoBehaviour
     private float bottomPadding = 18f;
 
     private ObjectiveRow[] rows;
+    private ObjectiveRow escapeRow;
+
+    Vector2 origin;
 
     private void Awake()
     {
@@ -45,7 +48,7 @@ public class ObjectiveListHud : MonoBehaviour
     private void Start()
     {
         var templateRect = (RectTransform)template.transform;
-        Vector2 origin = templateRect.anchoredPosition;
+        origin = templateRect.anchoredPosition;
 
         rows = new ObjectiveRow[objectives.Required];
         for (int i = 0; i < rows.Length; i++)
@@ -57,9 +60,10 @@ public class ObjectiveListHud : MonoBehaviour
             rows[i] = row;
         }
 
-        // The rows hang down from the template's position, so the card ends just below the last one
-        float rowsHeight = rows.Length == 0 ? 0f : rowSpacing * (rows.Length - 1) + templateRect.rect.height;
-        card.sizeDelta = new Vector2(card.sizeDelta.x, -origin.y + rowsHeight + bottomPadding);
+        escapeRow = Instantiate(template, templateRect.parent);
+        escapeRow.name = "EscapeObjective";
+        ((RectTransform)escapeRow.transform).anchoredPosition = origin + Vector2.down * (rowSpacing * rows.Length);
+        escapeRow.gameObject.SetActive(false);
 
         Refresh();
     }
@@ -73,5 +77,20 @@ public class ObjectiveListHud : MonoBehaviour
             LootItem item = objectives.RequiredItem(i);
             rows[i].Show(item != null ? item.DisplayName : "?", objectives.IsTaken(i));
         }
+
+        bool readyToEscape = objectives.IsComplete;
+        if (escapeRow != null)
+        {
+            escapeRow.gameObject.SetActive(readyToEscape);
+            if (readyToEscape) 
+            {
+                escapeRow.Show("Return to the escape van", false); 
+            }
+        }
+
+        // The rows hang down from the template's position, so the card ends just below the last one
+        int visibleRowsCount = readyToEscape ? rows.Length + 1 : rows.Length;
+        float rowsHeight = visibleRowsCount == 0 ? 0f : rowSpacing * (visibleRowsCount - 1) + ((RectTransform)template.transform).rect.height;
+        card.sizeDelta = new Vector2(card.sizeDelta.x, -origin.y + rowsHeight + bottomPadding);
     }
 }
