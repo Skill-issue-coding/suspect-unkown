@@ -3163,7 +3163,8 @@ MonoBehaviour:
   durationTime: 1.5
   sightingGap: 0.5
   colorConfusion: {fileID: 11400000, guid: 2ecd182514cef9e418e6b188a36d968a, type: 2}
-  clearLook: 0.35
+  clearLook: 0.25
+  worstWrongChance: 0.5
 --- !u!114 &5211560300784144956
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,7 +3,8 @@ using System.IO;
 using UnityEngine;
 
 // Loads and saves the police record, what the police know of the player's appearance across jobs, as
-// police.json beside progress.json. Its own file, so a broken record never costs the player's progress. A
+// police.json beside progress.json. Its own file, so a broken record never costs the player's progress.
+// Written on a completed job only (JobWitnesses), like progress.json. A
 // missing, unreadable or outdated file loads as an empty record. The only code that touches it on disk
 public static class PoliceStore
 {
