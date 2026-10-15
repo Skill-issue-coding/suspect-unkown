@@ -1,16 +1,17 @@
 using PrimeTween;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 // The job HUD's status tag (top right): UNDETECTED, SUSPICIOUS, SEARCHING or ALARM, the highest alert any
-// NPC reports through JobAlert, in a colour per level. Changes only on JobAlert.Changed, with a small punch
+// NPC reports through JobAlert, in a color per level. Changes only on JobAlert.Changed, with a small punch
 // so a rise catches the eye. On JobHud.prefab's root
 public class AlertStatusHud : MonoBehaviour
 {
     [Header("Parts")]
-    [SerializeField, Tooltip("The tag itself; punched when the level changes")]
-    private RectTransform tag;
+    [SerializeField, FormerlySerializedAs("tag"), Tooltip("The tag itself; punched when the level changes")]
+    private RectTransform statusTag;
 
     [SerializeField, Tooltip("Shows the level's name")]
     private TMP_Text label;
@@ -22,7 +23,7 @@ public class AlertStatusHud : MonoBehaviour
     private Image border;
 
     [Header("Look, per level: Undetected, Suspicious, Searching, Alarm")]
-    [SerializeField, Tooltip("Text and icon colour per level, in JobAlertLevel order")]
+    [SerializeField, Tooltip("Text and icon color per level, in JobAlertLevel order")]
     private Color[] colors =
     {
         new Color(0.93f, 0.91f, 0.86f, 0.5f),
@@ -34,7 +35,7 @@ public class AlertStatusHud : MonoBehaviour
     [SerializeField, Tooltip("Text per level, in JobAlertLevel order")]
     private string[] texts = { "UNDETECTED", "SUSPICIOUS", "SEARCHING", "ALARM" };
 
-    [SerializeField, Range(0f, 1f), Tooltip("Outline alpha, as a fraction of the level's colour")]
+    [SerializeField, Range(0f, 1f), Tooltip("Outline alpha, as a fraction of the level's color")]
     private float borderAlpha = 0.55f;
 
     [SerializeField, Tooltip("Scale added at the peak of the punch when the level rises")]
@@ -44,9 +45,9 @@ public class AlertStatusHud : MonoBehaviour
 
     private void Awake()
     {
-        if (tag == null || label == null || icon == null || border == null || colors.Length < 4 || texts.Length < 4)
+        if (statusTag == null || label == null || icon == null || border == null || colors.Length < 4 || texts.Length < 4)
         {
-            Debug.LogWarning($"{name} needs its tag, label, icon, border and four colours and texts; assign them in JobHud.prefab", this);
+            Debug.LogWarning($"{name} needs its tag, label, icon, border and four colors and texts; assign them in JobHud.prefab", this);
             enabled = false;
         }
     }
@@ -62,7 +63,7 @@ public class AlertStatusHud : MonoBehaviour
         Show(to);
         if (to <= from) return;
         punch.Complete();
-        punch = Tween.PunchScale(tag, Vector3.one * punchStrength, duration: 0.3f, frequency: 6);
+        punch = Tween.PunchScale(statusTag, Vector3.one * punchStrength, duration: 0.3f, frequency: 6);
     }
 
     private void Show(JobAlertLevel level)

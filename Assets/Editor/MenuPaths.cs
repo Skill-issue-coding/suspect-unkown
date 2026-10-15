@@ -26,9 +26,14 @@ public static class MenuPaths
     public const string ProgressReveal = Progress + "Reveal Save Folder";
     public const string ProgressDelete = Progress + "Delete Save";
 
+    public const string Police = Root + "Police Record/";
+    public const string PoliceLog = Police + "Log Record";
+    public const string PoliceDelete = Police + "Delete Record";
+
     // Priorities: blocks of 100 so there is always a separator between groups
     public const int WindowsPriority = 0;
     public const int PlayerPriority = 100;
     public const int NpcPriority = 200;
     public const int ProgressPriority = 300;
+    public const int PolicePriority = 400;
 }

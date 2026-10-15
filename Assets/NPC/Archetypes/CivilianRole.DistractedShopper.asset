@@ -80,6 +80,8 @@ MonoBehaviour:
   conductWeights:
     sprinting: 0.1
     inStaffArea: 0.1
+    lockpicking: 1
+    stealing: 1
   riseRate: 0.15
   decayRate: 0.4
   decayDelay: 0.5
@@ -87,3 +89,10 @@ MonoBehaviour:
   investigatingAt: 0.6
   alertedAt: 0.95
   hysteresis: 0.03
+  observerSkill: 0.4
+  featureVisibility:
+    head: 0.8
+    chest: 0.8
+    legs: 0.4
+    feet: 0.2
+  memoryHalfLife: 90

@@ -46,14 +46,14 @@ This is done through the existing rules rather than around them:
 
 Starting values, to be tuned in playtests:
 
-| Weight or value | `TiredClerk` (store) | `ApartmentClerk` | Effect                                                                            |
-| --------------- | -------------------- | ---------------- | --------------------------------------------------------------------------------- |
-| `inStaffArea`   | 0.25                 | 0.8              | Full view inside reaches Alerted (0.9) in about 2.3 s: 0.8 × 0.5 = 0.4 per second |
-| `lockpicking`   | 1.0                  | 1.0              | Same everywhere (decision 22)                                                     |
-| `stealing`      | —                    | 1.0              | Taking the laptop in view is the worst thing to be seen doing                     |
-| `sprinting`     | 0.1                  | 0.4              | Running indoors is odd                                                            |
-| `hearingSensitivity` | 0.6             | 12               | A sprint step (9 m radius) carries 108 m of NavMesh path; closed doors still block it (decision 10) |
-| `hearingSuspicion`   | 0.4             | 0.85             | A sprint (alarm 0.3) sets up to 0.26, past Curious out to about 23 m of path: a sprint in the bathroom or kitchen wakes them. Under `alertedAt`, so no sound alone alerts |
+| Weight or value      | `TiredClerk` (store) | `ApartmentClerk` | Effect                                                                                                                                                                    |
+| -------------------- | -------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `inStaffArea`        | 0.25                 | 0.8              | Full view inside reaches Alerted (0.9) in about 2.3 s: 0.8 × 0.5 = 0.4 per second                                                                                         |
+| `lockpicking`        | 1.0                  | 1.0              | Same everywhere (decision 22)                                                                                                                                             |
+| `stealing`           | —                    | 1.0              | Taking the laptop in view is the worst thing to be seen doing                                                                                                             |
+| `sprinting`          | 0.1                  | 0.4              | Running indoors is odd                                                                                                                                                    |
+| `hearingSensitivity` | 0.6                  | 12               | A sprint step (9 m radius) carries 108 m of NavMesh path; closed doors still block it (decision 10)                                                                       |
+| `hearingSuspicion`   | 0.4                  | 0.85             | A sprint (alarm 0.3) sets up to 0.26, past Curious out to about 23 m of path: a sprint in the bathroom or kitchen wakes them. Under `alertedAt`, so no sound alone alerts |
 
 ### 2.2 The routine: dozing in the armchair, the snack run, and the semi-dynamic cone
 
@@ -137,12 +137,12 @@ The window runs on sight rather than on suspicion dropping, because suspicion on
 
 **The job HUD** (`JobHud.prefab`, nested in `PlayerHud`; dark chamfered panels, thin lines, one sodium-orange accent):
 
-| Corner                   | Shows                                                                                                                                                                                                                         | Driven by                                          |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Top left, job card       | Job tag and title (set per level), the elapsed time, and a checklist of the required items, ticked as each is taken                                                                                                           | `JobClock`, `ObjectiveListHud` with `ObjectiveRow` |
-| Top right                | Status tag (UNDETECTED, SUSPICIOUS, SEARCHING, ALARM): the most alarmed NPC in the level | `AlertStatusHud`, fed by `JobAlert`; every NPC reports through `NpcAlertReporter` |
-| Bottom left, carry panel | The bag icon, filling as required loot is taken; a tree of the bag's two slots under "Bag", each showing its item or "Empty", so the panel never changes size; the pocket cash total; "+ ITEM" above the panel on each pickup | `LootBagHud`, `CarryHud`, `PickupToast`            |
-| Bottom right             | Ability slots with uses left                                                                                                                                                                                                  | Placeholder until abilities exist                  |
+| Corner                   | Shows                                                                                                                                                                                                                         | Driven by                                                                         |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Top left, job card       | Job tag and title (set per level), the elapsed time, and a checklist of the required items, ticked as each is taken                                                                                                           | `JobClock`, `ObjectiveListHud` with `ObjectiveRow`                                |
+| Top right                | Status tag (UNDETECTED, SUSPICIOUS, SEARCHING, ALARM): the most alarmed NPC in the level                                                                                                                                      | `AlertStatusHud`, fed by `JobAlert`; every NPC reports through `NpcAlertReporter` |
+| Bottom left, carry panel | The bag icon, filling as required loot is taken; a tree of the bag's two slots under "Bag", each showing its item or "Empty", so the panel never changes size; the pocket cash total; "+ ITEM" above the panel on each pickup | `LootBagHud`, `CarryHud`, `PickupToast`                                           |
+| Bottom right             | Ability slots with uses left                                                                                                                                                                                                  | Placeholder until abilities exist                                                 |
 
 Still to come with the van and the thrift shop: a carry model that refuses a third bag item and is emptied at the van on each trip (the bag list in `CarryHud` moves into it), and the bag icon's fill changing from collected over required to slots used.
 
@@ -198,13 +198,21 @@ Headlines come from a `HeadlineSet` ScriptableObject per outcome, picked at rand
 
 Phase 6 reuses this newspaper prefab for the witness report, so build it as a prefab with replaceable text from the start.
 
-**The witness paragraph** (Track W). On both outcomes, under the headline, the paper prints the clerk's description from the witness model (3.6): "The tenant described the burglar as wearing a black jacket and possibly white shoes." A clerk who never saw the player gives "No witnesses came forward." Later, if time allows, a picture beside it shows a figure in a T-pose dressed in that description, with grey for every slot the witness could not describe.
+**The witness sketch** (Track W, W7). The paper's grey picture box shows the player as the clerk remembers them: the player model in the first frame of its idle pose, dressed in the description from the witness model (3.6), printed in grayscale on the same grey background. Grayscale hides colors, so the caption under the photo names them: "Witness description: brown cap, red jacket, possibly grey trousers." The image depends on the outcome:
+
+| Outcome | Image | Title and caption |
+| --- | --- | --- |
+| Caught | The sketch as a mugshot, with height lines behind the figure | "Image of the caught criminal", with the description caption |
+| Completed, seen | The sketch as a wanted poster, with no height lines | "Police seek this person", with the description caption |
+| Completed, never seen | No figure: the grey "?" placeholder | "No witnesses came forward" |
+
+The sketch shows every outfit slot the clerk can describe in its leading style and color. A slot the clerk cannot describe shows a flat silhouette, like an unfinished police sketch, and a slot the clerk is unsure of fades toward the paper's grey. The player learns the same lesson on both outcomes: what the witness saw is what the paper prints.
 
 ### 3.6 The witness: what the clerk remembers
 
 This level is where the full witness model (`roadmap_npc.md` M7, decision 23) is built and first taught, on its one witness. The model is about **appearance only**: what the player looked like. What the player _did_ (which door, which route) is the job log's business and feeds adaptive security in Phase 8, not the witness.
 
-**Feature slots.** The four categories of `PlayerCustomization`: **Head**, **Chest**, **Legs**, **Feet**. Each part name carries a style and a colour (`Chest_002_Black` is style 002, colour Black), and the witness holds a separate belief for each. A poor look can get the colour right and the style wrong, or leave only "something black".
+**Feature slots.** The four categories of `PlayerCustomization`: **Head**, **Chest**, **Legs**, **Feet**. Each part name carries a style and a color (`Chest_002_Black` is style 002, color Black), and the witness holds a separate belief for each. A poor look can get the color right and the style wrong, or leave only "something black".
 
 | Slot  | Seen through body region |
 | ----- | ------------------------ |
@@ -223,17 +231,19 @@ q = f_dist · f_angle · f_light · f_duration · f_stance · observerSkill · f
 
 `f_dist`, `f_angle`, `f_light` and `f_stance` already come with every `Observation`. `f_duration` grows over one continuous sighting, so a glance and a long stare differ. `observerSkill` and the per-slot `featureVisibility` come from the archetype's new witness block; the clerk at home is a poor observer (skill about 0.4).
 
-**Beliefs.** Each slot holds a log-odds belief over styles and one over colours (`FeatureBelief`). Each observation adds evidence for the value the witness _thinks_ it saw, weighted by `q`. Below a quality threshold that value is drawn from a `ConfusionMatrix` (a ScriptableObject per slot) instead of the truth: black remembered as dark grey, one cut of jacket as a similar one.
+**Beliefs.** Each slot holds a log-odds belief over styles and one over colors (`FeatureBelief`). Each observation adds evidence for the value the witness _thinks_ it saw, weighted by `q` and by the look's length. Confidence in a value is its share of all scores, with values never seen counted at the even start (10 colors, 3 styles).
+
+**Confusion.** Below a quality threshold (`clearLook`, 0.35) a look can take in a wrong value, more often the worse the look. Colors come from one `ConfusionMatrix` asset (`ColorConfusion`) shared by every slot, since black reads as grey on a jacket and on shoes alike: each color lists its likely mistakes with weights (black as grey, blue or brown). Styles have no similar neighbours, so a wrong style is any other style. The chance of being wrong is capped (`worstWrongChance`, 0.5, at most 0.6) so the truth stays the single most likely recall: a poor witness is vague and sometimes wrong, never consistently wrong. Without the cap, many poor looks made a mistake outscore the truth.
 
 **Memory and the latest appearance.** Beliefs decay between sightings at the archetype's retention rate; the clerk forgets fast. Each observation reads the player's appearance at that moment, so a fresh good look outweighs an old poor one, and a mid-job change of clothes (later levels) gives a description of what the player wore when last seen well.
 
-**The report.** At job end, `NpcWitness` produces a `WitnessReport`: per slot the most likely style and colour with a confidence. The newspaper turns confidence into words: certain, "probably", "possibly", or left out. Several witnesses (later levels) merge in log-odds.
+**The report.** At job end, `NpcWitness` produces a `WitnessReport`: per slot the most likely style and color with a confidence. The newspaper shows it as a sketch of the player (3.4), with a caption that turns confidence into words: certain, "probably", "possibly", or left out. Several witnesses (later levels) merge in log-odds.
 
 **What it deliberately does not do yet.**
 
-- **No persistence.** The report is not saved. Phase 7's police profile stores it later, and it is built so it can be saved as it is.
-- **Burned clothes are temporary** (Phase 7): an item counts as burned for one or two jobs, or until newer witness evidence describes something different. Never permanently.
-- **The T-posed figure** in the newspaper is a later addition, if time allows.
+- **Saved, but not yet acted on.** The police description is saved at job end and loaded at job start (W8): the start of Phase 7's police profile. Nothing in the apartment reacts to it yet; guards and cameras that look for a described outfit come with Phase 7.
+- **Burned clothes are temporary** (Phase 7): an item counts as burned for one or two jobs, or until newer witness evidence describes something different. Never permanently. The saved description already behaves this way: it fades every job, and new evidence outweighs it.
+- **The sketch is one still image.** No animation and no live camera: one render at job end (W7).
 
 ### 3.5 Saved progress
 
@@ -312,26 +322,38 @@ _Check:_ someone who has not seen the code can tell from the animation alone whe
 
 Built on the clerk once they can see and react. Design in 3.6; done-when from `roadmap_npc.md` M7.
 
-**W1. The player's appearance.** `CharacterAppearance` (Player) holds the four slots' style and colour, read from `PlayerCustomization`'s active parts, and is read at each sighting.
-_Check:_ a debug readout shows the current outfit as four style and colour pairs; changing a part in play mode updates it.
+**Status (2026-10-15):** W5 is built (memory half-life per archetype; the clerk's is 90 s). W6 is done and checked: at job end every witness's report merges into the police description and is logged ("no witnesses came forward" when nobody saw the player), and the seven merge tests pass in EditMode (`Assets/Testing/Editor/WitnessMergeTests.cs`). W1–W4 are done and checked in play mode: the clerk builds per-slot beliefs about style and color from every sighting, learns nothing about slots whose regions were hidden, and stays vague but mostly right on poor looks. With skill 0.4 he needs about 6 s of a steady, close, lit look to be sure (about 90 % on colors). Memory retention moved from W2 to W5, where it is first used; the slot-to-region mapping is a fixed rule in `NpcWitness`, not archetype data. W7.1–W7.4 are done and checked: the `SketchBooth` (layer 17, one per job scene) poses a mannequin in idle frame 0, dresses it from the police description (see-through when unsure, a silhouette when unknown, the nearest existing part when the combination does not exist), renders it once at job end after a warm-up render at load, and hands the caption to the newspaper through `JobNews` (Core). W7.5 is built and verified on all three outcomes: the paper's photo is now square (225.5 × 225.5, `WitnessSketch.renderTexture` 512 × 512 in `Core/UI/Textures`), shown through the `Grayscale` Canvas Shader Graph, with height lines when caught, none when the player got away, and the "?" with "No witnesses came forward" when nobody saw them; the fake text column under the photo became the real caption. W8 (the police record: `PoliceStore`, `police.json`, loaded at job start, faded by half per job and merged at job end) is written and compiles but not yet tested; the test steps are in `handovers/witness-model.md`. The W7 playtest check is still open.
 
-**W2. Witness data.** `FeatureSlot` enum; the archetype's witness block: observer skill, per-slot feature visibility and the region each slot is seen through, memory retention.
-_Check:_ the clerk's archetype shows the block with skill about 0.4 and fast retention; `OnValidate` warns on a slot with no region.
+**W1. The player's appearance.** `CharacterAppearance` (Player) holds the four slots' style and color, read from `PlayerCustomization`'s active parts, and is read at each sighting.
+_Check:_ a debug readout shows the current outfit as four style and color pairs; changing a part in play mode updates it.
 
-**W3. Beliefs.** `FeatureBelief` in log-odds; `NpcWitness` adds evidence per observation weighted by quality, with `f_duration` growing over one continuous sighting. A live readout of each slot's leading style, colour and confidence.
+**W2. Witness data.** `FeatureSlot` enum; the archetype's witness block: observer skill and per-slot feature visibility (`FeatureVisibility`).
+_Check:_ the clerk's archetype shows the block with skill about 0.4; `OnValidate` warns when every slot's visibility is 0.
+
+**W3. Beliefs.** `FeatureBelief` in log-odds; `NpcWitness` adds evidence per observation weighted by quality, with `f_duration` growing over one continuous sighting. A live readout of each slot's leading style, color and confidence.
 _Check:_ a long, close, lit look drives every visible slot to high confidence in the true values; a glance barely moves them; crouched behind cover, Feet and Legs stay unknown.
 
-**W4. Confusion.** `ConfusionMatrix` per slot (colours and styles); below the quality threshold the observed value is sampled from it.
-_Check:_ repeated poor looks from the edge of the cone produce some wrong colours (black as dark grey), never wildly wrong ones; good looks stay correct.
+**W4. Confusion.** One `ConfusionMatrix` for colors shared by every slot, and a uniform wrong style; below the quality threshold the observed value is sometimes a mistake, with a capped chance so the truth stays the most likely recall.
+_Check:_ repeated poor looks from the edge of the cone produce some wrong colors (black as dark grey), never wildly wrong ones; good looks stay correct.
 
-**W5. Memory.** Decay between sightings at the archetype's retention.
+**W5. Memory.** The archetype's memory half-life; every belief fades toward the even start at that rate (0 never forgets).
 _Check:_ seen well, then hidden for a while: confidence fades in the readout. Seen again, it climbs back, and the description follows the latest good look.
 
-**W6. The report.** `WitnessReport` at job end: per slot the leading values and confidence. Unit tests for the log-odds merge (Unity Test Framework).
+**W6. The report.** `WitnessReport` at job end: per slot the style and color evidence in log-odds, and the leading values with their confidence. Every witness in the job merges into one police description (log-odds add). Unit tests for the merge (Unity Test Framework).
 _Check:_ the report matches the readout's last state; the merge tests pass.
 
-**W7. The newspaper paragraph.** The description in words with confidence wording, on both outcomes; "No witnesses came forward" if the clerk never saw the player.
+**W7. The witness sketch.** The newspaper's picture box shows the description as a figure (design in 3.4, "The witness sketch"):
+
+- **The sketch booth.** A mannequin copy of the player model stands out of sight, on its own render layer, held in the first frame of the player's idle clip (an Animator with one idle state at speed 0).
+- **Dressing.** For each slot, the mannequin shows the part named by the report's leading style and color (`Chest_001_Red`, the naming that `PlayerAppearance` reads). An unknown slot shows a flat silhouette, and a low-confidence slot fades toward the paper's grey.
+- **One render.** When `JobWitnesses` produces the description, a camera that sees only the sketch layer renders the mannequin once into a RenderTexture, then switches off.
+- **The paper.** A `RawImage` in the picture box shows the RenderTexture through a grayscale Canvas Shader Graph material, on the existing grey background. The backdrop is height lines when caught and a wanted poster when completed. The title and caption follow the outcome table. The caption names each slot's colors with confidence words: certain, "probably" or "possibly", or the slot left out. "No witnesses came forward" keeps the "?" placeholder.
+- **Dependencies.** The dressing and render code is NPC: it reads `WitnessReport` and the player's part names. The newspaper (Core) only holds the RawImage and a RenderTexture asset, and receives the caption text through a Core hook, so Core never references witness types. The sketch layer goes in the CLAUDE.md layers table.
+
 _Check:_ someone who played once can tell from the paper alone how good a look the clerk got, and says unprompted that they would change clothes (roadmap Phase 6 gate check).
+
+**W8. The saved description.** At job end the job's police description is saved (its own JSON file beside `progress.json`, so a broken file never costs the player's progress); at job start it is loaded. Before saving, the loaded description fades by one job and the new one merges into it, so old evidence counts for less each job and newer evidence that describes something different takes over (burns are temporary). A missing or broken file loads as "no description". The data is plain values (slot, style, color, scores), owned by the NPC side, so Core and Player stay free of NPC types.
+_Check:_ finish a job after a good look, then start again: the log (and a readout line) shows the loaded description. Change clothes and get seen well: at the next start, the changed slots follow the new outfit. A run with no sightings leaves the old description, one job fainter. Delete the file: the next start loads "no description" without errors.
 
 ### Together
 

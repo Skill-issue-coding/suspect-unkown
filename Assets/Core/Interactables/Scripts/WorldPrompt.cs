@@ -39,10 +39,10 @@ public class WorldPrompt : MonoBehaviour
     [SerializeField, Tooltip("Optional mesh behind the box; greyed out while blocked")]
     private Renderer boxBackground;
 
-    [SerializeField, Tooltip("Colour of the box, line and background while blocked")]
+    [SerializeField, Tooltip("Color of the box, line and background while blocked")]
     private Color blockedTint = new Color(0.42f, 0.44f, 0.48f, 1f);
 
-    [SerializeField, Tooltip("Label colour while blocked")]
+    [SerializeField, Tooltip("Label color while blocked")]
     private Color blockedLabelColor = Color.white;
 
     [Header("Hold")]
@@ -92,7 +92,7 @@ public class WorldPrompt : MonoBehaviour
         this.follower = follower;
         this.target = target;
 
-        // Activate first: the first time, Awake runs here and records the authored colours
+        // Activate first: the first time, Awake runs here and records the authored colors
         // before SetBlocked changes them
         if (!gameObject.activeSelf)
         {

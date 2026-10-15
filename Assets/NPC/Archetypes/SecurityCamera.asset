@@ -92,9 +92,14 @@ MonoBehaviour:
   tickRate: 10
   hearingSensitivity: 0
   hearingSuspicion: 0
+  anomalySuspicion: 0.6
+  anomalyWeights:
+    openDoor: 1
   conductWeights:
     sprinting: 0.5
     inStaffArea: 0.8
+    lockpicking: 1
+    stealing: 1
   riseRate: 0.5
   decayRate: 0.1
   decayDelay: 2
@@ -102,3 +107,10 @@ MonoBehaviour:
   investigatingAt: 0.5
   alertedAt: 0.9
   hysteresis: 0.05
+  observerSkill: 1
+  featureVisibility:
+    head: 1
+    chest: 1
+    legs: 0.6
+    feet: 0.3
+  memoryHalfLife: 0

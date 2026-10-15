@@ -76,6 +76,16 @@ public class NpcArchetype : ScriptableObject
     [SerializeField, Tooltip("How far suspicion must drop below a threshold to leave that state"), Range(0f, 0.1f)]
     private float hysteresis = 0.05f;
 
+    [Header("Witness")]
+    [SerializeField, Range(0f, 1f), Tooltip("How good an observer this is, a factor in every piece of evidence. Tired clerk ~0.4, civilian ~0.6, guard 1")]
+    private float observerSkill = 0.6f;
+
+    [SerializeField, Tooltip("How much each part of an outfit is noticed and remembered, 0 to 1")]
+    private FeatureVisibility featureVisibility = new FeatureVisibility(1f, 1f, 1f, 1f);
+
+    [SerializeField, Min(0f), Tooltip("Seconds for remembered evidence to halve. 0 never forgets (a camera's recording). Clerk ~90, civilian ~120, guard ~300")]
+    private float memoryHalfLife = 120f;
+
     public float ViewDistance => viewDistance;
     public float FovDegrees => fovDegrees;
     public float EyeHeight => eyeHeight;
@@ -93,6 +103,9 @@ public class NpcArchetype : ScriptableObject
     public float HearingSensitivity => hearingSensitivity;
     public float HearingSuspicion => hearingSuspicion;
     public float AnomalySuspicion => anomalySuspicion;
+    public float ObserverSkill => observerSkill;
+    public float MemoryHalfLife => memoryHalfLife;
+    public float FeatureVisibility(FeatureSlot slot) => featureVisibility.Get(slot);
     public float AnomalyWeight(AnomalyKind kind) => anomalyWeights.Get(kind);
 
     // Light level 0 is darkness, 1 full light. Shadow lowers visibility but never to zero:
@@ -131,5 +144,8 @@ public class NpcArchetype : ScriptableObject
 
         if (anomalySuspicion >= alertedAt)
             Debug.LogWarning($"{name} anomalySuspicion reaches alertedAt: an anomaly alone could alert", this);
+
+        if (featureVisibility.AllZero)
+            Debug.LogWarning($"{name} notices no part of an outfit: as a witness it will remember nothing", this);
     }
 }

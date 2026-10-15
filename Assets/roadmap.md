@@ -115,7 +115,7 @@ The prototype job uses a guard. Tier 1's only opposition is civilians, whose beh
 
 The art side and the systems side of the same feature. Build them together.
 
-The witness model is about appearance only (Head, Chest, Legs, Feet, each as style and colour); what the player does goes to the job log and adaptive security (decision 23 in `roadmap_npc.md`). It is built first in the apartment level (`Assets/apartment-level.md` 3.6, Track W), right after the clerk, with the newspaper as the report.
+The witness model is about appearance only (Head, Chest, Legs, Feet, each as style and color); what the player does goes to the job log and adaptive security (decision 23 in `roadmap_npc.md`). It is built first in the apartment level (`Assets/apartment-level.md` 3.6, Track W), right after the clerk, with the newspaper as the report.
 
 - **Modular character rig**: base mesh with head/torso/legs/hands sockets, shared skeleton, animations retargeting across all outfits
 - Three to five wardrobe pieces as swappable meshes with material tints

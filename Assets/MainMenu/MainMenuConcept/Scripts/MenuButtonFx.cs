@@ -19,9 +19,9 @@ public class MenuButtonFx : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     [Tooltip("Icon and labels. Slides right on hover")]
     [SerializeField] private RectTransform content;
 
-    [Tooltip("Plate colour at rest and hovered")]
+    [Tooltip("Plate color at rest and hovered")]
     [SerializeField] private Color fillIdle = new Color(0.07f, 0.08f, 0.09f, 0.72f), fillHover = new Color(0.12f, 0.13f, 0.14f, 0.85f);
-    [Tooltip("Border colour at rest and hovered")]
+    [Tooltip("Border color at rest and hovered")]
     [SerializeField] private Color borderIdle = new Color(1f, 1f, 1f, 0.28f), borderHover = new Color(1f, 1f, 1f, 0.95f);
     [Tooltip("Accent bar width when hovered, pixels")]
     [SerializeField] private float accentWidth = 6f;

@@ -2,7 +2,7 @@ using PrimeTween;
 using UnityEngine;
 
 // The ground marking at the van's back doors: a frame the size of the zone, grey with a lock while
-// locked, pulsing in the accent colour once unlocked, and a fill that grows toward the van with the
+// locked, pulsing in the accent color once unlocked, and a fill that grows toward the van with the
 // zone's progress. Displays only; the zone decides. Re-reads the state on StateChanged; only the fill
 // follows progress per frame, and only while it moves. Sprites on the Default layer, not world UI,
 // which WorldUiOverlay would draw over the player standing on it
@@ -22,10 +22,10 @@ public class ExtractionMarker : MonoBehaviour
     private SpriteRenderer lockIcon;
 
     [Header("Look")]
-    [SerializeField, Tooltip("Frame colour while locked")]
+    [SerializeField, Tooltip("Frame color while locked")]
     private Color lockedColor = new Color(0.93f, 0.91f, 0.86f, 0.3f);
 
-    [SerializeField, Tooltip("Frame colour once unlocked; the pulse dips its alpha")]
+    [SerializeField, Tooltip("Frame color once unlocked; the pulse dips its alpha")]
     private Color unlockedColor = new Color(1f, 0.71f, 0.28f, 1f);
 
     [SerializeField, Range(0f, 1f), Tooltip("Frame alpha at the low point of the pulse")]

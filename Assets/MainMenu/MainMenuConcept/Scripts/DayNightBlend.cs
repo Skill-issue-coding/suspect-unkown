@@ -10,7 +10,7 @@ public class DayNightBlend : MonoBehaviour
     [Serializable]
     public struct Look
     {
-        [Tooltip("Sun or moon colour")]
+        [Tooltip("Sun or moon color")]
         public Color lightColor;
         [Tooltip("Sun or moon intensity")]
         public float lightIntensity;

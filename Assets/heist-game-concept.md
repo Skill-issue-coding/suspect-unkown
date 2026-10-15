@@ -121,16 +121,16 @@ The **Curious** state is where the game lives. Detection must not be binary. A g
 
 **The centerpiece mechanic.**
 
-When an NPC perceives you, it does not record "the player." It records a **feature vector with per-feature confidence**. The witness model is about **appearance only**; what you *do* (your entry, your route, the door you always pick) is recorded in the job log and drives adaptive security instead (6.4, and decision 23 in `roadmap_npc.md`).
+When an NPC perceives you, it does not record "the player." It records a **feature vector with per-feature confidence**. The witness model is about **appearance only**; what you _do_ (your entry, your route, the door you always pick) is recorded in the job log and drives adaptive security instead (6.4, and decision 23 in `roadmap_npc.md`).
 
-The feature slots are the categories of the modular character, and each part is remembered as a **style and a colour separately**, so a witness can get the colour right and the cut wrong:
+The feature slots are the categories of the modular character, and each part is remembered as a **style and a color separately**, so a witness can get the color right and the cut wrong:
 
-| Feature    | Example values                                  |
-| ---------- | ----------------------------------------------- |
-| Head       | hair or headwear style, and its colour          |
-| Chest      | jacket, hoodie or shirt style, and its colour   |
-| Legs       | jeans or trousers style, and its colour         |
-| Feet       | shoe style, and its colour                      |
+| Feature | Example values                               |
+| ------- | -------------------------------------------- |
+| Head    | hair or headwear style, and its color        |
+| Chest   | jacket, hoodie or shirt style, and its color |
+| Legs    | jeans or trousers style, and its color       |
+| Feet    | shoe style, and its color                    |
 
 Face covering, build and gait are candidates for later slots once the character has content for them.
 

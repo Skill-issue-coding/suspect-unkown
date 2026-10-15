@@ -13,10 +13,10 @@ public class DecisionWindowHud : MonoBehaviour
     [SerializeField, Tooltip("Faint full ring behind it, so the empty part reads as a track")]
     private Image track;
 
-    [SerializeField, Tooltip("Ring colour while someone is deciding")]
+    [SerializeField, Tooltip("Ring color while someone is deciding")]
     private Color decidingColor = new Color(1f, 0.5f, 0.2f, 1f);
 
-    [SerializeField, Tooltip("Ring colour once a call is under way")]
+    [SerializeField, Tooltip("Ring color once a call is under way")]
     private Color callingColor = new Color(1f, 0.3f, 0.27f, 1f);
 
     [SerializeField, Tooltip("Pulses per second while calling")]

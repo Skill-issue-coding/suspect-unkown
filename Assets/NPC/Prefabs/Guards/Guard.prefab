@@ -2520,6 +2520,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5cc06995a9084030bf6b7fd5b014282, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcWitness
+  evidencePerSecond: 3
+  durationTime: 1.5
+  sightingGap: 0.5
+  colorConfusion: {fileID: 11400000, guid: 2ecd182514cef9e418e6b188a36d968a, type: 2}
+  clearLook: 0.35
 --- !u!114 &6652728458607151797
 MonoBehaviour:
   m_ObjectHideFlags: 0

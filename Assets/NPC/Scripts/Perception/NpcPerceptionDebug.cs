@@ -25,7 +25,7 @@ public class NpcPerceptionDebug : MonoBehaviour
 
     [Header("Readout")]
     [SerializeField] private bool readouts = true;
-    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 480f);
+    [SerializeField] private Rect readoutRect = new Rect(10f, 10f, 220f, 602f);
 
     private NpcPerception perception;
     private NpcSuspicion suspicion;
@@ -169,7 +169,17 @@ public class NpcPerceptionDebug : MonoBehaviour
 #endif
 
         if (witness != null)
+        {
             GUILayout.Label($"witness  {witness.Exposure:F1} s  (seen {witness.SeenTime:F1} s, best {witness.BestQuality:F2})");
+
+            foreach (FeatureSlot slot in (FeatureSlot[])Enum.GetValues(typeof(FeatureSlot)))
+            {
+                if (witness.TryDescribe(slot, out OutfitFeature f, out float sc, out float cc))
+                    GUILayout.Label($"  {slot,-6} {f.color} {cc:P0} · style {f.style:000} {sc:P0}");
+                else
+                    GUILayout.Label($"  {slot,-6} —");
+            }
+        }
 
         if (suspicion != null && suspicion.HasStimulus)
             GUILayout.Label($"stimulus {Vector3.Distance(transform.position, suspicion.LastStimulus):F1} m away");

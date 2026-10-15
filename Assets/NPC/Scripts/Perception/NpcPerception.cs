@@ -23,6 +23,7 @@ public class NpcPerception : MonoBehaviour, IPerceiver
     private PlayerStance playerStance;
     private PlayerConduct playerConduct;
     private PlayerLighting playerLighting;
+    private PlayerAppearance playerAppearance;
     private float nextTick;
 
     private Observation latest;
@@ -90,6 +91,10 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         playerLighting = targets.GetComponent<PlayerLighting>();
         if (playerLighting == null)
             Debug.LogWarning($"{name} found no PlayerLighting; light reads as full.", this);
+
+        playerAppearance = targets.GetComponent<PlayerAppearance>();
+        if (playerAppearance == null)
+            Debug.LogWarning($"{name} found no PlayerAppearance; witnesses will learn nothing about the outfit.", this);
 
         pointClear = new bool[targets.AllPoints.Count];
         regionFraction = new float[Regions.Length];
@@ -197,6 +202,7 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         observation.visibility = visibility;
         observation.conduct = playerConduct != null ? playerConduct.Current : ConductFlags.None;
         observation.abnormality = archetype.Abnormality(observation.conduct);
+        observation.appearance = playerAppearance != null ? playerAppearance.Current : default;
         return true;
     }
 }

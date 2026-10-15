@@ -37,16 +37,16 @@ public class LockpickHud : MonoBehaviour
     private Image[] levelPips;
 
     [Header("Look")]
-    [SerializeField, Tooltip("Colour while searching")]
+    [SerializeField, Tooltip("Color while searching")]
     private Color idleColor = new Color(0.62f, 0.68f, 0.8f, 1f);
 
-    [SerializeField, Tooltip("Colour while turning")]
+    [SerializeField, Tooltip("Color while turning")]
     private Color activeColor = new Color(0.92f, 0.96f, 1f, 1f);
 
-    [SerializeField, Tooltip("Colour while straining or after a slip")]
+    [SerializeField, Tooltip("Color while straining or after a slip")]
     private Color warningColor = new Color(1f, 0.48f, 0.32f, 1f);
 
-    [SerializeField, Tooltip("Colour once the lock is open")]
+    [SerializeField, Tooltip("Color once the lock is open")]
     private Color successColor = new Color(0.45f, 1f, 0.6f, 1f);
 
     [SerializeField, Range(0f, 1f), Tooltip("Alpha of a hint row that does nothing right now")]

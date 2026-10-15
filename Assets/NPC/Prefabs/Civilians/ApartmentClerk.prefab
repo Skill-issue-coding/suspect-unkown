@@ -261,6 +261,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: ApartmentClerk
       objectReference: {fileID: 0}
+    - target: {fileID: 8812113050130535251, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
+      propertyPath: readoutRect.x
+      value: 1300
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812113050130535251, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
+      propertyPath: readoutRect.y
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 8812113050130535251, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
+      propertyPath: readoutRect.height
+      value: 602
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

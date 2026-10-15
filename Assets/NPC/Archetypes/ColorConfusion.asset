@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2916b355b4364ea8b9965ec2e141597, type: 3}
+  m_Name: ColorConfusion
+  m_EditorClassIdentifier: Assembly-CSharp::ConfusionMatrix
+  rows:
+  - color: 1
+    mistakes:
+    - recalledAs: 6
+      weight: 3
+    - recalledAs: 4
+      weight: 2
+    - recalledAs: 3
+      weight: 1
+  - color: 6
+    mistakes:
+    - recalledAs: 1
+      weight: 2
+    - recalledAs: 9
+      weight: 2
+    - recalledAs: 4
+      weight: 1
+  - color: 9
+    mistakes:
+    - recalledAs: 6
+      weight: 3
+    - recalledAs: 10
+      weight: 1
+    - recalledAs: 2
+      weight: 1
+  - color: 4
+    mistakes:
+    - recalledAs: 1
+      weight: 2
+    - recalledAs: 7
+      weight: 2
+    - recalledAs: 5
+      weight: 1
+  - color: 4
+    mistakes:
+    - recalledAs: 1
+      weight: 2
+    - recalledAs: 7
+      weight: 2
+    - recalledAs: 5
+      weight: 1
+  - color: 5
+    mistakes:
+    - recalledAs: 4
+      weight: 2
+    - recalledAs: 6
+      weight: 1
+    - recalledAs: 10
+      weight: 1
+  - color: 8
+    mistakes:
+    - recalledAs: 3
+      weight: 2
+    - recalledAs: 7
+      weight: 2
+    - recalledAs: 10
+      weight: 1
+  - color: 3
+    mistakes:
+    - recalledAs: 1
+      weight: 2
+    - recalledAs: 8
+      weight: 2
+    - recalledAs: 2
+      weight: 1
+  - color: 7
+    mistakes:
+    - recalledAs: 4
+      weight: 3
+    - recalledAs: 8
+      weight: 2
+  - color: 10
+    mistakes:
+    - recalledAs: 2
+      weight: 3
+    - recalledAs: 9
+      weight: 2
+  - color: 2
+    mistakes:
+    - recalledAs: 10
+      weight: 3
+    - recalledAs: 3
+      weight: 2

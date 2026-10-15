@@ -112,6 +112,7 @@ Aim for a practical industry standard: code another developer could pick up, ext
 | Player | 14 | The player and its bone perception colliders |
 | NPC | 15 | NPC bodies |
 | Volume | 16 | `Zone` volumes. Collides with Player only |
+| Sketch | 17 | The witness sketch booth. Only `SketchCamera` and `SketchLight` see it |
 | UI | 5 | HUD canvases |
 
 ---

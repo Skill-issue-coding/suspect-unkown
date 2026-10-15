@@ -4,11 +4,14 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // Shows how a job ended. On failure the picture turns grey, time slows, and the newspaper spins in
 // with a "caught" headline and a restart button; on success it comes in with a positive headline and
-// a continue button. Listens to JobOutcome and nothing else, so it never needs to know who ended the
-// job. Lives on the always-active canvas root, because an inactive object never receives the event
+// a continue button. The photo shows the witness sketch from JobNews: a mugshot when caught, a wanted
+// picture when the player got away, a "?" when nobody saw them. Listens to JobOutcome and JobNews only,
+// so it never needs to know who ended the job or who saw the player. Lives on the always-active canvas
+// root, because an inactive object never receives the event
 public class JobOutcomeScreen : MonoBehaviour
 {
     [Header("References")]
@@ -79,15 +82,39 @@ public class JobOutcomeScreen : MonoBehaviour
     [SerializeField, Tooltip("Scene loaded by Continue. Must be in the build scene list")]
     private string menuScene = "MainMenu";
 
+    [Header("Witness sketch")]
+    [SerializeField, Tooltip("Shows the witness sketch's RenderTexture through the grayscale material")]
+    private RawImage sketch;
+
+    [SerializeField, Tooltip("The \"?\" shown when nobody saw the player")]
+    private GameObject noWitnessMark;
+
+    [SerializeField, Tooltip("Police height lines behind the figure: shown when the player was caught")]
+    private GameObject mugshotLines;
+
+    [SerializeField, Tooltip("The caption under the photo")]
+    private TMP_Text caption;
+
+    [SerializeField, Tooltip("Caption title when the job failed")]
+    private string caughtTitle = "Image of the caught criminal.";
+
+    [SerializeField, Tooltip("Caption title when the job succeeded but someone saw the player")]
+    private string wantedTitle = "Police seek this person.";
+
+    [SerializeField, Tooltip("Caption when nobody saw the player")]
+    private string noWitnessCaption = "No witnesses came forward.";
+
     private Tween greyTween;
     private Tween timeTween;
     private Sequence entry;
+    private bool failed;
 
     private void Awake()
     {
         if (screenRoot == null || paper == null || headline == null || backdrop == null || buttons == null ||
             restartButton == null || continueButton == null || failVolume == null ||
-            caught == null || policeCalled == null || completed == null)
+            caught == null || policeCalled == null || completed == null ||
+            sketch == null || noWitnessMark == null || mugshotLines == null || caption == null)
         {
             Debug.LogWarning($"{name} is missing references; job outcomes will not be shown", this);
             enabled = false;
@@ -101,12 +128,14 @@ public class JobOutcomeScreen : MonoBehaviour
     {
         JobOutcome.Failed += OnFailed;
         JobOutcome.Completed += OnCompleted;
+        JobNews.Changed += ShowPhoto;
     }
 
     private void OnDisable()
     {
         JobOutcome.Failed -= OnFailed;
         JobOutcome.Completed -= OnCompleted;
+        JobNews.Changed -= ShowPhoto;
     }
 
     private void OnFailed(FailReason reason)
@@ -115,14 +144,20 @@ public class JobOutcomeScreen : MonoBehaviour
             (volume, weight) => volume.weight = weight, useUnscaledTime: true);
         timeTween = Tween.GlobalTimeScale(slowTimeScale, slowDuration);
 
+        failed = true;
         Show(reason == FailReason.Caught ? caught : policeCalled, restartButton);
     }
 
-    private void OnCompleted() => Show(completed, continueButton);
+    private void OnCompleted()
+    {
+        failed = false;
+        Show(completed, continueButton);
+    }
 
     private void Show(HeadlineSet set, GameObject button)
     {
         headline.text = set.PickRandom();
+        ShowPhoto();
         restartButton.SetActive(button == restartButton);
         continueButton.SetActive(button == continueButton);
         screenRoot.SetActive(true);
@@ -149,6 +184,18 @@ public class JobOutcomeScreen : MonoBehaviour
             .Group(Tween.LocalEulerAngles(paper, startAngles, restAngles, paperDuration, Ease.OutCubic))
             .Chain(Tween.Alpha(buttons, 1f, 0.25f))
             .ChainCallback(this, self => self.buttons.interactable = true);
+    }
+
+    // The photo box: the witness sketch with a title for how the job ended, or the "?" when nobody saw the
+    // player. Called when the paper is shown and again on JobNews.Changed, because the description and the
+    // outcome arrive on the same event in no fixed order: whichever comes second leaves it right
+    private void ShowPhoto()
+    {
+        bool seen = JobNews.HasWitness;
+        sketch.enabled = seen;
+        noWitnessMark.SetActive(!seen);
+        mugshotLines.SetActive(seen && failed);
+        caption.text = seen ? $"<b>{(failed ? caughtTitle : wantedTitle)}</b> {JobNews.WitnessCaption}" : noWitnessCaption;
     }
 
     // Connected to RestartButton's On Click

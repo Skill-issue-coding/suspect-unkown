@@ -11,10 +11,10 @@ public class ObjectiveRow : MonoBehaviour
     [SerializeField, Tooltip("The filled, ticked box laid over the empty one; shown once the item is taken")]
     private GameObject doneMark;
 
-    [SerializeField, Tooltip("Text colour while the item is still to take")]
+    [SerializeField, Tooltip("Text color while the item is still to take")]
     private Color openColor = Color.white;
 
-    [SerializeField, Tooltip("Text colour once the item is taken")]
+    [SerializeField, Tooltip("Text color once the item is taken")]
     private Color doneColor = new Color(1f, 1f, 1f, 0.5f);
 
     private void Awake()
