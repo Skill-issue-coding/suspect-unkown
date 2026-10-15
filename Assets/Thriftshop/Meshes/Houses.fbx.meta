@@ -24,6 +24,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Texture
     second: {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: ThriftshopSign
+    second: {fileID: 2100000, guid: dffb1b44a8c454146b062078fc503b90, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
@@ -69,7 +74,7 @@ ModelImporter:
     nodeNameCollisionStrategy: 1
     fileIdsGeneration: 2
     swapUVChannels: 0
-    generateSecondaryUV: 0
+    generateSecondaryUV: 1
     useFileUnits: 1
     keepQuads: 0
     weldVertices: 1
