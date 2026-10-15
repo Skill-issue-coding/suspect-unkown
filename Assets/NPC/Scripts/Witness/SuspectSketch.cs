@@ -179,25 +179,32 @@ public class SuspectSketch : MonoBehaviour
         Dress(report);
         sketchCamera.Render();
 
-        string caption = Caption(report);
-        Debug.Log($"Witness sketch: {caption}", this);
-        JobNews.ReportWitness(caption);
+        string caption = Caption(report, out bool clear, out int named);
+        // The debrief scores the paper's words: nothing named is as good as unseen, "probably" or better is clear
+        WitnessClarity clarity = named == 0 ? WitnessClarity.Unseen : clear ? WitnessClarity.Clear : WitnessClarity.Vague;
+        Debug.Log($"Witness sketch ({clarity}): {caption}", this);
+        JobNews.ReportWitness(caption, clarity);
     }
 
     // "Witness description: brown hair, red jacket, possibly grey trousers." Colors the witness is unsure of are
-    // hedged, colors it cannot name are left out
-    private string Caption(WitnessReport report)
+    // hedged, colors it cannot name are left out. clear: at least one color is named "probably" or better.
+    // named: how many colors the caption names; none means the police have nothing to go on. The debrief scores
+    // these, so the paper and the XP always agree
+    private string Caption(WitnessReport report, out bool clear, out int named)
     {
+        clear = false;
         List<string> items = new List<string>();
         foreach (FeatureSlot slot in Slots)
         {
             if (!report.TryDescribe(slot, out OutfitFeature feature, out _, out float colorConfidence)) continue;
             if (colorConfidence < vagueAt) continue;
 
+            if (colorConfidence >= clearAt) clear = true;
             string hedge = colorConfidence >= certainAt ? "" : colorConfidence >= clearAt ? "probably " : "possibly ";
             items.Add($"{hedge}{feature.color.ToString().ToLowerInvariant()} {Word(slot, feature.style)}");
         }
-        return items.Count == 0
+        named = items.Count;
+        return named == 0
             ? "Witness description: too vague to describe."
             : $"Witness description: {string.Join(", ", items)}.";
     }

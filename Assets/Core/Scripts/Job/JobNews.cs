@@ -2,7 +2,8 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// What the newspaper reports about a job beyond how it ended: for now, the witness caption. Filled by the NPC
+// What the newspaper reports about a job beyond how it ended: the witness caption and how clear the
+// description is (the debrief scores it). Filled by the NPC
 // side at job end, so Core never references witness types; the picture itself arrives through a
 // RenderTexture asset. The newspaper listens for Changed, because the outcome and the description arrive on
 // the same JobOutcome event in no fixed order. Empty means no witness came forward
@@ -12,11 +13,14 @@ public static class JobNews
 
     public static bool HasWitness { get; private set; }
     public static string WitnessCaption { get; private set; }
+    // How clear the description is, for the debrief's XP. Unseen until a witness reports
+    public static WitnessClarity Clarity { get; private set; }
 
-    public static void ReportWitness(string caption)
+    public static void ReportWitness(string caption, WitnessClarity clarity)
     {
         HasWitness = true;
         WitnessCaption = caption;
+        Clarity = clarity;
         Changed?.Invoke();
     }
 
@@ -39,5 +43,6 @@ public static class JobNews
     {
         HasWitness = false;
         WitnessCaption = null;
+        Clarity = WitnessClarity.Unseen;
     }
 }

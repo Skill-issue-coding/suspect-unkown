@@ -25,6 +25,8 @@ public static class MenuPaths
     public const string ProgressLog = Progress + "Log Save";
     public const string ProgressReveal = Progress + "Reveal Save Folder";
     public const string ProgressDelete = Progress + "Delete Save";
+    public const string ProgressUnlockAll = Progress + "Unlock All";
+    public const string ProgressFakeDebrief = Progress + "Fake Debrief";
 
     public const string Police = Root + "Police Record/";
     public const string PoliceLog = Police + "Log Record";

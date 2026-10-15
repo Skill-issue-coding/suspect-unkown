@@ -11,7 +11,7 @@ Read `CLAUDE.md` first, then decisions 6, 7, 9, 13, 14, 18, 19, 21, 22 and 23 in
 ## 1. What the level is for
 
 1. **Teach the game** by design rather than text: movement, crouching, noise, light and shadow, lockpicking, suspicion, and the decision window.
-2. **Steal two items.** The **laptop** sits in the living room, where the clerk sleeps in the armchair in the corner. The **cellphone** is in the bedroom. The laptop unlocks the shop; the cellphone unlocks the next targets.
+2. **Steal two items.** The **laptop** sits in the living room, where the clerk sleeps in the armchair in the corner. The **cellphone** is in the bedroom. The laptop unlocks the shop; the cellphone unlocks the next target, the thrift shop.
 3. **Fail fairly.** If the clerk reaches Alerted and the player does not break line of sight in time, the clerk calls the police and the job fails.
 4. **Teach that being seen leaves a description.** Every look the clerk gets at the player feeds the witness model (3.6). The newspaper then prints what the clerk remembers the burglar wearing, so the player learns early that NPCs remember their latest appearance, and how well depends on how good a look they got.
 
@@ -127,7 +127,7 @@ The window runs on sight rather than on suspicion dropping, because suspicion on
 
 ### 3.2 Loot and the bag
 
-- **`LootItem`** (Core, ScriptableObject): display name, take time, where it is carried (`LootCarry`: `Bag` or `Pocket`), what it unlocks (`ProgressUnlock`: `Shop`, `Targets`, flags) and its money value. Data only.
+- **`LootItem`** (Core, ScriptableObject): display name, take time, where it is carried (`LootCarry`: `Bag` or `Pocket`), what it unlocks (`ProgressUnlock`: `Shop`, `ThriftShop`, flags) and its money value. Data only.
 - **`LootPickup`** (Core, interactables): the world object. Reach trigger, outline and `WorldPrompt`, the same pattern as the door. `Take()` raises a static `Taken(LootPickup)` event and hides it.
 - **`PlayerLootInteraction`** (Player): hold E to take an item in reach, for the item's take time. The player carries the `Stealing` conduct flag during the hold.
 - **`JobObjectives`** (Core, one per level): lists the required items, counts the ones taken, and raises `Changed`. Exposes `Collected`, `Required`, `IsComplete` (every required item taken), and each slot through `RequiredItem(i)` and `IsTaken(i)`. Required items are the minimum to leave: in this level that is the laptop and the cellphone. A level with nothing required is complete from the start.
@@ -250,14 +250,65 @@ q = f_dist · f_angle · f_light · f_duration · f_stance · observerSkill · f
 A small JSON file, `progress.json` in `Application.persistentDataPath`, written with `JsonUtility`:
 
 ```json
-{ "shopUnlocked": true, "targetsUnlocked": true, "money": 670, "completedJobs": ["Apartment"] }
+{
+  "unlocks": 3, "money": 670, "xp": 968, "skillPoints": 1,
+  "lastJob": { "job": "Apartment", "seconds": 161, "loot": [ ... ], "peakAlert": 0, "witness": 1, "witnessCaption": "..." },
+  "debriefPending": true,
+  "completedJobs": ["Apartment"]
+}
 ```
 
 - `ProgressSave` is the plain serializable data; `ProgressStore` (static) loads and saves it, and treats a missing or broken file as a fresh save.
 - `JobRewards` (on the level's `Job` object) adds up the value and unlocks of everything taken, required or extra. On `JobOutcome.Completed` it loads the save, adds them, records the job by scene name, and saves.
 - **Written on job success only.** Taking an item and then failing unlocks nothing and earns nothing. A replayed job pays again but is listed once.
-- Tools/Suspect Unknown/Progress logs, reveals or deletes the file while testing.
+- `unlocks` holds every `ProgressUnlock` flag earned so far as one number (3 is `Shop` and `ThriftShop`). `ProgressSave.Has` asks for one, `Apply` adds new ones and never removes any. Flags are saved as numbers, so a value is never renumbered.
+- `xp` is every XP point ever earned; the level is worked out from it (`Reputation`, 3.7), so the two can never disagree. `skillPoints` is the unspent count. `lastJob` and `debriefPending` carry the debrief from the job to the menu (3.7).
+- Tools/Suspect Unknown/Progress logs, reveals or deletes the file, or unlocks everything, while testing.
 - The Phase 7 save system (police profile, wardrobe) grows from this file rather than replacing it.
+
+### 3.7 The debrief: the take, XP and levels
+
+After a completed job the menu opens on the **Debrief** station instead of the main board: a cork board on the safehouse's left wall, in the same style as the briefing card and the shop (a pinned cream title card, dark plates with thin borders, amber headings). It has two views, played in order, then free to flip between with tabs:
+
+1. **The take.** Each item slides in from the left with a small overshoot, one after another (objectives first, then bonus loot, cash grouped into one line with its count), then the total counts up.
+2. **Reputation.** The XP sources slide in the same way, then the level bar fills from the XP before the job to the XP after it. Each time it wraps, "LEVEL UP +1 SKILL POINT" punches in.
+
+**The take scrolls.** Four item rows fit; more scroll. Each new row turns on, the list scrolls so it is in view, and the oldest rows fade out at the top instead of being cut (a `RectMask2D` with softness, with padding so a resting row never sits in the fade). After the animations the player can scroll back with the mouse wheel. Rows are made from one template per debrief, never per frame. Reputation always has exactly four rows, one per `XpRules` line, so it does not scroll. With more than two kinds of bonus loot, its detail sums them up ("9 items  $490") so the line fits.
+
+A Continue button skips a running animation, then moves on (REPUTATION, then DONE back to the main board). The tabs stay locked until both views have played. A failed job gives no XP and no debrief: the newspaper is the result, as before.
+
+**XP.** Worked out from the job's facts by `XpRules` (Core, static, unit-tested), never stored per job, so changing the rules never leaves stale numbers in a save:
+
+| Source | XP | Why |
+| --- | --- | --- |
+| Each objective item | 250 | Doing the job is always the largest share |
+| Bonus bag loot | value ÷ 10 | Greed pays a little |
+| Cash | value ÷ 10 | Small, on purpose |
+| Clean getaway: no NPC reached Alarm (`JobAlert.Peak`) | +150 | Rewards a quiet job |
+| Witness report: unseen (or nothing named) | +300 | The stealth reward |
+| Witness report: vague ("possibly" only) | +200 | Seen, but badly |
+| Witness report: clear ("probably" or better) | +100 | The description is the real cost |
+
+The apartment played well (both items, $180 cash, no alarm, unseen) gives 500 + 18 + 150 + 300 = 968 XP.
+
+**Levels** (`Reputation`, Core): level 1 to 2 needs 1000 XP, each level after that 250 more. Every level gained gives one skill point, spent in the shop's skill tab later. One clean job is about a level early on, and levels slow down after that.
+
+**Witness clarity** comes from the newspaper's own words, so the paper and the XP always agree. `SuspectSketch` reports it with the caption (`JobNews.ReportWitness(caption, clarity)`):
+
+| Clarity | The caption | Example |
+| --- | --- | --- |
+| **Unseen** | Nobody saw the player, or the caption names no color ("too vague to describe") | A glimpse at 13 % |
+| **Vague** | Only "possibly" colors (confidence from `vagueAt`, 20 %, up to `clearAt`) | A long look that faded to 24 % on the walk to the van |
+| **Clear** | At least one color "probably" or better (at or above `clearAt`, 35 %) | A long look shortly before leaving, or a catch |
+
+The cut-off is "probably", not "certain" (`certainAt`, 60 %), because the clerk forgets (90 s half-life) while the player walks to the van: in testing, a long look faded to 24 % by job end, and only a catch reached 46 %, so a 60 % rule would almost never score an escape as clear. A description too thin to name anything counts as unseen: if the paper cannot describe the player, the police have nothing.
+
+**How it travels from the job to the menu.** Through the save, not a singleton. At `JobOutcome.Completed`, `JobRewards` builds a `JobResult` (plain facts: the job, the time, one `JobLoot` line per item kind, `JobAlert.Peak`, the witness clarity and caption), adds the take to `money` and the XP to `xp`, adds a skill point per level gained, sets `lastJob` and `debriefPending`, and saves. The menu reads the save on load: with `debriefPending` set it starts on the Debrief station, fills the board from `lastJob`, and clears the flag once shown. This survives quitting between the van and the menu, works when play starts in any scene, and keeps one source of truth.
+
+- A `DontDestroyOnLoad` singleton was considered and rejected: it is missing or doubled when play starts in a single scene, it loses the result on quit, and it hides its own lifetime. Within a scene, static Core hubs (`JobOutcome`, `JobAlert`, `JobNews`) stay the pattern; between scenes, the save is.
+- `JobAlert.Peak` and `JobNews.Clarity` are reset on every single-mode scene load, so a restart starts a fresh job.
+
+**What it deliberately does not do yet.** Skill points are counted but cannot be spent (the shop's skill tab is still a mock-up). The wallet in the menu still shows mock money; it moves to the save with the shop work. Dirty and clean money (laundering) is not split yet: the take goes straight into `money`.
 
 ---
 
@@ -322,7 +373,7 @@ _Check:_ someone who has not seen the code can tell from the animation alone whe
 
 Built on the clerk once they can see and react. Design in 3.6; done-when from `roadmap_npc.md` M7.
 
-**Status (2026-10-15):** W5 is built (memory half-life per archetype; the clerk's is 90 s). W6 is done and checked: at job end every witness's report merges into the police description and is logged ("no witnesses came forward" when nobody saw the player), and the seven merge tests pass in EditMode (`Assets/Testing/Editor/WitnessMergeTests.cs`). W1–W4 are done and checked in play mode: the clerk builds per-slot beliefs about style and color from every sighting, learns nothing about slots whose regions were hidden, and stays vague but mostly right on poor looks. With skill 0.4 he needs about 6 s of a steady, close, lit look to be sure (about 90 % on colors). Memory retention moved from W2 to W5, where it is first used; the slot-to-region mapping is a fixed rule in `NpcWitness`, not archetype data. W7.1–W7.4 are done and checked: the `SketchBooth` (layer 17, one per job scene) poses a mannequin in idle frame 0, dresses it from the police description (see-through when unsure, a silhouette when unknown, the nearest existing part when the combination does not exist), renders it once at job end after a warm-up render at load, and hands the caption to the newspaper through `JobNews` (Core). W7.5 is built and verified on all three outcomes: the paper's photo is now square (225.5 × 225.5, `WitnessSketch.renderTexture` 512 × 512 in `Core/UI/Textures`), shown through the `Grayscale` Canvas Shader Graph, with height lines when caught, none when the player got away, and the "?" with "No witnesses came forward" when nobody saw them; the fake text column under the photo became the real caption. W8 (the police record: `PoliceStore`, `police.json`, loaded at job start, faded by half per completed job and merged when the job is completed; a failed job saves nothing) is written and compiles but not yet tested; the test steps are in `handovers/witness-model.md`. The W7 playtest check is still open.
+**Status (2026-10-15):** W5 is built (memory half-life per archetype; the clerk's is 90 s). W6 is done and checked: at job end every witness's report merges into the police description and is logged ("no witnesses came forward" when nobody saw the player), and the seven merge tests pass in EditMode (`Assets/Testing/Editor/WitnessMergeTests.cs`). W1–W4 are done and checked in play mode: the clerk builds per-slot beliefs about style and color from every sighting, learns nothing about slots whose regions were hidden, and stays vague but mostly right on poor looks. With skill 0.4 he needs about 6 s of a steady, close, lit look to be sure (about 90 % on colors). Memory retention moved from W2 to W5, where it is first used; the slot-to-region mapping is a fixed rule in `NpcWitness`, not archetype data. W7.1–W7.4 are done and checked: the `SketchBooth` (layer 17, one per job scene) poses a mannequin in idle frame 0, dresses it from the police description (see-through when unsure, a silhouette when unknown, the nearest existing part when the combination does not exist), renders it once at job end after a warm-up render at load, and hands the caption to the newspaper through `JobNews` (Core). W7.5 is built and verified on all three outcomes: the paper's photo is now square (225.5 × 225.5, `WitnessSketch.renderTexture` 512 × 512 in `Core/UI/Textures`), shown through the `Grayscale` Canvas Shader Graph, with height lines when caught, none when the player got away, and the "?" with "No witnesses came forward" when nobody saw them; the fake text column under the photo became the real caption. W8 (the police record: `PoliceStore`, `police.json`, loaded at job start, faded by half per completed job and merged when the job is completed; a failed job saves nothing) is written and partly tested: a clean start loads nothing, a catch saves nothing, and an escape after a good look is loaded at the next start exactly as described. Fading, a changed outfit, a catch with a record on file and a broken file are still to test (steps in `handovers/witness-model.md`). The W7 playtest check is still open.
 
 **W1. The player's appearance.** `CharacterAppearance` (Player) holds the four slots' style and color, read from `PlayerCustomization`'s active parts, and is read at each sighting.
 _Check:_ a debug readout shows the current outfit as four style and color pairs; changing a part in play mode updates it.
@@ -355,6 +406,30 @@ _Check:_ someone who played once can tell from the paper alone how good a look t
 **W8. The saved description.** When a job is completed, the job's police description is saved (its own JSON file beside `progress.json`, so a broken file never costs the player's progress); at job start it is loaded. A failed job still produces the description for the mugshot but saves nothing, as with progress, so a failure never makes the next attempt harder. Before saving, the loaded description fades by one job and the new one merges into it, so old evidence counts for less each job and newer evidence that describes something different takes over (burns are temporary). A missing or broken file loads as "no description". The data is plain values (slot, style, color, scores), owned by the NPC side, so Core and Player stay free of NPC types.
 _Check:_ finish a job after a good look, then start again: the log (and a readout line) shows the loaded description. Get caught: the next start shows the record unchanged. Change clothes, get seen well and finish: at the next start, the changed slots follow the new outfit. A completed run with no sightings leaves the old description, one job fainter. Delete the file: the next start loads "no description" without errors.
 
+### Track D — the debrief (after A8 and W8)
+
+Design in 3.7. The board itself exists as a concept in `MainMenu.unity` (`DebriefConcept` on the left wall, `CM Debrief`, the `Debrief` station) with mock values; this track connects it to the job.
+
+**Status (2026-10-15):** D1 is done and compiles: `JobResult`, `JobLoot`, `WitnessClarity`, `Reputation` and the new save fields. D2 is checked in play mode: `JobAlert.Peak` reports and resets on restart, and `SuspectSketch` reports the clarity through `JobNews.ReportWitness(caption, clarity)`. Testing showed a 60 % "certain" rule was almost never reached on an escape, so the rule moved to "probably" (35 %), and a caption that names nothing counts as unseen (3.7); the new rule is checked against the real `SuspectSketch` (13 % reads unseen, 24 % vague, 46 % clear). The facts must be read one frame after `Completed` (D4). D3 is done: `XpRules.Score` and `XpLine`, with `XpRulesTests` (the 968 XP run, the alarm, the three witness tiers, no bonus loot, rounding down, a reused list) passing in EditMode. D4 is done and checked: after three completed runs the save held $2190, 2654 XP (968 + 968 + 718 for a run that reached Alarm with a vague description), 2 skill points (level 3), `lastJob` with the objectives first in the order taken and the cash grouped, and `debriefPending`; the saved clarity matched the sketch, so the one-frame read works. D5a is done and checked: with `debriefPending` set the menu opens on the debrief and clears the flag, and the next start opens on the main board. D5b and D5c are done and checked in play mode: the take is a scrolling list built from `lastJob` (one row per loot line from a template), the header shows the job, how it ended and its time, and reputation shows `XpRules`' four lines and runs the bar from the XP before the job to after it with `Reputation`; with nine loot lines the list scrolls to the newest row and fades the oldest out at the top, Skip shows every row, and the bar ends where the save's XP says. The mock values are gone. D6 is done and checked (2026-10-16): Progress → Fake Debrief writes a six-line apartment run with a vague witness and sets the flag without touching money or XP, and the next menu start opens on it. Track D is complete; what is left is playtesting the XP numbers (section 6).
+
+**D1. Data.** `JobResult` and `JobLoot` (Core, `Job/`), `WitnessClarity` (Core), `Reputation` with `XpForLevel` and `LevelFor` (Core, `Progress/`), and `xp`, `skillPoints`, `lastJob` and `debriefPending` on `ProgressSave`.
+_Check:_ Log Save after Unlock All shows the new fields at their defaults. `LevelFor(0)` is level 1, `LevelFor(1568)` is level 2 with 568 into it, `LevelFor(2250)` is level 3 with 0.
+
+**D2. The facts the job does not keep yet.** `JobAlert.Peak` (the highest level reached this job, reset on scene load), and the witness clarity handed from `SuspectSketch` to `JobNews`.
+_Check:_ a temporary log in `JobRewards`, one frame after `Completed`, shows `peak Undetected, witness Unseen` after an unseen run and after a glimpse the paper cannot describe, `Vague` when the caption only says "possibly", `Clear` when it says "probably" or better, and `peak Undetected` again after a restart.
+
+**D3. `XpRules`.** Static, Core: from a `JobResult` to XP lines (label, detail, XP) and a total, with the table in 3.7. EditMode tests in `Assets/Testing/Editor`.
+_Check:_ the tests pass; the apartment played well gives 968.
+
+**D4. `JobRewards` writes the result.** On `JobOutcome.Completed`: build the `JobResult`, add money and XP, add the skill points for levels gained, set `lastJob` and `debriefPending`, save. The witness clarity must be read after `SuspectSketch` has reported, since both answer the same event in no fixed order.
+_Check:_ Log Save after a completed run shows the take, the XP, `lastJob` filled in and `debriefPending` true. A failed run leaves the save unchanged.
+
+**D5. The menu opens the debrief.** With `debriefPending` set, the menu starts on the Debrief station; `DebriefConcept` becomes the real board, builds its rows from `lastJob` (one row template, not fixed rows), runs the bar from the XP before the job to after it with `Reputation`, and clears the flag once shown.
+_Check:_ finish the apartment and press Continue: the menu opens on the debrief with the real take and XP. Back to the main board, then quit and restart play in the menu: it opens on the main board.
+
+**D6. Debug.** Tools/Suspect Unknown/Progress → Fake Debrief writes a sample `lastJob` and sets the flag, so the board can be tuned without replaying the job.
+_Check:_ Fake Debrief, then play the menu: the debrief shows the sample.
+
 ### Together
 
 **C1. Teaching pass.** `GameplayLight` on the room lights and street spots (the scene has none yet, so the light level always reads as dark). World-space control prompts on the street. Place the laptop so that taking it needs the dozing window.
@@ -382,4 +457,5 @@ Fixed on 2026-10-13: shadows were flickering in the street and switching on and 
 - **Snack run defaults.** A run every 45–75 s, only from a doze, with a 1.5 s getting-up tell, 4–6 s at the fridge with the back to the room, and the same decision window if the player is seen on the way. These were chosen as defaults when the snack run was added; confirm or change them in playtests.
 - **Witness numbers.** The quality threshold for confusion, the confusion tables, the clerk's retention, and the confidence cut-offs for "probably" and "possibly". Playtest against the W7 check.
 - **Does the call need a counter?** Concept 6.8 suggests knocking the phone away. Not in this level; the window is the counter.
-- **Results screen content.** The success newspaper could list what was taken and, after Phase 6, what the witnesses said.
+- **Results screen content.** The success newspaper could list what was taken and, after Phase 6, what the witnesses said. Partly answered by the debrief (3.7): the take and the witness result are shown in the menu after the paper.
+- **XP numbers.** The table in 3.7 and the level curve (1000, then +250 per level) are starting values. Does one clean apartment run feel worth about a level? Does the witness bonus change how people play?
