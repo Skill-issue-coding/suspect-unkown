@@ -75,11 +75,11 @@ The tension in the loop is greed versus exposure. Every extra thirty seconds ins
 
 Three tiers, reduced from five because 3D locations cost roughly double (see `roadmap.md` Phase 10). Each tier introduces exactly one new opposition concept so the player learns them one at a time. Verticality lets each tier also add a spatial dimension.
 
-| Tier | Target            | New opposition                                                                                                   | New space                                            |
-| ---- | ----------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| 1    | Thrift shop       | Civilians (a tired clerk, customers) and the first patrolling guard; security first adapts to the player's habits. | Open shop floor fading into staff rooms, side doors  |
-| 2    | Jewelry store     | Several guards: trained observers who read behaviour.                                                            | Mezzanine (first verticality), security office above |
-| 3    | Bank branch       | Cameras, watched from a security monitor. Perfect retention, fixed arcs, visual features only. Locked zones.     | Two floors, vault stairwell                          |
+| Tier | Target        | New opposition                                                                                                     | New space                                            |
+| ---- | ------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
+| 1    | Thrift shop   | Civilians (a tired clerk, customers) and the first patrolling guard; security first adapts to the player's habits. | Open shop floor fading into staff rooms, side doors  |
+| 2    | Jewelry store | Several guards: trained observers who read behaviour.                                                              | Mezzanine (first verticality), security office above |
+| 3    | Bank branch   | Cameras, watched from a security monitor. Perfect retention, fixed arcs, visual features only. Locked zones.       | Two floors, vault stairwell                          |
 
 Folded or cut from the five-tier plan: the pharmacy tier's civilians move into tier 1, and the vault tier's alarm timers and guards sharing information become stretch goals. Roof access, vents, and service shafts are no longer tied to a tier; add them where a level wants them, and note that they are third in the `roadmap.md` cut order.
 
@@ -115,7 +115,7 @@ The **Curious** state is where the game lives. Detection must not be binary. A g
 
 **Cover and stance.** Standing and crouching change your detection profile and your movement noise. With a steep camera this reads clearly, and it gives the player a constant meaningful choice. Flattening against a wall is deferred, and added only if playtests show crouching behind low walls is not enough cover.
 
-**Only the robber opens doors.** NPCs never use doors; to them a closed door is a wall. The player opens doors by lockpicking or other means, and an open door is therefore evidence: an NPC who spots one grows suspicious, plays a confused beat, and slams it shut. The joke is the genre convention that only players open doors, turned into a rule the NPCs believe. An open door also opens a path, so a guard can now follow you through it. The tripped breaker works the same way: staff notice the dark and go and reset it. See decisions 18 and 19 in `roadmap_npc.md`.
+**Only the robber leaves doors open.** Civilians never use doors; to them a closed door is a wall. Guards carry keys: they open a door they need to pass and close it behind them. The player opens doors by lockpicking or other means and leaves them open, so an open door is evidence: an NPC who spots one grows suspicious, plays a confused beat, and slams it shut. The joke is the genre convention that only players leave doors open, turned into a rule the NPCs believe. An open door also opens a path, and a guard chasing you runs straight through any door, so locking yourself in is no escape. The tripped breaker works the same way: staff notice the dark and go and reset it. See decisions 18 and 19 in `roadmap_npc.md`.
 
 ### 6.2 Witness model — per job
 

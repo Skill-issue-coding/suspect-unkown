@@ -5,6 +5,8 @@ Design and implementation plan for the second job, `Assets/Thriftshop/Thriftshop
 Read `CLAUDE.md` first, then decisions 6, 15, 18, 19, 22, 23, 24 and 25 in `roadmap_npc.md`, and `Assets/apartment-level.md` for everything this level reuses (loot, the van, the newspaper, the save, the witness). Each step ends with a check to pass in play mode before moving on.
 
 > Written 2026-10-16. Already in place: the street, the shop building (`Houses.fbx`), the `GetawayVan`, the player, the HUD, the `SketchBooth`, and empty `Loot`, `Cash`, `Doors` and `CivilianSpots` groups. Left over from copying the apartment and to be removed: `SnackPoint` and the single `StaffArea` zone.
+>
+> **Status (2026-10-17):** T1 is done and checked: nine room zones, `PlayerRoom` logging room changes with hysteresis, four `Entrance`s logging inbound crossings, and `JobLayout` numbering both. The NavMesh is baked (T2 still needs the guard door link, T2b). `InteriorReveal` fades the upper floor while the player is inside, as in the apartment. The sun is a low red-orange sunset matched to the `OasisSunset` skybox; T3 (interior lights, rebake) is still open. Changes made on the way: the room list grew from seven to ten, room and entrance names moved into `JobLayout` (Core), room tracking moved into its own `PlayerRoom`, and guards may now open doors to pass through (1.1, decision 19).
 
 ---
 
@@ -20,19 +22,24 @@ Read `CLAUDE.md` first, then decisions 6, 15, 18, 19, 22, 23, 24 and 25 in `road
 
 Seen from above, the shop is one large public floor with staff rooms along the back wall.
 
-| Area       | Color in the plan  | Zone type | What is there                                         | What it teaches                                                       |
-| ---------- | ------------------ | --------- | ----------------------------------------------------- | --------------------------------------------------------------------- |
-| Street     | —                  | none      | The van, street lamps, the four entrances             | Round trips: leaving is safe, coming back is a choice                 |
-| Shop front | Pink, front half   | Public    | Racks, shelves, customers, the register counter       | Social stealth: walking normally in an open shop is safe              |
-| Shop back  | Pink, back half    | Public    | Fewer customers, darker, fading toward the staff wall | The shop "fades" into the staff area: the risk grows as you go deeper |
-| Register   | Behind the counter | Staff     | The register till (required)                          | Timing the clerk's errands                                            |
-| Trash room | Red                | Staff     | Bins, the clerk's bin run                             | A quiet side way in, with a lockpick                                  |
-| Stockroom  | Green, middle      | Staff     | Bonus loot, the clerk's restocking                    | Greed: the best bonus loot is in staff rooms                          |
-| Office     | Green, right       | Staff     | The safe (bonus money), a base POI                    | The greed ratchet: a long hold next to a guard's POI                  |
+Each area is one room of the job log (section 4), numbered by its place in `JobLayout`'s room list. Room 0 is the street.
 
-**Entrances.** Two at the front into the shop front, open during opening hours. One on the left side into the trash room, locked, lock level 1. One on the right side into the shop back, just below the staff wall, locked, lock level 1. The front entrances are doorways (or automatic doors) with **no** `Door` component and no anomaly: they are open because the shop is open, not because a robber opened them. The two side entrances are `Door`s, so opening one raises an `OpenDoor` anomaly (decisions 18 and 19).
+| Room | Area           | Where                                                | Zone type | What is there                                         | What it teaches                                          |
+| ---- | -------------- | ---------------------------------------------------- | --------- | ----------------------------------------------------- | -------------------------------------------------------- |
+| 0    | Street         | Outside every zone                                   | none      | The van, street lamps, the four entrances             | Round trips: leaving is safe, coming back is a choice    |
+| 1    | Shop front     | Behind the front window, right of the shoe section   | Public    | Window displays, customers                            | Social stealth: walking normally in an open shop is safe |
+| 2    | Shoe section   | The left strip, front to back; the left front door   | Public    | Shoe wall and bench, clothing racks                   | Social stealth                                           |
+| 3    | Shop middle    | The two gondola rows                                 | Public    | Gondolas, loot displays                               | The shop "fades" toward the staff area                   |
+| 4    | Emergency exit | The right pocket between the register and the office | Public    | The emergency exit door, wall shelves, a loot display | A side way in, away from the register                    |
+| 5    | Shop back      | Along the staff wall                                 | Public    | Furniture corner, racks; the doorways to staff rooms  | The risk grows as you go deeper                          |
+| 6    | Register       | Behind the counter, front right                      | Staff     | The register till (required)                          | Timing the clerk's errands                               |
+| 7    | Trash room     | Back left                                            | Staff     | Bins, the clerk's bin run                             | A quiet side way in, with a lockpick                     |
+| 8    | Stockroom      | Back middle, open to the shop back (no front wall)   | Staff     | Bonus loot, the clerk's restocking                    | Greed: the best bonus loot is in staff rooms             |
+| 9    | Office         | Back right, behind the StaffRoom door only           | Staff     | The safe (bonus money), a base POI                    | The greed ratchet: a long hold next to a guard's POI     |
 
-**Inside the staff area NPCs need open doorways.** NPCs never use doors (decision 19), so every route a guard or the clerk walks (shop to stockroom, stockroom to office, shop to trash room for the bin run) must be an open doorway, not a closable `Door`. The only `Door`s in the level are the two exterior side doors.
+**Entrances.** Two at the front, open during opening hours: the left one into the shoe section, the right one into the shop front. One on the left side into the trash room, locked, lock level 1. One on the right side into the emergency exit pocket, locked, lock level 1. The front entrances are static open doorways with **no** `Door` component and no anomaly: they are open because the shop is open, not because a robber opened them. The two side entrances are `Door`s, so opening one raises an `OpenDoor` anomaly (decisions 18 and 19).
+
+**Inside, guards may pass through doors; civilians may not** (decision 19, changed 2026-10-17). The office is closed off by the `StaffRoom Door`, its only way in. A guard who needs to pass a closed door opens it without raising an anomaly and closes it once past it, so a door left open is still evidence that only the player causes. The clerk never uses doors, so every route the clerk walks (the register, the bin run through the trash room's open doorway, restocking in the stockroom, which has no front wall) is open floor. The two exterior doors have no guard link: guards stay inside.
 
 ---
 
@@ -62,7 +69,7 @@ Evening, sunset light from a low directional sun, the shop's interior lights on,
 
 Errands use the existing `CivilianSpot` mechanism; the clerk's spots get weights so the register wins most picks. The clerk at work is calm (decision 22): ordinary oddness barely registers. `Stealing` (taking the till in view) and `Lockpicking` weigh 1.0, so being seen taking the till in front of the clerk opens the window within about two seconds. Door chores (the clerk shutting an open side door without suspicion, M6 step 3) are optional in this level.
 
-**The guard** patrols the base POIs and any adaptive POIs (section 5), slams open side doors (M5 step 2.4), investigates the open safe and closes it (section 2.3), and catches. The guard weighs `InStaffArea` heavily and also recognises a described outfit (decision 25). Guards spawn only inside the shop, at authored spawn candidates.
+**The guard** patrols the base POIs and any adaptive POIs (section 5), opens the StaffRoom door to reach the office and closes it behind them, slams doors the player has left open (M5 step 2.4; not while chasing, when they run straight through), investigates the open safe and closes it (section 2.3), and catches. The guard weighs `InStaffArea` heavily and also recognises a described outfit (decision 25). Guards spawn only inside the shop, at authored spawn candidates.
 
 ### 2.3 The safe
 
@@ -119,9 +126,11 @@ The record of what the player did, kept whether or not anyone saw it (decision 2
 
 ### 4.1 Rooms and entrances
 
-- **Rooms are the Markov states.** Each room in 1.1 gets one `Zone` volume, and `Zone` gains a **room index**. The street is room 0, the implicit room when the player is inside no zone. Zones of one level must not overlap. This replaces the single `StaffArea` zone left over from the apartment: each room's zone carries its own type (the register, trash room, stockroom and office are `Staff`; the shop front and back are `Public`).
-- **`Entrance`** (Core): a trigger straddling one doorway to the street, with an index and the room it opens into. A crossing counts as **inbound** when the player enters the trigger from the street side and leaves it on the room side (checked against the entrance's forward axis). Every inbound crossing counts, so round trips through the same door reinforce it.
-- **`SecurityLayout`** (NPC, one per level): the names of the rooms and entrances in index order, the guard spawn candidates, and the adaptive POI candidates. `OnValidate` checks that every zone and entrance index exists in the layout.
+- **Rooms are the Markov states.** Each room in 1.1 is one `Zone` volume (several boxes on one object for odd shapes). The street is room 0, the implicit room when the player is inside no zone. Zones of one level must not overlap. This replaces the single `StaffArea` zone left over from the apartment: each room's zone carries its own type.
+- **`JobLayout`** (Core, on the `Job` object): the level's rooms as a list of `Zone`s and its entrances as a list of `Entrance`s, in index order. A zone's room number is its place in the list plus one, an entrance's index its place in the list, handed out in `Awake` before the first physics step; the object names are the display names. It is the one place that numbers rooms and entrances, so nothing can disagree. `OnValidate` warns on empty or duplicate slots; `Start` (and a "Check Scene" context menu that works in edit mode) warns about any active zone or entrance in the scene that is not listed, and any entrance opening into an unlisted room. In a level without a `JobLayout` (the apartment) every zone reads as the street, harmlessly.
+- **`PlayerRoom`** (Player): the room the player is in, with hysteresis. The raw room is the newest zone the player is still inside, else the street; it becomes the current room only after the player has stayed in it for 0.5 s, so brushing a boundary (the register counter, the stockroom's open front) logs nothing, and A → B → C taken quickly is recorded as A → C. Raises `RoomChanged(from, to)`. Assumes the player starts on the street.
+- **`Entrance`** (Core): a trigger straddling one doorway to the street, with the `Zone` it opens into. A crossing counts as **inbound** when the player enters the trigger from the street side and leaves it on the room side (the entrance's local +Z points into the room). Every inbound crossing counts, so round trips through the same door reinforce it. Indoor doors are never entrances: moving between rooms is a room transition. `Door.prefab` carries an inactive `Entrance` child, switched on for exterior doors (the door's forward faces the street, so the child is turned 180°); the front doorways have their own.
+- **`SecurityLayout`** (NPC, one per level, built with S4): the guard spawn candidates and the adaptive POI candidates, read alongside `JobLayout`.
 
 ### 4.2 What is recorded
 
@@ -130,7 +139,7 @@ The record of what the player did, kept whether or not anyone saw it (decision 2
 - **Room transitions:** `transitions[from × rooms + to]`, incremented whenever the player's room changes. A flat array, because `JsonUtility` serializes neither 2D arrays nor dictionaries.
 - **Entrance crossings:** `entries[entrance]`, every inbound crossing.
 
-`PlayerConduct` already tracks which zones the player is inside; it reports room changes to `JobLog`. Each `Entrance` reports its own crossings. Loot order, tools and detections (concept 6.4) are not logged yet: nothing in this level uses them.
+`PlayerRoom` reports room changes to `JobLog` through `RoomChanged`; each `Entrance` reports its own crossings. Loot order, tools and detections (concept 6.4) are not logged yet: nothing in this level uses them.
 
 ### 4.3 What is saved
 
@@ -142,7 +151,8 @@ The record of what the player did, kept whether or not anyone saw it (decision 2
     {
       "location": "Thriftshop",
       "completedRuns": 2,
-      "rooms": 7, "entrances": 4,
+      "rooms": ["Street", "Shop front", "...", "Office"],
+      "entrances": ["Front left", "Front right", "Trash room door", "Emergency exit"],
       "transitions": [0.0, 1.8, ...],
       "entries": [0.0, 0.0, 0.0, 1.8]
     }
@@ -151,7 +161,7 @@ The record of what the player did, kept whether or not anyone saw it (decision 2
 ```
 
 - **Written on completion only.** On `JobOutcome.Completed`, the stored counts are decayed and the run is added: `C ← 0.8 · C + run`, the same for `entries`, and `completedRuns` goes up by one. A failed run teaches security nothing and never makes the next try harder, the same rule as progress and the police record.
-- **A layout change discards the record.** If the stored room or entrance count differs from the level's `SecurityLayout`, the record is dropped with a warning and the level plays as a first run.
+- **A layout change discards the record.** If the stored room or entrance **names** differ from the level's `JobLayout` (in count or in order), the record is dropped with a warning and the level plays as a first run. Comparing names rather than counts catches rooms that were reordered without being added or removed.
 - **`SecurityRecord` and `SecurityStore` live in Core,** plain data with no NPC types, so the main menu can read them. The model that reads them lives in NPC.
 - Tools/Suspect Unknown/Security logs, reveals or deletes the file, and can fake a number of completed runs through a chosen entrance, for testing.
 
@@ -238,11 +248,14 @@ Five tracks. **T** comes first because the others are tested in it; **G**, **C**
 
 ### Track T — the level
 
-**T1. Rooms, zones and entrances.** One `Zone` per room with a room index and its type, `Entrance` triggers at the four doorways, and the `SecurityLayout` listing them. Remove `SnackPoint` and the apartment's `StaffArea`. Two side `Door`s at lock level 1; the front doorways have no `Door`.
+**T1. Rooms, zones and entrances.** Done 2026-10-17. One `Zone` per room with its type, `PlayerRoom`, `Entrance` triggers at the four doorways, and `JobLayout` listing and numbering them (4.1). Remove `SnackPoint` and the apartment's `StaffArea`. Two side `Door`s at lock level 1; the front doorways have no `Door`.
 _Check:_ the conduct readout shows `InStaffArea` in exactly the staff rooms; a debug log prints each room change and each inbound crossing, and walking out through a front doorway logs no crossing.
 
-**T2. NavMesh.** A `NavMeshSurface` bake over the shop floor and the staff rooms, joined by open doorways. The side doors carve while closed.
-_Check:_ a guard placed by hand can reach every room except the street; opening a side door opens a path through it.
+**T2. NavMesh.** Baked 2026-10-17. A `NavMeshSurface` bake over the shop floor and the staff rooms. The doors carve while closed.
+_Check:_ a guard placed by hand can reach every room except the street and the office; opening a side door opens a path through it.
+
+**T2b. Guards pass through doors** (decision 19). A `NavMeshLink` across the `StaffRoom Door` on a new NavMesh area `Door`; civilian agents and hearing paths exclude that area. `Door.OpenForPassage()` opens without an anomaly and leaves the lock as it was. The guard crosses links itself (`autoTraverseOffMeshLink` off): stop, open, walk across, complete the link, and close the door once outside the far reach's bounds. A chasing guard does not stop to close it.
+_Check:_ the guard reaches the office POI through the closed door and the door is shut again behind them, with no anomaly raised. The clerk never paths through it. A sprint behind the closed door is not heard in the office. Chased, the player gains nothing by closing themselves in.
 
 **T3. Dusk lighting.** Sun, interior and street lights, `GameplayLight` on the lamps that count, light probes, within the 32-shadow budget.
 _Check:_ the player's light readout is clearly lower in the shop back than at the front; no shadows flicker as the camera moves.
@@ -252,8 +265,8 @@ _Check:_ the player's light readout is clearly lower in the shop back than at th
 **G1. A guard in the level.** The `SecurityGuard` prefab placed by hand, three or four base POIs (the office important), catch failing the job.
 _Check:_ the guard patrols, visits the office most, catches the player standing in the stockroom, and the caught newspaper plays.
 
-**G2. Slamming doors** (M5 step 2.4). The guard claims an open side door's anomaly, walks over, plays the confused beat, and calls `Resolve()`; the door slams.
-_Check:_ pick the right side door and leave it open: the guard comes, looks confused and slams it. Two guards never go for the same door.
+**G2. Slamming doors** (M5 step 2.4). The guard claims an open door's anomaly, walks over, plays the confused beat, and calls `Resolve()`; the door slams. A pursuing guard ignores open doors and runs through.
+_Check:_ pick the right side door and leave it open: the guard comes, looks confused and slams it. Two guards never go for the same door. Chased through an open door, the guard follows without slamming it.
 
 **G3. The safe.** `Safe` (Core) with a lock level, the lockpick minigame, money stacks inside, and an `Anomaly` of the new kind `SafeOpen`. The guard investigates it, raises their baseline to just under `curiousAt`, and closes the safe as an errand. The office POI drains 1.5 times faster once the safe has been opened.
 _Check:_ open the safe and hide: the guard comes, closes it, and from then on reaches Curious from a glance that would not have made them Curious before. The office POI's drain readout is 1.5 times its base rate.
@@ -286,7 +299,7 @@ _Check:_ fill the bag, walk to the van's side door, press G: the bag empties, th
 _Check:_ walk street → front left → shop front → shop back → stockroom: the readout shows those four transitions and one crossing.
 
 **S2. `SecurityRecord` and `SecurityStore`.** The JSON file, the decay-and-add on completion, the layout check, and the Tools menu.
-_Check:_ complete a run: `security.json` holds it with `completedRuns` 1. Fail a run: the file is unchanged. Complete again: the old counts are 0.8 times what they were, plus the new run. Change the room count: the next load warns and plays as a first run.
+_Check:_ complete a run: `security.json` holds it with `completedRuns` 1. Fail a run: the file is unchanged. Complete again: the old counts are 0.8 times what they were, plus the new run. Change the room list (add one, or swap two): the next load warns and plays as a first run.
 
 **S3. Stage A** (`SecurityModel`, NPC, pure logic). Transition probabilities with Laplace smoothing, the entrance Dirichlet, forward propagation. EditMode tests: rows sum to 1; unseen transitions are above 0; a record of three runs through one entrance gives that entrance the highest probability; occupancy sums to 1 and leaves the street out.
 _Check:_ the tests pass.

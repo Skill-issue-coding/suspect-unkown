@@ -1,35 +1,34 @@
 using UnityEngine;
 
-// Trigger volume tagged public or staff. Passive: the player side 
-// tracks which zones it is in. Colliders on this object; 
-// several boxes make complex shapes. Reused by Phase 8.
+// Trigger volume tagged public or staff. Passive: the player side tracks which zones it is in.
+// Colliders on this object only; several boxes make complex shapes. In a level with a JobLayout
+// each zone is also one room of the job log, numbered by its place in the layout's room list.
 [RequireComponent(typeof(Collider))]
 public class Zone : MonoBehaviour
 {
     [SerializeField, Tooltip("What type of Zone it is")]
     private ZoneType type;
 
-    [SerializeField, Min(0), Tooltip("Room index for the job log; 0 is the street, so zones start at 1. Unique per room in a level")]
-    private int room = 1;
-
-    [SerializeField]
+    [SerializeField, Tooltip("Draw the zone's volume and name in the Scene view")]
     private bool drawGizmo = true;
 
-    [SerializeField]
+    [SerializeField, Tooltip("Gizmo color for a public zone")]
     private Color publicColor = new Color(0.2f, 1f, 0.2f, 0.15f);
 
-    [SerializeField]
+    [SerializeField, Tooltip("Gizmo color for a staff zone")]
     private Color staffColor = new Color(1f, 0.2f, 0.2f, 0.15f);
 
     public ZoneType Type => type;
-    public int Room => room;
 
-    private Collider[] colliders;
+    // Set by the level's JobLayout in Awake from its position in the room list; 0 (the street)
+    // when the level has no layout or the zone is not listed
+    public int Room { get; private set; }
+
+    public void AssignRoom(int room) => Room = room;
 
     private void Reset()
     {
-        colliders = GetComponents<Collider>();
-        foreach (Collider collider in colliders)
+        foreach (Collider collider in GetComponents<Collider>())
             collider.isTrigger = true;
 
         int layer = LayerMask.NameToLayer("Volume");
@@ -41,9 +40,7 @@ public class Zone : MonoBehaviour
 
     private void OnValidate()
     {
-        colliders = GetComponents<Collider>();
-
-        foreach (Collider collider in colliders)
+        foreach (Collider collider in GetComponents<Collider>())
             if (!collider.isTrigger)
                 Debug.LogWarning($"{name} collider isn't a trigger", this);
     }
@@ -77,9 +74,8 @@ public class Zone : MonoBehaviour
 
         Gizmos.matrix = Matrix4x4.identity;
 
-
 #if UNITY_EDITOR
-        UnityEditor.Handles.Label(transform.position, $"{name} [{room}]");
+        UnityEditor.Handles.Label(transform.position, name);
 #endif
     }
 }

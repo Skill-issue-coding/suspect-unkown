@@ -76,7 +76,7 @@ public class NightPreset : ScriptableObject
         if (volume != null && volumeProfile != null)
             volume.sharedProfile = volumeProfile;
 
-        foreach (NightLabLight nightLight in FindObjectsByType<NightLabLight>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (NightLabLight nightLight in FindObjectsByType<NightLabLight>(FindObjectsInactive.Include))
         {
             switch (nightLight.Role)
             {

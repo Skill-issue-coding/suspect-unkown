@@ -260,19 +260,23 @@ An **anomaly** is a world object in a state that only the player causes: an open
 
 **Why.** Only the robber opens doors or trips breakers, so these are the clearest evidence the game has, and they tell the player that their actions leave traces even when nobody saw them. One mechanism covers doors, the breaker, and later loot, instead of one special case each.
 
-### 19. Doors are the player's
+### 19. Doors: guards pass through, an open door is evidence
 
-NPCs walk only in open areas and never use doors. A closed door is a wall to them: it blocks their NavMesh and therefore their paths and their hearing (decision 10). Only the player opens doors, by lockpicking or other means.
+Changed 2026-10-17 (was "Doors are the player's"). Civilians walk only in open areas and never use doors: a closed door is a wall to them, blocking their paths. Guards may open a closed door they need to pass, and close it again behind them. A door is evidence only when the **player** opens it and leaves it open.
 
-- An **open door** is an anomaly (decision 18). It also opens the NavMesh, so a guard can now follow the player through it, and sound now carries through it.
-- A guard who notices it plays a confused animation and slams it shut, which closes the path and clears the anomaly. The tone is comedic on purpose: the joke is the genre convention that only players open doors, made into a rule NPCs believe.
+- **Guards pass through.** A guard-usable door has a `NavMeshLink` across it on a NavMesh area `Door`. The guard crosses links itself (`autoTraverseOffMeshLink` off): it stops, opens the door with `OpenForPassage()`, which raises no anomaly and leaves the lock as it was (guards carry keys), walks across, and closes the door once it is outside the reach on the far side. The check is the reach's bounds, not its trigger: reaches are on `Volume`, which collides with the player only, and switch off while the door is open.
+- **Which doors get a link:** only doors guards need inside a level. In the thrift shop that is the `StaffRoom Door`, the office's only way in. Exterior doors get none, so guards stay inside.
+- **Civilians and hearing exclude `Door`.** Civilian agents leave the `Door` area out of their area mask, and hearing's path query does too, so a closed door still blocks paths for civilians and blocks sound for everyone (decision 10). An open door is uncarved floor, so sound carries through it.
+- **An open door the player leaves is an anomaly** (decision 18). It also opens the NavMesh. A guard who notices it while not chasing plays a confused animation and slams it shut, which closes the path and clears the anomaly. The tone stays comedic: guards cannot stand an open door.
+- **A chasing guard ignores doors as evidence.** It runs through open doors without slamming them and opens closed ones without stopping to close them, so shutting yourself in is no escape.
 - Doors are built with a `NavMeshObstacle` that carves while the door is closed. The door leaf is ignored by the NavMesh bake, or it would be baked in as a permanent wall.
 - The leaf is on `Occluder`, so a closed door also blocks sight and light.
 - **Locks have levels, 1 to 3, gated by skill.** All interactables are unlocked by buying skills, as in the Payday series. A lock above the player's Lockpicking level cannot be attempted at all; within it, a higher level is a harder minigame. Picks are unlimited and never break. A picked door stays unlocked for the heist.
 - **Lockpicking is a minigame in the style of Dying Light:** swing the pick to find a hidden sweet spot, apply tension to turn the lock, and force it at the wrong angle and the pick slips with a rattle. It is very suspicious when seen (the `Lockpicking` conduct flag, which every archetype weighs highly) and noisy when it goes wrong.
-- The guard never references `Door`: it resolves the door's **anomaly**, and the door slams itself in response. The same mechanism serves the breaker and staff errands.
+- For slamming, the guard resolves the door's **anomaly**, and the door slams itself in response; the same mechanism serves the breaker and staff errands. For passage the guard calls the `Door` it is crossing directly (NPC → Core).
+- `Door.prefab` carries an inactive `Entrance` child for the job log (decision 24), switched on only for exterior doors.
 
-This replaces the earlier "jam a door" verb, which assumed NPCs walk through doors. Full design and implementation steps: `Assets/doors-and-lockpicking.md`.
+This replaces the earlier "jam a door" verb, which assumed NPCs walk through doors. Full design of the door and the minigame: `Assets/doors-and-lockpicking.md`. Guard passage is built as thrift shop step T2b (`Assets/thriftshop-level.md`).
 
 ### 20. Verbs are abilities used at in-world devices
 
@@ -331,7 +335,7 @@ Two models, two questions. The **witness model** (M7) answers "what did the burg
 
 Concept 6.4, first built in the thrift shop (`Assets/thriftshop-level.md` sections 4 and 5).
 
-- **The job log** records what the player did in the run: room transitions (each room is a `Zone` with a room index; the street is room 0) and inbound crossings at each `Entrance`. It is kept whether or not anyone saw it (decision 23).
+- **The job log** records what the player did in the run: room transitions (each room is a `Zone`, numbered by its place in the level's `JobLayout`; the street is room 0; `PlayerRoom` reports a change only after 0.5 s in the new room) and inbound crossings at each `Entrance`. It is kept whether or not anyone saw it (decision 23).
 - **Only completed runs teach security.** On `JobOutcome.Completed` the location's stored counts decay by 0.8 and the run is added, in `security.json`, a file of its own. A failed run is forgotten, so failing never makes the next try harder (the same rule as progress and the police record).
 - **Stage A, prediction:** a first-order Markov chain over rooms with Laplace smoothing, a Dirichlet-multinomial over entrances, and forward propagation to a predicted occupancy per room.
 - **Stage B, placement:** greedy maximum coverage over candidate POIs (decision 15), scored on room occupancy and entrance probability. **Deterministic:** no sampling, ties to the lower index, so the same history always gives the same plan.
@@ -340,6 +344,7 @@ Concept 6.4, first built in the thrift shop (`Assets/thriftshop-level.md` sectio
 - **Explainable by construction:** each pick writes one line from its marginal-gain step ("guards now check the side entrance: used on 2 of your last 2 runs"). The lines feed the debug overlay and the AI report; the player sees only "Raised security" on the main menu.
 - **Solvability is held by authoring** while the budget is this small: no candidate covers the required loot, and none covers more than one entrance.
 - **Data in Core, model in NPC.** `JobLog`, `SecurityRecord` and `SecurityStore` are plain data in Core, so the main menu can read them; `SecurityModel`, `SecurityPlanner` and `SecurityDirector` are NPC.
+- **The layout is Core, the candidates are NPC** (2026-10-17). `JobLayout` (Core, on the `Job` object) lists the rooms as `Zone`s and the entrances as `Entrance`s and numbers both, so `JobLog` and `SecurityStore` can size and check against it. `SecurityLayout` (NPC) holds only the guard spawn candidates and candidate POIs. The saved record keeps the room and entrance names and is dropped when they differ from the layout's.
 
 ### 25. Guards recognise a described outfit
 
@@ -538,49 +543,53 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 
 ### NPC/Scripts/Witness/
 
-| File                 | Type             | Purpose                                                                            | Status                            | Milestone |
-| -------------------- | ---------------- | ---------------------------------------------------------------------------------- | --------------------------------- | --------- |
-| `NpcWitness.cs`      | MonoBehaviour    | Exposure in M6 (time seen × quality); beliefs, `f_duration` and memory decay in M7 | working (beliefs, confusion, decay, report) | M6, M7 |
-| `FeatureBelief.cs`   | class            | Log-odds belief over one property of one slot (style or color)                     | working                           | M7        |
-| `WitnessReport.cs`   | class            | One description: per-slot style and color beliefs; a witness's memory and its job-end copy | working                     | M7        |
-| `JobWitnesses.cs`    | static class     | The job's witnesses; merges their reports into the police description at job end | working                           | M7        |
-| `SuspectSketch.cs`   | MonoBehaviour    | The witness sketch: dresses the booth's mannequin from the description, renders it once, writes the caption | working                     | M7        |
-| `ConfusionMatrix.cs` | ScriptableObject | Wrong-color table, one asset (`ColorConfusion`) shared by every slot               | working                           | M7        |
+| File                 | Type             | Purpose                                                                                                     | Status                                      | Milestone |
+| -------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------- | --------- |
+| `NpcWitness.cs`      | MonoBehaviour    | Exposure in M6 (time seen × quality); beliefs, `f_duration` and memory decay in M7                          | working (beliefs, confusion, decay, report) | M6, M7    |
+| `FeatureBelief.cs`   | class            | Log-odds belief over one property of one slot (style or color)                                              | working                                     | M7        |
+| `WitnessReport.cs`   | class            | One description: per-slot style and color beliefs; a witness's memory and its job-end copy                  | working                                     | M7        |
+| `JobWitnesses.cs`    | static class     | The job's witnesses; merges their reports into the police description at job end                            | working                                     | M7        |
+| `SuspectSketch.cs`   | MonoBehaviour    | The witness sketch: dresses the booth's mannequin from the description, renders it once, writes the caption | working                                     | M7        |
+| `ConfusionMatrix.cs` | ScriptableObject | Wrong-color table, one asset (`ColorConfusion`) shared by every slot                                        | working                                     | M7        |
 
 ### Core/Scripts/
 
-| File                        | Type             | Purpose                                                                                                                    | Status  | Milestone |
-| --------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------- | ------- | --------- |
-| `Animation/Dangle.cs`       | MonoBehaviour    | Procedural pendulum for small hanging accessories (the guard's keys). No physics; runs after the animated pose             | working | M3        |
-| `Noise/NoiseEvent.cs`       | struct           | Position, radius (loudness), alarm                                                                                         | working | M4        |
-| `Noise/NoiseBus.cs`         | static class     | Publish and subscribe                                                                                                      | working | M4        |
-| `Volumes/ZoneType.cs`       | enum             | Public, Staff. Public first, so a forgotten zone is harmless                                                               | working | M2        |
-| `Volumes/Zone.cs`           | MonoBehaviour    | Trigger volume on the `Volume` layer, public or staff; several colliders make complex shapes. Zone id arrives with Phase 8 | working | M2        |
-| `Lighting/GameplayLight.cs` | MonoBehaviour    | Marks a Point or Spot light as one gameplay counts; static registry and unshadowed contribution at a point (decision 17)   | working | M4        |
-| `World/Anomaly.cs`          | MonoBehaviour    | World state only a robber causes; static registry, active flag, point to see, kind (decision 18)                           | working | M5        |
-| `World/AnomalyKind.cs`      | enum             | OpenDoor; SafeOpen joins with the thrift shop safe, PowerOut with the breaker. A kind is added only with its producer                                 | working | M5        |
-| `World/Door.cs`             | MonoBehaviour    | Player-only door: carves the NavMesh while closed, raises an anomaly while open, can be slammed shut (decision 19)         | —       | M5        |
-| `World/Breaker.cs`          | MonoBehaviour    | Switches a set of lamps; an anomaly while tripped; reset by staff                                                          | —       | M5        |
-| `World/Device.cs`           | MonoBehaviour    | In-world object an ability is used at; names its `Ability`, exposes `Activate()`, raises `Activated` (decision 20)         | —       | M5        |
-| `World/Ability.cs`          | ScriptableObject | Data for one bought ability: name, uses per heist, description. No runtime state                                           | —       | M5        |
+| File                        | Type             | Purpose                                                                                                                                                                                                                     | Status  | Milestone       |
+| --------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | --------------- |
+| `Animation/Dangle.cs`       | MonoBehaviour    | Procedural pendulum for small hanging accessories (the guard's keys). No physics; runs after the animated pose                                                                                                              | working | M3              |
+| `Noise/NoiseEvent.cs`       | struct           | Position, radius (loudness), alarm                                                                                                                                                                                          | working | M4              |
+| `Noise/NoiseBus.cs`         | static class     | Publish and subscribe                                                                                                                                                                                                       | working | M4              |
+| `Volumes/ZoneType.cs`       | enum             | Public, Staff. Public first, so a forgotten zone is harmless                                                                                                                                                                | working | M2              |
+| `Volumes/Zone.cs`           | MonoBehaviour    | Trigger volume on the `Volume` layer, public or staff; several colliders make complex shapes. Its room number is handed out by `JobLayout` (decision 24)                                                                    | working | M2, Thrift shop |
+| `Volumes/Entrance.cs`       | MonoBehaviour    | Doorway from the street: counts inbound crossings (street side in, room side out), opens into a `Zone`; a child of `Door.prefab`, inactive unless exterior                                                                  | working | Thrift shop     |
+| `Volumes/InteriorReveal.cs` | MonoBehaviour    | Fades a building's roof or upper floor through the OccluderWall shader while the player is inside                                                                                                                           | working | Apartment       |
+| `Job/JobLayout.cs`          | MonoBehaviour    | The level's rooms (`Zone`s) and entrances in index order; numbers them in `Awake`; checks the scene against the lists                                                                                                       | working | Thrift shop     |
+| `Lighting/GameplayLight.cs` | MonoBehaviour    | Marks a Point or Spot light as one gameplay counts; static registry and unshadowed contribution at a point (decision 17)                                                                                                    | working | M4              |
+| `World/Anomaly.cs`          | MonoBehaviour    | World state only a robber causes; static registry, active flag, point to see, kind (decision 18)                                                                                                                            | working | M5              |
+| `World/AnomalyKind.cs`      | enum             | OpenDoor; SafeOpen joins with the thrift shop safe, PowerOut with the breaker. A kind is added only with its producer                                                                                                       | working | M5              |
+| `World/Door.cs`             | MonoBehaviour    | Door with a lock: carves the NavMesh while closed, raises an anomaly when the player opens it, can be slammed shut; guard passage (`OpenForPassage`) planned (decision 19). Lives in `Core/Interactables/Scripts/Lockpick/` | working | M5              |
+| `World/Breaker.cs`          | MonoBehaviour    | Switches a set of lamps; an anomaly while tripped; reset by staff                                                                                                                                                           | —       | M5              |
+| `World/Device.cs`           | MonoBehaviour    | In-world object an ability is used at; names its `Ability`, exposes `Activate()`, raises `Activated` (decision 20)                                                                                                          | —       | M5              |
+| `World/Ability.cs`          | ScriptableObject | Data for one bought ability: name, uses per heist, description. No runtime state                                                                                                                                            | —       | M5              |
 
 ### Player/Scripts/ (what NPCs read)
 
-| File                                  | Type           | Purpose                                                                                                                            | Status   | Milestone |
-| ------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
-| `Perception/BodyRegion.cs`            | enum           | Head, UpperBody, Hands, LowerBody, Feet. No explicit values: the region bitmask indexes by `(int)region`                           | working  | M1        |
-| `Perception/PerceptionPoint.cs`       | MonoBehaviour  | One body point: its region, and its collider's bounds centre                                                                       | working  | M1        |
-| `Perception/PerceptionTargets.cs`     | MonoBehaviour  | Every body point, flat and by region. Fixed after `Awake`                                                                          | working  | M1        |
-| `Perception/CharacterAppearance.cs`   | struct         | The player's appearance: style and color per slot (Head, Chest, Legs, Feet), read from `PlayerCustomization`                       | declared | M7        |
-| `Perception/FeatureSlot.cs`           | enum           | The outfit parts a witness can describe: Head, Chest, Legs, Feet (decision 23). Moved from NPC so `CharacterAppearance` can use it | declared | M7        |
-| `Editor/MapPlayerPerceptionPoints.cs` | static class   | Adds `PerceptionPoint` to the 17 bone colliders in `Player.prefab` by bone name                                                    | working  | M1        |
-| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea, Lockpicking, Stealing. Powers of two; a flag is added only with its producer                               | working  | M2, M5    |
-| `Perception/PlayerConduct.cs`         | MonoBehaviour  | What the player is doing right now, including the staff-area flag from zone triggers, counted per zone                             | working  | M2        |
-| `Perception/PlayerLighting.cs`        | MonoBehaviour  | Light level at the player, sampled from every `GameplayLight` on a tick with shadow rays (decision 17)                             | working  | M4        |
-| `Abilities/PlayerAbilities.cs`        | MonoBehaviour  | Remaining uses per owned ability for this heist; checks and spends a charge, then calls `Device.Activate()`                        | —        | M5        |
-| `Perception/PlayerLightingDebug.cs`   | MonoBehaviour  | On-screen light readout and a level-tinted sphere at the sample point; computes nothing itself                                     | working  | M4        |
-| `Locomotion/PlayerStance.cs`          | MonoBehaviour  | Owns `Stance`: Standing and Crouching only                                                                                         | working  | done      |
-| `Noise/PlayerNoise.cs`                | MonoBehaviour  | A footstep on `NoiseBus` every stride; louder and alarming when sprinting, quieter when crouching                                  | working  | M4        |
+| File                                  | Type           | Purpose                                                                                                                            | Status   | Milestone   |
+| ------------------------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | ----------- |
+| `Perception/BodyRegion.cs`            | enum           | Head, UpperBody, Hands, LowerBody, Feet. No explicit values: the region bitmask indexes by `(int)region`                           | working  | M1          |
+| `Perception/PerceptionPoint.cs`       | MonoBehaviour  | One body point: its region, and its collider's bounds centre                                                                       | working  | M1          |
+| `Perception/PerceptionTargets.cs`     | MonoBehaviour  | Every body point, flat and by region. Fixed after `Awake`                                                                          | working  | M1          |
+| `Perception/CharacterAppearance.cs`   | struct         | The player's appearance: style and color per slot (Head, Chest, Legs, Feet), read from `PlayerCustomization`                       | declared | M7          |
+| `Perception/FeatureSlot.cs`           | enum           | The outfit parts a witness can describe: Head, Chest, Legs, Feet (decision 23). Moved from NPC so `CharacterAppearance` can use it | declared | M7          |
+| `Editor/MapPlayerPerceptionPoints.cs` | static class   | Adds `PerceptionPoint` to the 17 bone colliders in `Player.prefab` by bone name                                                    | working  | M1          |
+| `Perception/ConductFlags.cs`          | `[Flags]` enum | Sprinting, InStaffArea, Lockpicking, Stealing. Powers of two; a flag is added only with its producer                               | working  | M2, M5      |
+| `Perception/PlayerConduct.cs`         | MonoBehaviour  | What the player is doing right now, including the staff-area flag from zone triggers, counted per zone                             | working  | M2          |
+| `Perception/PlayerLighting.cs`        | MonoBehaviour  | Light level at the player, sampled from every `GameplayLight` on a tick with shadow rays (decision 17)                             | working  | M4          |
+| `Abilities/PlayerAbilities.cs`        | MonoBehaviour  | Remaining uses per owned ability for this heist; checks and spends a charge, then calls `Device.Activate()`                        | —        | M5          |
+| `Perception/PlayerLightingDebug.cs`   | MonoBehaviour  | On-screen light readout and a level-tinted sphere at the sample point; computes nothing itself                                     | working  | M4          |
+| `Job/PlayerRoom.cs`                   | MonoBehaviour  | The room the player is in, with 0.5 s hysteresis; raises `RoomChanged(from, to)` for the job log. Not read by NPCs                 | working  | Thrift shop |
+| `Locomotion/PlayerStance.cs`          | MonoBehaviour  | Owns `Stance`: Standing and Crouching only                                                                                         | working  | done        |
+| `Noise/PlayerNoise.cs`                | MonoBehaviour  | A footstep on `NoiseBus` every stride; louder and alarming when sprinting, quieter when crouching                                  | working  | M4          |
 
 ### Prefab composition
 
@@ -719,7 +728,7 @@ Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no 
 2. [ ] **Anomalies and doors** (decisions 18, 19). Full design and steps for 2.3–2.5 in `Assets/doors-and-lockpicking.md`.
    - [x] 2.1 `Anomaly` and `AnomalyKind` in Core: a registry of raised anomalies only, so the usual case (nothing wrong) costs NPCs nothing.
    - [x] 2.2 `NpcAnomalySight` on NPCs checks raised anomalies on the perception tick through `NpcPerception.InViewCone`. The archetype gains anomaly suspicion and per-kind weights (`AnomalyWeights`); a noticed anomaly sets a suspicion floor and becomes the stimulus and the guard's last-known position. The guard only moves to a position it actually knows.
-   - [ ] 2.3 A player-only `Door` with a lock level, reach, interaction, and the lockpicking minigame.
+   - [x] 2.3 A `Door` with a lock level, reach, interaction, and the lockpicking minigame. Built for the apartment (`Apartment House Door`); ticked 2026-10-17.
    - [ ] 2.4 The guard's errand: claim the open door, walk over, look confused, slam it.
    - [x] 2.5 `Lockpicking` conduct when the player is seen picking a lock. Built as apartment step A3: `PlayerConduct` reads `PlayerLockpicking.IsPicking`.
 3. [ ] **Breaker** (decisions 17, 18). Trips a set of lamps: `f_light` drops for everyone looking into the zone, and the tripped breaker is an anomaly. Staff notice the dark, walk to the breaker, and reset it. Breaker lamps must be Mixed or Realtime.
@@ -922,3 +931,5 @@ First built in the apartment level as Track W (`Assets/apartment-level.md` 3.6),
 - **2026-10-15** — Apartment W7.5 built: `JobOutcomeScreen` shows the witness sketch from `JobNews` (a RawImage with the new `Grayscale` Canvas Shader Graph material), with mugshot height lines when the job failed, a wanted caption when it succeeded, and the "?" when nobody saw the player; it listens to `JobNews.Changed` so the order of the end-of-job events does not matter. The newspaper photo is square and the RenderTexture moved to `Core/UI/Textures/WitnessSketch.renderTexture` (512 × 512), so Core owns the seam and the NPC booth writes into it.
 - **2026-10-16** — Thrift shop planned in `Assets/thriftshop-level.md`: an open shop at dusk with a tired clerk, customers and the first guard in a real level; a required register till and randomised bonus loot; the two-slot bag with van stashing (G). New decision 24: adaptive security from completed runs only, a Markov chain over rooms and a Dirichlet over entrances, deterministic greedy placement over authored candidate POIs at load, one adaptive POI per guard, a second guard after two completed runs. New decision 25: guards recognise a described outfit (decision 6 extended as its one exception to "never from being seen"). Decision 15: base and candidate POIs, and a runtime drain factor. Decision 23: appearance is fixed during a job. The open safe is a new anomaly kind, `SafeOpen`, that raises the noticing guard's baseline to just under Curious for the rest of the job.
 - **2026-10-15** — Apartment W8 changed: the police record is saved only when a job is completed, as `progress.json` is. A failed job still produces the description (the mugshot) but leaves the record unchanged, so a failure cannot make the level unwinnable. `JobWitnesses` listens to `Failed` and `Completed` separately.
+- **2026-10-17** — Thrift shop T1 done and checked. Rooms: nine `Zone`s (shop front, shoe section, shop middle, emergency exit, shop back, register, trash room, stockroom, office) plus the street, ten states instead of the planned seven. `JobLayout` (Core) lists rooms as `Zone`s and entrances as `Entrance`s and numbers both in `Awake`, so the number lives in one place; object names are the display names. Room and entrance names moved out of `SecurityLayout`, which keeps only spawn and POI candidates (decision 24). `PlayerRoom` (Player) tracks the current room with 0.5 s hysteresis instead of `PlayerConduct`. `Entrance` (Core) counts inbound crossings; `Door.prefab` carries an inactive `Entrance` child for exterior doors. The saved security record will compare room and entrance names, not counts.
+- **2026-10-17** — Decision 19 changed: guards open doors they need to pass (a `NavMeshLink` on a `Door` area, `OpenForPassage()` with no anomaly, closed again once past the far reach) and ignore the lock; civilians and hearing still treat closed doors as walls. Only a door the player leaves open is evidence; a chasing guard runs through doors without slamming or closing them. Needed because the thrift shop's office is reachable only through the `StaffRoom Door`. Built as thrift shop step T2b. M5 2.3 ticked (the door was already built for the apartment).

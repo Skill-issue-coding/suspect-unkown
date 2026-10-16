@@ -101,7 +101,7 @@ Aim for a practical industry standard: code another developer could pick up, ext
 - Perception is stateless per tick and exposes results only (`IPerceiver.Perceived`, `TryGetLatest`). Consumers never trigger raycasts.
 - `Observation` is a struct with no arrays or other reference-type collections.
 - Suspicion comes from abnormal conduct or abnormal world state (an open door, lights out), never from being seen.
-- NPCs never use doors; only the player opens them. Verbs are bought abilities used at in-world devices, with no physical throwing (decisions 18–20).
+- Civilians never use doors. Guards may open a door to pass and close it behind them, without raising an anomaly; only a door the player leaves open is evidence (decision 19). Verbs are bought abilities used at in-world devices, with no physical throwing (decisions 18–20).
 - Guards patrol by serving points of interest (decision 15), not fixed routes.
 
 ### Physics layers

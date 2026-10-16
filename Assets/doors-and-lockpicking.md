@@ -12,6 +12,8 @@ Read `CLAUDE.md` first, then decisions 6, 18, 19 and 20 in `roadmap_npc.md`. Thi
 
 ### 1.1 Doors belong to the player
 
+> **Changed 2026-10-17** (decision 19 in `roadmap_npc.md`): guards may now open a door they need to pass and close it behind them, with no anomaly and the lock left as it was; civilians still never use doors, and only a door the player leaves open is evidence. A chasing guard runs through doors. The rest of this section still holds.
+
 The joke at the heart of this feature is a genre convention made into a rule the NPCs believe: **only the robber opens doors.**
 
 - **NPCs never use doors.** They walk only through open areas. To them a closed door is a wall: it blocks their NavMesh, so it blocks their paths and their hearing (sound travels along the NavMesh, decision 10).

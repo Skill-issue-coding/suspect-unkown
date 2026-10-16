@@ -86,7 +86,7 @@ The prototype job uses a guard. Tier 1, the thrift shop (`Assets/thriftshop-leve
 
 **The critical phase. No persistence exists yet and none should.**
 
-- **Three verbs**: open a door (only the robber opens doors, so an open door is evidence and a new route), trip a breaker to darken a zone (staff come to reset it), and one bought ability used at an in-world device. Each must visibly move an NPC or change what an NPC perceives. No physical throwing (decisions 18–20 in `roadmap_npc.md`).
+- **Three verbs**: open a door (only the robber leaves doors open, so an open door is evidence and a new route; guards pass through and close doors behind them), trip a breaker to darken a zone (staff come to reset it), and one bought ability used at an in-world device. Each must visibly move an NPC or change what an NPC perceives. No physical throwing (decisions 18–20 in `roadmap_npc.md`).
 - An interaction system for doors and devices. Placeholders until it exists.
 - **Vault and climb** via NavMeshLink, so cover is traversable rather than just an obstacle
 - **The greed ratchet**: escalating value at escalating exposure. Register fast, back office safe 40s, display case loud. Leaving early with a partial take is always allowed.

@@ -112,13 +112,13 @@ public class NightLabWindow : EditorWindow
     {
         if (RenderSettings.sun != null)
             return RenderSettings.sun;
-        return FindObjectsByType<Light>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+        return FindObjectsByType<Light>(FindObjectsInactive.Exclude)
             .FirstOrDefault(l => l.type == LightType.Directional);
     }
 
     static Volume FindOrCreateGlobalVolume()
     {
-        Volume volume = FindObjectsByType<Volume>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
+        Volume volume = FindObjectsByType<Volume>(FindObjectsInactive.Exclude)
             .Where(v => v.isGlobal)
             .OrderByDescending(v => v.priority)
             .FirstOrDefault();
@@ -137,7 +137,7 @@ public class NightLabWindow : EditorWindow
         Light sun = FindSun();
         Volume volume = FindOrCreateGlobalVolume();
 
-        var undoTargets = FindObjectsByType<NightLabLight>(FindObjectsInactive.Include, FindObjectsSortMode.None)
+        var undoTargets = FindObjectsByType<NightLabLight>(FindObjectsInactive.Include)
             .SelectMany(l => new Object[] { l, l.GetComponent<Light>() })
             .Append(volume);
         if (sun != null)
@@ -147,7 +147,7 @@ public class NightLabWindow : EditorWindow
         preset.Apply(sun, volume);
 
         // Post-processing does nothing unless the camera renders it.
-        foreach (Camera camera in FindObjectsByType<Camera>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+        foreach (Camera camera in FindObjectsByType<Camera>(FindObjectsInactive.Exclude))
         {
             UniversalAdditionalCameraData data = camera.GetUniversalAdditionalCameraData();
             if (data != null && !data.renderPostProcessing)
@@ -196,7 +196,7 @@ public class NightLabWindow : EditorWindow
             preset.moonShadowStrength = sun.shadowStrength;
         }
 
-        Volume volume = FindObjectsByType<Volume>(FindObjectsInactive.Exclude, FindObjectsSortMode.None).FirstOrDefault(v => v.isGlobal);
+        Volume volume = FindObjectsByType<Volume>(FindObjectsInactive.Exclude).FirstOrDefault(v => v.isGlobal);
         if (volume != null)
             preset.volumeProfile = volume.sharedProfile;
 
@@ -211,7 +211,7 @@ public class NightLabWindow : EditorWindow
         GameObject playground = GameObject.Find("Playground");
         Renderer[] renderers = playground != null
             ? playground.GetComponentsInChildren<Renderer>()
-            : FindObjectsByType<Renderer>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            : FindObjectsByType<Renderer>(FindObjectsInactive.Exclude);
 
         renderers = renderers.Where(r => r.GetComponentInParent<NightLabLight>() == null
                                          && !r.transform.root.name.StartsWith(LightsRootName)).ToArray();
