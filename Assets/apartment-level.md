@@ -200,11 +200,11 @@ Phase 6 reuses this newspaper prefab for the witness report, so build it as a pr
 
 **The witness sketch** (Track W, W7). The paper's grey picture box shows the player as the clerk remembers them: the player model in the first frame of its idle pose, dressed in the description from the witness model (3.6), printed in grayscale on the same grey background. Grayscale hides colors, so the caption under the photo names them: "Witness description: brown cap, red jacket, possibly grey trousers." The image depends on the outcome:
 
-| Outcome | Image | Title and caption |
-| --- | --- | --- |
-| Caught | The sketch as a mugshot, with height lines behind the figure | "Image of the caught criminal", with the description caption |
-| Completed, seen | The sketch as a wanted poster, with no height lines | "Police seek this person", with the description caption |
-| Completed, never seen | No figure: the grey "?" placeholder | "No witnesses came forward" |
+| Outcome               | Image                                                        | Title and caption                                            |
+| --------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Caught                | The sketch as a mugshot, with height lines behind the figure | "Image of the caught criminal", with the description caption |
+| Completed, seen       | The sketch as a wanted poster, with no height lines          | "Police seek this person", with the description caption      |
+| Completed, never seen | No figure: the grey "?" placeholder                          | "No witnesses came forward"                                  |
 
 The sketch shows every outfit slot the clerk can describe in its leading style and color. A slot the clerk cannot describe shows a flat silhouette, like an unfinished police sketch, and a slot the clerk is unsure of fades toward the paper's grey. The player learns the same lesson on both outcomes: what the witness saw is what the paper prints.
 
@@ -235,7 +235,7 @@ q = f_dist · f_angle · f_light · f_duration · f_stance · observerSkill · f
 
 **Confusion.** Below a quality threshold (`clearLook`, 0.35) a look can take in a wrong value, more often the worse the look. Colors come from one `ConfusionMatrix` asset (`ColorConfusion`) shared by every slot, since black reads as grey on a jacket and on shoes alike: each color lists its likely mistakes with weights (black as grey, blue or brown). Styles have no similar neighbours, so a wrong style is any other style. The chance of being wrong is capped (`worstWrongChance`, 0.5, at most 0.6) so the truth stays the single most likely recall: a poor witness is vague and sometimes wrong, never consistently wrong. Without the cap, many poor looks made a mistake outscore the truth.
 
-**Memory and the latest appearance.** Beliefs decay between sightings at the archetype's retention rate; the clerk forgets fast. Each observation reads the player's appearance at that moment, so a fresh good look outweighs an old poor one, and a mid-job change of clothes (later levels) gives a description of what the player wore when last seen well.
+**Memory and the latest appearance.** Beliefs decay between sightings at the archetype's retention rate; the clerk forgets fast. Each observation reads the player's appearance at that moment, so a fresh good look outweighs an old poor one. The player's appearance never changes during a job (decision 23); a change of clothes between jobs is what makes newer evidence describe something different.
 
 **The report.** At job end, `NpcWitness` produces a `WitnessReport`: per slot the most likely style and color with a confidence. The newspaper shows it as a sketch of the player (3.4), with a caption that turns confidence into words: certain, "probably", "possibly", or left out. Several witnesses (later levels) merge in log-odds.
 
@@ -273,21 +273,21 @@ After a completed job the menu opens on the **Debrief** station instead of the m
 1. **The take.** Each item slides in from the left with a small overshoot, one after another (objectives first, then bonus loot, cash grouped into one line with its count), then the total counts up.
 2. **Reputation.** The XP sources slide in the same way, then the level bar fills from the XP before the job to the XP after it. Each time it wraps, "LEVEL UP +1 SKILL POINT" punches in.
 
-**The take scrolls.** Four item rows fit; more scroll. Each new row turns on, the list scrolls so it is in view, and the oldest rows fade out at the top instead of being cut (a `RectMask2D` with softness, with padding so a resting row never sits in the fade). After the animations the player can scroll back with the mouse wheel. Rows are made from one template per debrief, never per frame. Reputation always has exactly four rows, one per `XpRules` line, so it does not scroll. With more than two kinds of bonus loot, its detail sums them up ("9 items  $490") so the line fits.
+**The take scrolls.** Four item rows fit; more scroll. Each new row turns on, the list scrolls so it is in view, and the oldest rows fade out at the top instead of being cut (a `RectMask2D` with softness, with padding so a resting row never sits in the fade). After the animations the player can scroll back with the mouse wheel. Rows are made from one template per debrief, never per frame. Reputation always has exactly four rows, one per `XpRules` line, so it does not scroll. With more than two kinds of bonus loot, its detail sums them up ("9 items $490") so the line fits.
 
 A Continue button skips a running animation, then moves on (REPUTATION, then DONE back to the main board). The tabs stay locked until both views have played. A failed job gives no XP and no debrief: the newspaper is the result, as before.
 
 **XP.** Worked out from the job's facts by `XpRules` (Core, static, unit-tested), never stored per job, so changing the rules never leaves stale numbers in a save:
 
-| Source | XP | Why |
-| --- | --- | --- |
-| Each objective item | 250 | Doing the job is always the largest share |
-| Bonus bag loot | value ÷ 10 | Greed pays a little |
-| Cash | value ÷ 10 | Small, on purpose |
-| Clean getaway: no NPC reached Alarm (`JobAlert.Peak`) | +150 | Rewards a quiet job |
-| Witness report: unseen (or nothing named) | +300 | The stealth reward |
-| Witness report: vague ("possibly" only) | +200 | Seen, but badly |
-| Witness report: clear ("probably" or better) | +100 | The description is the real cost |
+| Source                                                | XP         | Why                                       |
+| ----------------------------------------------------- | ---------- | ----------------------------------------- |
+| Each objective item                                   | 250        | Doing the job is always the largest share |
+| Bonus bag loot                                        | value ÷ 10 | Greed pays a little                       |
+| Cash                                                  | value ÷ 10 | Small, on purpose                         |
+| Clean getaway: no NPC reached Alarm (`JobAlert.Peak`) | +150       | Rewards a quiet job                       |
+| Witness report: unseen (or nothing named)             | +300       | The stealth reward                        |
+| Witness report: vague ("possibly" only)               | +200       | Seen, but badly                           |
+| Witness report: clear ("probably" or better)          | +100       | The description is the real cost          |
 
 The apartment played well (both items, $180 cash, no alarm, unseen) gives 500 + 18 + 150 + 300 = 968 XP.
 
@@ -295,11 +295,11 @@ The apartment played well (both items, $180 cash, no alarm, unseen) gives 500 + 
 
 **Witness clarity** comes from the newspaper's own words, so the paper and the XP always agree. `SuspectSketch` reports it with the caption (`JobNews.ReportWitness(caption, clarity)`):
 
-| Clarity | The caption | Example |
-| --- | --- | --- |
-| **Unseen** | Nobody saw the player, or the caption names no color ("too vague to describe") | A glimpse at 13 % |
-| **Vague** | Only "possibly" colors (confidence from `vagueAt`, 20 %, up to `clearAt`) | A long look that faded to 24 % on the walk to the van |
-| **Clear** | At least one color "probably" or better (at or above `clearAt`, 35 %) | A long look shortly before leaving, or a catch |
+| Clarity    | The caption                                                                    | Example                                               |
+| ---------- | ------------------------------------------------------------------------------ | ----------------------------------------------------- |
+| **Unseen** | Nobody saw the player, or the caption names no color ("too vague to describe") | A glimpse at 13 %                                     |
+| **Vague**  | Only "possibly" colors (confidence from `vagueAt`, 20 %, up to `clearAt`)      | A long look that faded to 24 % on the walk to the van |
+| **Clear**  | At least one color "probably" or better (at or above `clearAt`, 35 %)          | A long look shortly before leaving, or a catch        |
 
 The cut-off is "probably", not "certain" (`certainAt`, 60 %), because the clerk forgets (90 s half-life) while the player walks to the van: in testing, a long look faded to 24 % by job end, and only a catch reached 46 %, so a 60 % rule would almost never score an escape as clear. A description too thin to name anything counts as unseen: if the paper cannot describe the player, the police have nothing.
 

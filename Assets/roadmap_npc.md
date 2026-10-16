@@ -119,6 +119,8 @@ Abnormality is computed by the **perceiver**, with its own archetype, at tick ti
 
 **Extended 2026-10-05: abnormal world state counts too.** Suspicion comes from abnormal conduct **or** abnormal world state: an open door, lights that went out (decision 18). Both are things only a robber causes. It still never comes from the player merely being seen. Sound was already a third source (decision 10); like sound, an anomaly sets a suspicion floor rather than rising every frame, and on its own never pushes an NPC past Investigating.
 
+**Extended 2026-10-16: a described outfit counts for guards** (decision 25). This is the one deliberate exception to "never from being seen": a guard who sees the player wearing what the police description names grows suspicious from the match alone. It joins abnormality as one more term, weighted per archetype (civilians 0), and on its own never pushes past Investigating.
+
 ### 7. Perception is stateless; two components accumulate, separately
 
 `NpcPerception` answers "what can I see right now, and what is the player doing" once per tick and nothing else. Two different things accumulate over time, in two different places:
@@ -213,6 +215,8 @@ Need comes first, so a fully covered POI scores 0. Distance discounts but never 
 4. **Budget.** If total drain exceeds what the guards can cover, every POI empties and guards run in circles. Total decay is the Phase 8 fixed budget, and the solvability check still applies: coverage must never make a job impossible.
 
 **Consequences.** There is no `ReturningToPost`: after an investigation the guard just picks again, and the nearest neglected POI wins naturally. A static guard post is one POI with high decay and a long dwell. POIs detect guards by distance, not triggers, since the `Volume` layer collides with `Player` only. Each POI knows its `Zone`, because the Phase 8 Markov model works over zones.
+
+**Extended 2026-10-16: base and candidate POIs** (decision 24). A level has **base** POIs, always active and placed by the developers, and **candidate** POIs, also placed by the developers but inactive until the security plan switches them on at load and sets their `DecayMultiplier`. The optimiser never creates POIs at arbitrary positions: candidates keep every POI on the guard's NavMesh, give each a precomputed list of the rooms and entrances it covers, and give the change log a name to use. A POI can also carry a **runtime** drain factor that is not the plan's, such as the office draining 1.5 times faster once its safe has been opened (`Assets/thriftshop-level.md` 2.3): `Importance = baseDecayRate × DecayMultiplier × runtime factor`.
 
 ### 16. Animator controllers are built from code, around stances
 
@@ -321,6 +325,29 @@ Two models, two questions. The **witness model** (M7) answers "what did the burg
 - **Slots** are the player's customization categories: **Head, Chest, Legs, Feet**. Each part is remembered as a **style and a color separately** (`Chest_002_Black` is style 002, color Black), each with its own belief and its own confusion table, so a witness can get the color right and the cut wrong.
 - **Burns are temporary** (Phase 7): an item confirmed into the police profile counts as burned for one or two jobs, or until newer witness evidence describes something different. Never permanently.
 - **First built in the apartment level** (`Assets/apartment-level.md` 3.6, Track W), right after the clerk, with the clerk as the only witness and the newspaper as the report.
+- **Appearance is fixed during a job** (2026-10-16). The player can never change clothes mid-heist; outfits change only between jobs, in the menu's wardrobe and shop. The counter to a burned outfit is therefore changing it before the next job. Concept 7.2's mid-job layering is cut.
+
+### 24. Adaptive security: predict, then place, at load, from completed runs
+
+Concept 6.4, first built in the thrift shop (`Assets/thriftshop-level.md` sections 4 and 5).
+
+- **The job log** records what the player did in the run: room transitions (each room is a `Zone` with a room index; the street is room 0) and inbound crossings at each `Entrance`. It is kept whether or not anyone saw it (decision 23).
+- **Only completed runs teach security.** On `JobOutcome.Completed` the location's stored counts decay by 0.8 and the run is added, in `security.json`, a file of its own. A failed run is forgotten, so failing never makes the next try harder (the same rule as progress and the police record).
+- **Stage A, prediction:** a first-order Markov chain over rooms with Laplace smoothing, a Dirichlet-multinomial over entrances, and forward propagation to a predicted occupancy per room.
+- **Stage B, placement:** greedy maximum coverage over candidate POIs (decision 15), scored on room occupancy and entrance probability. **Deterministic:** no sampling, ties to the lower index, so the same history always gives the same plan.
+- **The budget** is the number of adaptive POIs: one per guard, from the first completed run, capped at two in the thrift shop. The guard count itself grows with completed runs (one guard, two after two completed runs) and never shrinks.
+- **It runs once, at load,** in `SecurityDirector`, which also spawns the guards at authored spawn candidates. Security never learns during a run.
+- **Explainable by construction:** each pick writes one line from its marginal-gain step ("guards now check the side entrance: used on 2 of your last 2 runs"). The lines feed the debug overlay and the AI report; the player sees only "Raised security" on the main menu.
+- **Solvability is held by authoring** while the budget is this small: no candidate covers the required loot, and none covers more than one entrance.
+- **Data in Core, model in NPC.** `JobLog`, `SecurityRecord` and `SecurityStore` are plain data in Core, so the main menu can read them; `SecurityModel`, `SecurityPlanner` and `SecurityDirector` are NPC.
+
+### 25. Guards recognise a described outfit
+
+The police description saved at the end of a completed job (Track W, W8) is loaded at job start. When a guard observes the player, the match between the description and the player's current `CharacterAppearance` (per slot: confidence × color match × a style bonus, averaged over the four slots, with confidences under "possibly" counted as 0) times the archetype's `recognition` weight joins abnormality (decision 6). Guards weigh it about 0.6, civilians 0. On its own it never pushes past Investigating: a guard who recognises an outfit comes over for a closer look, and conduct tips them into pursuit.
+
+- **Why:** it closes the witness loop. Being seen well on one job costs something on the next, which is the burn of concept 6.3, and the counter (change clothes between jobs) already exists.
+- **Burns stay temporary:** the description fades by half every completed job, and new evidence describing something else takes over.
+- **Dependencies:** the match is NPC code reading `WitnessReport`; Core and Player never see the description.
 
 ---
 
@@ -531,7 +558,7 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `Volumes/Zone.cs`           | MonoBehaviour    | Trigger volume on the `Volume` layer, public or staff; several colliders make complex shapes. Zone id arrives with Phase 8 | working | M2        |
 | `Lighting/GameplayLight.cs` | MonoBehaviour    | Marks a Point or Spot light as one gameplay counts; static registry and unshadowed contribution at a point (decision 17)   | working | M4        |
 | `World/Anomaly.cs`          | MonoBehaviour    | World state only a robber causes; static registry, active flag, point to see, kind (decision 18)                           | working | M5        |
-| `World/AnomalyKind.cs`      | enum             | OpenDoor; PowerOut joins with the breaker. A kind is added only with its producer                                          | working | M5        |
+| `World/AnomalyKind.cs`      | enum             | OpenDoor; SafeOpen joins with the thrift shop safe, PowerOut with the breaker. A kind is added only with its producer                                 | working | M5        |
 | `World/Door.cs`             | MonoBehaviour    | Player-only door: carves the NavMesh while closed, raises an anomaly while open, can be slammed shut (decision 19)         | —       | M5        |
 | `World/Breaker.cs`          | MonoBehaviour    | Switches a set of lamps; an anomaly while tripped; reset by staff                                                          | —       | M5        |
 | `World/Device.cs`           | MonoBehaviour    | In-world object an ability is used at; names its `Ability`, exposes `Activate()`, raises `Activated` (decision 20)         | —       | M5        |
@@ -754,7 +781,7 @@ First built in the apartment level as Track W (`Assets/apartment-level.md` 3.6),
 - A 3D view cone for cameras. `NpcPerception` flattens forward for the FOV check, so camera pitch is ignored. A camera pointing straight down has a zero flattened forward, `Vector3.Angle` returns 0, and the camera sees all 360°. Until then, mount test cameras at an angle.
 - `SecurityMonitor`: relays its cameras' observations to the guard posted at it, whose `NpcSuspicion` acts on them (decision 11).
 - Guards register behavioural features that civilians never notice.
-- POIs, camera mounts, and the monitor post expose which `Zone`s they cover, so the Phase 8 placement optimiser can treat them as candidates in the `SecurityPlan`. For POIs the optimiser sets presence and `DecayMultiplier` (decision 15).
+- POIs, camera mounts, and the monitor post expose which `Zone`s they cover, so the Phase 8 placement optimiser can treat them as candidates in the `SecurityPlan`. For POIs the optimiser sets presence and `DecayMultiplier` (decision 15). The POI part, with the job log, the model and the guard count, is built first in the thrift shop (decision 24, `Assets/thriftshop-level.md` Track S); cameras and the monitor join the candidate set here.
 
 **Done when:** cameras work without a single change to guard code, and tampering with a camera fools the guard at the monitor.
 
@@ -893,4 +920,5 @@ First built in the apartment level as Track W (`Assets/apartment-level.md` 3.6),
 - **2026-10-15** — Apartment W6 done and checked: `FeatureBelief` stores scores in a serializable array and merges by adding log-odds; `WitnessReport` holds a description (per-slot style and color beliefs) and is both a witness's memory and its job-end copy; `JobWitnesses` merges every witness's report into the police description when `JobOutcome` ends the job. Seven EditMode tests for the merge, fade and confidence (`Assets/Testing/Editor/WitnessMergeTests.cs`) pass.
 - **2026-10-15** — Apartment W7.1–W7.4 done and checked: `SketchBooth` prefab (Sketch layer 17, added to the CLAUDE.md layers table) with a mannequin of the player model held in frame 0 of `standing_idle` through a PlayableGraph; `SuspectSketch` dresses it from a `WitnessReport` (part lookup by name through the shared `OutfitFeature.TryParse`, nearest existing part as fallback, `SketchUnsure` and `SketchUnknown` material swaps), warms up its shader variants at load, renders once into a RenderTexture when `JobWitnesses.Described` fires, and writes the hedged caption to the new Core hook `JobNews`.
 - **2026-10-15** — Apartment W7.5 built: `JobOutcomeScreen` shows the witness sketch from `JobNews` (a RawImage with the new `Grayscale` Canvas Shader Graph material), with mugshot height lines when the job failed, a wanted caption when it succeeded, and the "?" when nobody saw the player; it listens to `JobNews.Changed` so the order of the end-of-job events does not matter. The newspaper photo is square and the RenderTexture moved to `Core/UI/Textures/WitnessSketch.renderTexture` (512 × 512), so Core owns the seam and the NPC booth writes into it.
+- **2026-10-16** — Thrift shop planned in `Assets/thriftshop-level.md`: an open shop at dusk with a tired clerk, customers and the first guard in a real level; a required register till and randomised bonus loot; the two-slot bag with van stashing (G). New decision 24: adaptive security from completed runs only, a Markov chain over rooms and a Dirichlet over entrances, deterministic greedy placement over authored candidate POIs at load, one adaptive POI per guard, a second guard after two completed runs. New decision 25: guards recognise a described outfit (decision 6 extended as its one exception to "never from being seen"). Decision 15: base and candidate POIs, and a runtime drain factor. Decision 23: appearance is fixed during a job. The open safe is a new anomaly kind, `SafeOpen`, that raises the noticing guard's baseline to just under Curious for the rest of the job.
 - **2026-10-15** — Apartment W8 changed: the police record is saved only when a job is completed, as `progress.json` is. A failed job still produces the description (the mugshot) but leaves the record unchanged, so a failure cannot make the level unwinnable. `JobWitnesses` listens to `Failed` and `Completed` separately.

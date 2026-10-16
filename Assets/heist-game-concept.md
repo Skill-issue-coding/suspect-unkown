@@ -77,8 +77,8 @@ Three tiers, reduced from five because 3D locations cost roughly double (see `ro
 
 | Tier | Target            | New opposition                                                                                                   | New space                                            |
 | ---- | ----------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| 1    | Convenience store | Civilians: a tired clerk (poor memory, decays fast) and a few customers giving independent partial descriptions. | Single room, low shelving, stockroom door            |
-| 2    | Jewelry store     | Patrolling guard. Trained observer, reads behaviour.                                                             | Mezzanine (first verticality), security office above |
+| 1    | Thrift shop       | Civilians (a tired clerk, customers) and the first patrolling guard; security first adapts to the player's habits. | Open shop floor fading into staff rooms, side doors  |
+| 2    | Jewelry store     | Several guards: trained observers who read behaviour.                                                            | Mezzanine (first verticality), security office above |
 | 3    | Bank branch       | Cameras, watched from a security monitor. Perfect retention, fixed arcs, visual features only. Locked zones.     | Two floors, vault stairwell                          |
 
 Folded or cut from the five-tier plan: the pharmacy tier's civilians move into tier 1, and the vault tier's alarm timers and guards sharing information become stretch goals. Roof access, vents, and service shafts are no longer tied to a tier; add them where a level wants them, and note that they are third in the `roadmap.md` cut order.
@@ -163,7 +163,7 @@ q = f_dist · f_angle · f_light · f_duration · f_stance · observerSkill · f
 
 **Let witnesses be wrong.** Below a quality threshold, sample the reported value from a confusion distribution rather than reporting the truth, so a red jacket gets described as orange. Store confusion matrices per feature slot in a ScriptableObject. Cheap to build, and it buys a great deal: low-quality witnesses become actively misleading, corroboration becomes meaningful, the post-job report becomes fun to read, and section 6.6 becomes possible at all.
 
-Mid-job outfit changes work automatically, since each report keys on the appearance at the moment of observation.
+Each report keys on the appearance at the moment of observation. The player's appearance is fixed during a job; outfits change only between jobs (decision 23 in `roadmap_npc.md`).
 
 ### 6.3 Police profile — career-long
 
@@ -196,6 +196,8 @@ Some budget goes to a global pool, so hitting many _different_ jewelry stores ra
 The budget grows slowly with how often and how recently a location has been hit, but at any moment it is finite and must be fully allocated. Fortifying the front means the rear gets thinner. A guard watching the loading dock is not watching the showroom. Verticality makes this sharper: covering the roof costs coverage on the ground floor.
 
 If coverage could simply grow everywhere, adaptation is pure punishment and deception pays nothing. Scarcity on their side is the entire reason 6.6 works. NPC attention is finite too, so a guard investigating a noise is genuinely not looking at anything else.
+
+First built in the thrift shop (`Assets/thriftshop-level.md`, decision 24 in `roadmap_npc.md`): only completed runs are logged, placement is deterministic over authored candidate POIs, and the budget is one adaptive POI per guard, with a second guard after two completed runs.
 
 #### Implementation: predict, then optimize
 
@@ -349,7 +351,6 @@ Clothing is functional, not cosmetic. Each piece occupies a feature slot the wit
 
 - Cheap pieces are disposable: buy, burn, discard.
 - Expensive pieces carry a functional benefit. A work uniform lets you stand in staff areas without generating suspicion; a long coat conceals tools; quiet shoes reduce noise radius.
-- **Layering** — carry a second layer and change appearance mid-job in a bathroom or stairwell, so witnesses from the first half describe someone different from the second half.
 - **Decoy pieces** — cheap, loud, distinctive items that exist to be confirmed into the profile on purpose. Mark them as such in the shop so the strategy is discoverable.
 - A wardrobe screen shows each piece's burn status and whether the burn was intentional.
 

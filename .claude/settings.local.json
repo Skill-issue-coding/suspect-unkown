@@ -15,6 +15,9 @@
     "unity:sprite-segment-3x3grid": "off",
     "unity:tilemap-palette-create": "off",
     "unity:tilemap-ruletile-createempty": "off",
-    "unity:tilemap-ruletile-createfromsegment": "off"
+    "unity:tilemap-ruletile-createfromsegment": "off",
+    "caveman": "on",
+    "caveman-compress": "on",
+    "caveman-help": "on"
   }
 }

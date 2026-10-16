@@ -76,7 +76,7 @@ The apartment level (`Assets/apartment-level.md`) is where loot, the bag indicat
 
 **Status (2026-10-14):** the apartment has built loot with hold-to-take timers, optional cash, the job HUD (objectives, bag contents, pocket cash, job clock), the fail state, the results newspaper and saved progress (steps A1–A6). The getaway van is next. The bag holds two items in every job (a hard limit, shown as two slots); refusing a third item and round trips to the van arrive with the thrift shop. There is no carry weight.
 
-The prototype job uses a guard. Tier 1's only opposition is civilians, whose behaviour does not exist until Phase 5, so tier 1 content is built after that.
+The prototype job uses a guard. Tier 1, the thrift shop (`Assets/thriftshop-level.md`), mixes civilians with the first guard in a real level, and adds randomised bonus loot and van round trips with the two-slot bag.
 
 **Gate check:** play it ten times. Is there ever tension? If not, the Curious state is almost certainly too short. Lengthen it before doing anything else.
 
@@ -154,6 +154,8 @@ The AI course deliverable.
 
 **Done when:** you can hit the same store four times the same way and watch coverage visibly migrate onto your route, with the change log explaining why.
 
+First built in the thrift shop (`Assets/thriftshop-level.md` sections 4–5, decision 24 in `roadmap_npc.md`): only completed runs are logged, rooms are the Markov states, placement is deterministic over authored candidate POIs, and the budget is one adaptive POI per guard, with a second guard hired after two completed runs. The player sees "Raised security" on the main menu; the change log lines go to the debug overlay and the report. Loot order, tools, detections and cameras join the log and the candidates in later levels.
+
 **For the report:** keep the Markov model as a baseline even if you later add a neural route predictor. A baseline-versus-model comparison with an ablation is most of what the AI course wants, and it costs almost nothing once logging exists.
 
 ---
@@ -172,7 +174,7 @@ The AI course deliverable.
 
 **Reduced from five tiers to three.** 3D locations cost roughly double their 2D equivalents.
 
-- Tier 2: jewelry store with a patrolling guard and a **mezzanine** (first verticality)
+- Tier 2: jewelry store with several trained guards and a **mezzanine** (first verticality). The first guard arrives in tier 1, the thrift shop
 - Tier 3: bank branch with cameras, locked zones, two floors
 - Guard archetype with behavioural feature observation
 - Cameras with fixed arcs, mounted height, and visual-only features
