@@ -1,17 +1,28 @@
 using UnityEngine;
 
 // Trigger volume tagged public or staff. Passive: the player side 
-// tracks which zones it is in. Colliders on this object or its children; 
+// tracks which zones it is in. Colliders on this object; 
 // several boxes make complex shapes. Reused by Phase 8.
 [RequireComponent(typeof(Collider))]
 public class Zone : MonoBehaviour
 {
-    [SerializeField] private ZoneType type;
-    [SerializeField] private bool drawGizmo = true;
-    [SerializeField] private Color publicColor = new Color(0.2f, 1f, 0.2f, 0.15f);
-    [SerializeField] private Color staffColor = new Color(1f, 0.2f, 0.2f, 0.15f);
+    [SerializeField, Tooltip("What type of Zone it is")]
+    private ZoneType type;
+
+    [SerializeField, Min(0), Tooltip("Room index for the job log; 0 is the street, so zones start at 1. Unique per room in a level")]
+    private int room = 1;
+
+    [SerializeField]
+    private bool drawGizmo = true;
+
+    [SerializeField]
+    private Color publicColor = new Color(0.2f, 1f, 0.2f, 0.15f);
+
+    [SerializeField]
+    private Color staffColor = new Color(1f, 0.2f, 0.2f, 0.15f);
 
     public ZoneType Type => type;
+    public int Room => room;
 
     private Collider[] colliders;
 
@@ -65,5 +76,10 @@ public class Zone : MonoBehaviour
         }
 
         Gizmos.matrix = Matrix4x4.identity;
+
+
+#if UNITY_EDITOR
+        UnityEditor.Handles.Label(transform.position, $"{name} [{room}]");
+#endif
     }
 }

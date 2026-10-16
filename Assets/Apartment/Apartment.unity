@@ -4902,6 +4902,18 @@ PrefabInstance:
       propertyPath: 'outlines.Array.data[0]'
       value: 
       objectReference: {fileID: 547872851}
+    - target: {fileID: 9216349966825725930, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_Size.z
+      value: 2.7857127
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216349966825725930, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_Center.x
+      value: 3.126388e-13
+      objectReference: {fileID: 0}
+    - target: {fileID: 9216349966825725930, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_Center.z
+      value: 1.3999999
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
