@@ -512,6 +512,10 @@ PrefabInstance:
       value: SM_Prop_Book_01
       objectReference: {fileID: 0}
     - target: {fileID: 179376, guid: 20fba2d07ecf8bf4f949e6e9c195c7b5, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 179376, guid: 20fba2d07ecf8bf4f949e6e9c195c7b5, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -1446,6 +1450,10 @@ PrefabInstance:
     - target: {fileID: 104650, guid: 0e356c1cc31375f45b1544c3dab4f5cf, type: 3}
       propertyPath: m_Name
       value: SM_Item_Wine_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 104650, guid: 0e356c1cc31375f45b1544c3dab4f5cf, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 104650, guid: 0e356c1cc31375f45b1544c3dab4f5cf, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -2388,6 +2396,10 @@ PrefabInstance:
       value: SM_Prop_Sack_01
       objectReference: {fileID: 0}
     - target: {fileID: 106010, guid: e40e7ea9354330d4ca5ac23056ae5de1, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 106010, guid: e40e7ea9354330d4ca5ac23056ae5de1, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -2518,6 +2530,10 @@ PrefabInstance:
     - target: {fileID: 179172, guid: e4e5d2f7f155681449aca26cbdb2b635, type: 3}
       propertyPath: m_Name
       value: SM_Prop_CardboardBox_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 179172, guid: e4e5d2f7f155681449aca26cbdb2b635, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 179172, guid: e4e5d2f7f155681449aca26cbdb2b635, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -2784,6 +2800,10 @@ PrefabInstance:
       value: SM_Prop_TrashCan_01
       objectReference: {fileID: 0}
     - target: {fileID: 188538, guid: f738f6acdbb1d5844bd657732cb05e13, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 188538, guid: f738f6acdbb1d5844bd657732cb05e13, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -2914,6 +2934,10 @@ PrefabInstance:
     - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
       propertyPath: m_Name
       value: SM_Prop_PotPlant_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -3165,6 +3189,10 @@ PrefabInstance:
       value: SM_Prop_CardboardBox_01
       objectReference: {fileID: 0}
     - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -3365,6 +3393,10 @@ PrefabInstance:
     - target: {fileID: 150698, guid: f4c62b1a746281e44800c9250dd3643c, type: 3}
       propertyPath: m_Name
       value: SM_Item_Lantern_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 150698, guid: f4c62b1a746281e44800c9250dd3643c, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 150698, guid: f4c62b1a746281e44800c9250dd3643c, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -3631,6 +3663,10 @@ PrefabInstance:
       value: SM_Prop_TrashBag_02
       objectReference: {fileID: 0}
     - target: {fileID: 103300, guid: 70a4fe26c99cdd645b53ab796679e200, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 103300, guid: 70a4fe26c99cdd645b53ab796679e200, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -3695,6 +3731,10 @@ PrefabInstance:
     - target: {fileID: 140880, guid: e9155916723d2f541a53f1db112851c8, type: 3}
       propertyPath: m_Name
       value: SM_Prop_Book_03
+      objectReference: {fileID: 0}
+    - target: {fileID: 140880, guid: e9155916723d2f541a53f1db112851c8, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 140880, guid: e9155916723d2f541a53f1db112851c8, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -5633,6 +5673,10 @@ PrefabInstance:
       value: SM_Prop_CardboardBox_01
       objectReference: {fileID: 0}
     - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -5909,6 +5953,10 @@ PrefabInstance:
       value: SM_Prop_Book_01
       objectReference: {fileID: 0}
     - target: {fileID: 179376, guid: 20fba2d07ecf8bf4f949e6e9c195c7b5, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 179376, guid: 20fba2d07ecf8bf4f949e6e9c195c7b5, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -6045,6 +6093,10 @@ PrefabInstance:
       value: SM_Prop_Basket_03
       objectReference: {fileID: 0}
     - target: {fileID: 179152, guid: d9b3a115a210dd242aec65164919e678, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 179152, guid: d9b3a115a210dd242aec65164919e678, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -6175,6 +6227,10 @@ PrefabInstance:
     - target: {fileID: 143142, guid: 7c9db1abedcdc2443bde7301346f4dc3, type: 3}
       propertyPath: m_Name
       value: SM_Prop_Basket_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 143142, guid: 7c9db1abedcdc2443bde7301346f4dc3, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 143142, guid: 7c9db1abedcdc2443bde7301346f4dc3, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -6750,6 +6806,10 @@ PrefabInstance:
       value: SM_Prop_PotPlant_01
       objectReference: {fileID: 0}
     - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -7012,6 +7072,10 @@ PrefabInstance:
     - target: {fileID: 103300, guid: 70a4fe26c99cdd645b53ab796679e200, type: 3}
       propertyPath: m_Name
       value: SM_Prop_TrashBag_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 103300, guid: 70a4fe26c99cdd645b53ab796679e200, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 103300, guid: 70a4fe26c99cdd645b53ab796679e200, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -7420,6 +7484,10 @@ PrefabInstance:
     - target: {fileID: 106888, guid: 24785933d7ceaad4a800f09511c371db, type: 3}
       propertyPath: m_Name
       value: SM_Prop_Table_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 106888, guid: 24785933d7ceaad4a800f09511c371db, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 106888, guid: 24785933d7ceaad4a800f09511c371db, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -8136,6 +8204,10 @@ PrefabInstance:
       value: SM_Prop_ShopInterior_Display_01
       objectReference: {fileID: 0}
     - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -8601,6 +8673,10 @@ PrefabInstance:
       value: SM_Prop_Book_02
       objectReference: {fileID: 0}
     - target: {fileID: 142830, guid: 9f3ef59f783322441a01e041c6c6351f, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 142830, guid: 9f3ef59f783322441a01e041c6c6351f, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -8665,6 +8741,10 @@ PrefabInstance:
     - target: {fileID: 160208, guid: 170d5c1a9243bed498801f398ce205e0, type: 3}
       propertyPath: m_Name
       value: SM_Item_Wine_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 160208, guid: 170d5c1a9243bed498801f398ce205e0, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 160208, guid: 170d5c1a9243bed498801f398ce205e0, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -8762,6 +8842,10 @@ PrefabInstance:
     - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
       propertyPath: m_Name
       value: SM_Prop_PotPlant_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -8900,6 +8984,10 @@ PrefabInstance:
       value: SM_Prop_Barrel_01
       objectReference: {fileID: 0}
     - target: {fileID: 139238, guid: ea39c929a43fec843a8747fa0f34346e, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 139238, guid: ea39c929a43fec843a8747fa0f34346e, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -9030,6 +9118,10 @@ PrefabInstance:
     - target: {fileID: 103760, guid: 4a6798a16f218f44e9d82cdb16502a98, type: 3}
       propertyPath: m_Name
       value: SM_Prop_Barrel_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 103760, guid: 4a6798a16f218f44e9d82cdb16502a98, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 103760, guid: 4a6798a16f218f44e9d82cdb16502a98, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -9234,6 +9326,10 @@ PrefabInstance:
       value: SM_Prop_PotPlant_02
       objectReference: {fileID: 0}
     - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -9340,6 +9436,10 @@ PrefabInstance:
       value: SM_Wep_Shield_01
       objectReference: {fileID: 0}
     - target: {fileID: 6718714066201611536, guid: fdc7e75bbc7e544409c8c985aa0eec1f, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 6718714066201611536, guid: fdc7e75bbc7e544409c8c985aa0eec1f, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -9364,6 +9464,10 @@ PrefabInstance:
     - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
       propertyPath: m_Name
       value: SM_Prop_PotPlant_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -9428,7 +9532,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 942161686}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: FrontWindow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9617,6 +9721,10 @@ PrefabInstance:
     - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
       propertyPath: m_Name
       value: SM_Prop_ShopInterior_Display_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -9817,7 +9925,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 970933464}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Gondolas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9866,6 +9974,10 @@ PrefabInstance:
     - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
       propertyPath: m_Name
       value: SM_Prop_ShopInterior_Display_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -9930,7 +10042,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 982554251}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: VintageTables
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10117,6 +10229,10 @@ PrefabInstance:
     - target: {fileID: 139926, guid: f710382517201604d939dd1e30c50b66, type: 3}
       propertyPath: m_Name
       value: SM_Prop_ShopInterior_Chair_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 139926, guid: f710382517201604d939dd1e30c50b66, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 139926, guid: f710382517201604d939dd1e30c50b66, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -10368,6 +10484,10 @@ PrefabInstance:
     - target: {fileID: 105510, guid: 386068bed8b5c18419802b44c6cc68b3, type: 3}
       propertyPath: m_Name
       value: SM_Prop_Pot_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 105510, guid: 386068bed8b5c18419802b44c6cc68b3, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 105510, guid: 386068bed8b5c18419802b44c6cc68b3, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -10630,7 +10750,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1041828657}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Stockroom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11026,6 +11146,10 @@ PrefabInstance:
     - target: {fileID: 8072554541562425819, guid: edf54b3dd7a16ad41bfe4c82ba7456f4, type: 3}
       propertyPath: m_Name
       value: SM_Wep_Shield_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 8072554541562425819, guid: edf54b3dd7a16ad41bfe4c82ba7456f4, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8072554541562425819, guid: edf54b3dd7a16ad41bfe4c82ba7456f4, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -12021,6 +12145,10 @@ PrefabInstance:
       value: SM_Prop_Basket_01
       objectReference: {fileID: 0}
     - target: {fileID: 196528, guid: 970cd4f601e083847b3c1dede5521995, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 196528, guid: 970cd4f601e083847b3c1dede5521995, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -12481,6 +12609,10 @@ PrefabInstance:
     - target: {fileID: 139430, guid: 4584be541115cdc4bbf6147fe22347b2, type: 3}
       propertyPath: m_Name
       value: SM_Item_Lantern_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 139430, guid: 4584be541115cdc4bbf6147fe22347b2, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 139430, guid: 4584be541115cdc4bbf6147fe22347b2, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -12989,7 +13121,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1188430669}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: BackShelves
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13171,6 +13303,10 @@ PrefabInstance:
     - target: {fileID: 125560, guid: 5489de3ba8de3204983754afa325efc5, type: 3}
       propertyPath: m_Name
       value: SM_Prop_Basket_04
+      objectReference: {fileID: 0}
+    - target: {fileID: 125560, guid: 5489de3ba8de3204983754afa325efc5, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 125560, guid: 5489de3ba8de3204983754afa325efc5, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -13375,6 +13511,10 @@ PrefabInstance:
       value: SM_Item_Lantern_01
       objectReference: {fileID: 0}
     - target: {fileID: 150698, guid: f4c62b1a746281e44800c9250dd3643c, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 150698, guid: f4c62b1a746281e44800c9250dd3643c, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -13540,6 +13680,10 @@ PrefabInstance:
     - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
       propertyPath: m_Name
       value: SM_Prop_CardboardBox_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -13836,6 +13980,10 @@ PrefabInstance:
     - target: {fileID: 160208, guid: 170d5c1a9243bed498801f398ce205e0, type: 3}
       propertyPath: m_Name
       value: SM_Item_Wine_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 160208, guid: 170d5c1a9243bed498801f398ce205e0, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 160208, guid: 170d5c1a9243bed498801f398ce205e0, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -14191,6 +14339,10 @@ PrefabInstance:
     - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
       propertyPath: m_Name
       value: SM_Prop_ShopInterior_Display_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -14774,7 +14926,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1309837120}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Decor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15118,7 +15270,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1340704402}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Clothes
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -15289,6 +15441,10 @@ PrefabInstance:
       value: SM_Item_Wine_02
       objectReference: {fileID: 0}
     - target: {fileID: 104650, guid: 0e356c1cc31375f45b1544c3dab4f5cf, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 104650, guid: 0e356c1cc31375f45b1544c3dab4f5cf, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -15353,6 +15509,10 @@ PrefabInstance:
     - target: {fileID: 143208, guid: b02bc145bce4ede4da8151c54b21e0e0, type: 3}
       propertyPath: m_Name
       value: SM_Prop_Crate_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 143208, guid: b02bc145bce4ede4da8151c54b21e0e0, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 143208, guid: b02bc145bce4ede4da8151c54b21e0e0, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -15485,6 +15645,10 @@ PrefabInstance:
     - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
       propertyPath: m_Name
       value: SM_Prop_PotPlant_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -16138,7 +16302,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1399869035}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Office
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -16299,6 +16463,10 @@ PrefabInstance:
     - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
       propertyPath: m_Name
       value: SM_Prop_PotPlant_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -16589,6 +16757,10 @@ PrefabInstance:
     - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
       propertyPath: m_Name
       value: SM_Prop_ShopInterior_Display_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -17893,6 +18065,10 @@ PrefabInstance:
       value: SM_Prop_Sack_02
       objectReference: {fileID: 0}
     - target: {fileID: 162040, guid: 092ae17ef10fe5a41a76f5f4549496de, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 162040, guid: 092ae17ef10fe5a41a76f5f4549496de, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -18091,6 +18267,10 @@ PrefabInstance:
       value: SM_Prop_ShopInterior_Chair_01
       objectReference: {fileID: 0}
     - target: {fileID: 139926, guid: f710382517201604d939dd1e30c50b66, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 139926, guid: f710382517201604d939dd1e30c50b66, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -18155,6 +18335,10 @@ PrefabInstance:
     - target: {fileID: 164688, guid: b32b49582c8c3394bbd30856fe9caee9, type: 3}
       propertyPath: m_Name
       value: SM_Item_Potion_03
+      objectReference: {fileID: 0}
+    - target: {fileID: 164688, guid: b32b49582c8c3394bbd30856fe9caee9, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 164688, guid: b32b49582c8c3394bbd30856fe9caee9, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -18285,7 +18469,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1632803779}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: TrashRoom
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19854,6 +20038,10 @@ PrefabInstance:
       value: SM_Item_Lantern_02
       objectReference: {fileID: 0}
     - target: {fileID: 139430, guid: 4584be541115cdc4bbf6147fe22347b2, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 139430, guid: 4584be541115cdc4bbf6147fe22347b2, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -20394,6 +20582,10 @@ PrefabInstance:
       value: SM_Prop_ShopInterior_Chair_01
       objectReference: {fileID: 0}
     - target: {fileID: 139926, guid: f710382517201604d939dd1e30c50b66, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 139926, guid: f710382517201604d939dd1e30c50b66, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -20458,6 +20650,10 @@ PrefabInstance:
     - target: {fileID: 179988, guid: 5e9f23a0d535d65438771a89191d0f83, type: 3}
       propertyPath: m_Name
       value: SM_Prop_TrashBag_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 179988, guid: 5e9f23a0d535d65438771a89191d0f83, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 179988, guid: 5e9f23a0d535d65438771a89191d0f83, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -20588,7 +20784,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1799521943}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Register
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21510,6 +21706,10 @@ PrefabInstance:
     - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
       propertyPath: m_Name
       value: SM_Prop_ShopInterior_Display_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 171428, guid: 2ea7292a3363b0648a35e02467d8ef1d, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -22810,6 +23010,10 @@ PrefabInstance:
       value: SM_Prop_TrashBag_03
       objectReference: {fileID: 0}
     - target: {fileID: 177750, guid: 5b20f7f96ea80dc4cbd7199fbb4d4d3e, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 177750, guid: 5b20f7f96ea80dc4cbd7199fbb4d4d3e, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -22876,6 +23080,10 @@ PrefabInstance:
       value: SM_Prop_PotPlant_01
       objectReference: {fileID: 0}
     - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 110146, guid: aab301b5d4a9c1b4ab55351b46f6be40, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -22940,6 +23148,10 @@ PrefabInstance:
     - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
       propertyPath: m_Name
       value: SM_Prop_ShopInterior_Display_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 147756, guid: e6368a4e913510c4e8f89c70757b02ef, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -23369,7 +23581,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2026695131}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: FurnitureCorner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23476,6 +23688,10 @@ PrefabInstance:
     - target: {fileID: 179172, guid: e4e5d2f7f155681449aca26cbdb2b635, type: 3}
       propertyPath: m_Name
       value: SM_Prop_CardboardBox_02
+      objectReference: {fileID: 0}
+    - target: {fileID: 179172, guid: e4e5d2f7f155681449aca26cbdb2b635, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 179172, guid: e4e5d2f7f155681449aca26cbdb2b635, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -23953,7 +24169,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2064790877}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: LeftWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24191,6 +24407,10 @@ PrefabInstance:
       value: SM_Prop_Poster_Frame_01
       objectReference: {fileID: 0}
     - target: {fileID: 106640, guid: 675b73d883444064fb48c1dd46a03c44, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 106640, guid: 675b73d883444064fb48c1dd46a03c44, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -24391,6 +24611,10 @@ PrefabInstance:
     - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
       propertyPath: m_Name
       value: SM_Prop_CardboardBox_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 121478, guid: 87c2df8e665f8664e932718fcf85c0b2, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -24645,6 +24869,10 @@ PrefabInstance:
       value: SM_Prop_PotPlant_02
       objectReference: {fileID: 0}
     - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 147494, guid: 31fa0b36e57a33f44ae905116d606e3a, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
@@ -24709,6 +24937,10 @@ PrefabInstance:
     - target: {fileID: 176050, guid: 72f75b6a94cb9e1449431bac7a846899, type: 3}
       propertyPath: m_Name
       value: SM_Item_Potion_01
+      objectReference: {fileID: 0}
+    - target: {fileID: 176050, guid: 72f75b6a94cb9e1449431bac7a846899, type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 176050, guid: 72f75b6a94cb9e1449431bac7a846899, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -25213,7 +25445,7 @@ GameObject:
   - component: {fileID: 5771990004514274208}
   - component: {fileID: 7240762507575190680}
   - component: {fileID: 1546660601934366054}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Shop_Door.003
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25392,7 +25624,7 @@ GameObject:
   - component: {fileID: 321225974565458453}
   - component: {fileID: 2943539104398506510}
   - component: {fileID: 6739997409247440886}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SM_Bld_Shop_03
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25549,7 +25781,7 @@ GameObject:
   - component: {fileID: 587636104621181269}
   - component: {fileID: 2013432879588299174}
   - component: {fileID: 8702157059268609116}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Shop_Door.002
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25575,7 +25807,7 @@ GameObject:
   - component: {fileID: 7246952552285232919}
   - component: {fileID: 1617226680480457676}
   - component: {fileID: 5691195536009551866}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SM_Bld_OfficeOld_Small_Floor_01.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25593,7 +25825,7 @@ GameObject:
   - component: {fileID: 8105991320693976451}
   - component: {fileID: 1328161502183431801}
   - component: {fileID: 7852956145866064695}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Shop_Door.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25739,7 +25971,7 @@ GameObject:
   - component: {fileID: 5502968105864034426}
   - component: {fileID: 7175385200216213299}
   - component: {fileID: 5505492204442217797}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: terminal.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25807,7 +26039,7 @@ GameObject:
   - component: {fileID: 1752757310216974659}
   - component: {fileID: 1659330320229531718}
   - component: {fileID: 2675095444685984027}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Shop_Door
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25856,7 +26088,7 @@ GameObject:
   - component: {fileID: 1910816989317790257}
   - component: {fileID: 8444250222122386290}
   - component: {fileID: 3135423089782098429}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: SM_Bld_FireEscape_03.001
   m_TagString: Untagged
   m_Icon: {fileID: 0}
