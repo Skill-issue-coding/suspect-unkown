@@ -27,8 +27,8 @@ public class ActionModel
 
         RoomCount = n;
         transitions = BuildTransitions(record.transitions, n, alpha);
-        entrances = BuildEntrances(record.entries, alpha);
-        occupancy = BuildOccupancy(entranceRooms, steps);
+        // entrances = BuildEntrances(record.entries, alpha);
+        // occupancy = BuildOccupancy(entranceRooms, steps);
     }
 
     // Unchecked, like JobLog: callers loop below RoomCount and EntranceCount
@@ -45,6 +45,11 @@ public class ActionModel
             float row = (n - 1) * alpha;
             for (int k = 0; k < n; k++)
                 if (k != i) row += counts[i * n + k];
+
+            for (int j = 0; j < n; j++)
+                p[i * n + j] = j == i ? 0f : (counts[i * n + j] + alpha) / row;
         }
+
+        return p;
     }
 }
