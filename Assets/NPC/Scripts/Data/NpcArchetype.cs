@@ -38,7 +38,7 @@ public class NpcArchetype : ScriptableObject
     private float tickRate = 10f;
 
     [Header("Hearing")]
-    [SerializeField, Range(0f, 5f), Tooltip("Multiplier on how far a sound carries to this NPC")]
+    [SerializeField, Range(0f, 20f), Tooltip("Multiplier on how far a sound carries to this NPC")]
     private float hearingSensitivity = 1.0f;
 
     [SerializeField, Range(0f, 1f), Tooltip("Suspicion added by a sound at full loudness and alarm 1")]

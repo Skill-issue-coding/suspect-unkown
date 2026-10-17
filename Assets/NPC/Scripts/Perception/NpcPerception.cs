@@ -185,7 +185,7 @@ public class NpcPerception : MonoBehaviour, IPerceiver
             regionFraction[r] = fraction;
             seen += weight * fraction;
             total += weight;
-            observation.SetRegionVisible(Regions[r], regionClear[r] > 0);
+            observation.SetRegionFraction(Regions[r], fraction);
         }
 
         float visibility = total > 0 ? seen / total : 0;

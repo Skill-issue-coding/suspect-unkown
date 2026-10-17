@@ -73,13 +73,14 @@ public class NpcWitness : MonoBehaviour
 
         Forget(observation.timestamp);
 
-        float lookQuality = observation.Strength * fDuration * perception.Archetype.ObserverSkill;   // 0 to 1
+        float lookQuality = observation.ViewingConditions * fDuration * perception.Archetype.ObserverSkill;   // 0 to 1, before how much of each slot was in view
         for (int i = 0; i < Slots.Length; i++)
         {
             FeatureSlot slot = Slots[i];
-            if (!SlotSeen(slot, observation)) continue;
+            float fraction = SlotFraction(slot, observation);
+            if (fraction <= 0f) continue;
 
-            float slotQuality = lookQuality * perception.Archetype.FeatureVisibility(slot);
+            float slotQuality = lookQuality * fraction * perception.Archetype.FeatureVisibility(slot);
             if (slotQuality <= 0f) continue;
 
             OutfitFeature seen = Recall(observation.appearance[slot], slotQuality);
@@ -99,24 +100,22 @@ public class NpcWitness : MonoBehaviour
         if (colorConfusion != null && Random.value < wrongChance)
             recalled.color = colorConfusion.MistakeFor(truth.color);
         if (Random.value < wrongChance)
-            recalled.style = WrongStyle(truth.style);
+            recalled.style = RandomStyle();
         return recalled;
     }
 
-    private static int WrongStyle(int style)
-    {
-        int other = Random.Range(1, WitnessReport.StyleCount);
-        return other >= style ? other + 1 : other;          // skips the true style
-    }
+    private static int RandomStyle() => Random.Range(1, WitnessReport.StyleCount);
 
-    // A slot is seen when any of its body regions had a clear line: feet hidden means nothing about shoes.
-    // The same for every observer, so a rule here rather than archetype tuning
-    private static bool SlotSeen(FeatureSlot slot, Observation observation) => slot switch
+    // How much of a slot was in view, 0 to 1: its own region's share of clear points. 0 teaches nothing (feet
+    // hidden means nothing about shoes); a sliver of the head teaches little, a clear face teaches fully even
+    // with the legs behind a counter. The chest shows through the better of the torso and the hands. The same
+    // for every observer, so a rule here rather than archetype tuning
+    private static float SlotFraction(FeatureSlot slot, Observation observation) => slot switch
     {
-        FeatureSlot.Head => observation.IsRegionVisible(BodyRegion.Head),
-        FeatureSlot.Chest => observation.IsRegionVisible(BodyRegion.UpperBody) || observation.IsRegionVisible(BodyRegion.Hands),
-        FeatureSlot.Legs => observation.IsRegionVisible(BodyRegion.LowerBody),
-        _ => observation.IsRegionVisible(BodyRegion.Feet),
+        FeatureSlot.Head => observation.RegionFraction(BodyRegion.Head),
+        FeatureSlot.Chest => Mathf.Max(observation.RegionFraction(BodyRegion.UpperBody), observation.RegionFraction(BodyRegion.Hands)),
+        FeatureSlot.Legs => observation.RegionFraction(BodyRegion.LowerBody),
+        _ => observation.RegionFraction(BodyRegion.Feet),
     };
 
     // What this witness believes about one slot right now, after forgetting up to this moment. False while
