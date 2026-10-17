@@ -6,7 +6,7 @@ Read `CLAUDE.md` first, then decisions 6, 15, 18, 19, 22, 23, 24 and 25 in `road
 
 > Written 2026-10-16. Already in place: the street, the shop building (`Houses.fbx`), the `GetawayVan`, the player, the HUD, the `SketchBooth`, and empty `Loot`, `Cash`, `Doors` and `CivilianSpots` groups. Left over from copying the apartment and to be removed: `SnackPoint` and the single `StaffArea` zone.
 >
-> **Status (2026-10-17):** T1 is done and checked: nine room zones, `PlayerRoom` logging room changes with hysteresis, four `Entrance`s logging inbound crossings, and `JobLayout` numbering both. The NavMesh is baked (T2 still needs the guard door link, T2b). `InteriorReveal` fades the upper floor while the player is inside, as in the apartment. The sun is a low red-orange sunset matched to the `OasisSunset` skybox; T3 (interior lights, rebake) is still open. Changes made on the way: the room list grew from seven to ten, room and entrance names moved into `JobLayout` (Core), room tracking moved into its own `PlayerRoom`, and guards may now open doors to pass through (1.1, decision 19).
+> **Status (2026-10-17):** T1 is done and checked: nine room zones, `PlayerRoom` logging room changes with hysteresis, four `Entrance`s logging inbound crossings, and `JobLayout` numbering both. The NavMesh is baked (T2 still needs the guard door link, T2b). `InteriorReveal` fades the upper floor while the player is inside, as in the apartment. The sun is a low red-orange sunset matched to the `OasisSunset` skybox; T3 (interior lights, rebake) is still open. The level's post-processing profile, `ThriftShopVolume`, has a sunset grade (warmer white balance and color filter, violet shadows and orange highlights in split toning); bloom, depth of field, vignette and the other effects are untouched. S1 (`JobLog`) is done and checked. S2 (`SecurityRecord`, `SecurityStore`, `SecurityRecorder`, the Security Record menu) is built and compiles; its play-mode check is still to run. Fake Runs moved to S2b. Changes made on the way: the room list grew from seven to ten, room and entrance names moved into `JobLayout` (Core), room tracking moved into its own `PlayerRoom`, and guards may now open doors to pass through (1.1, decision 19).
 
 ---
 
@@ -134,12 +134,12 @@ The record of what the player did, kept whether or not anyone saw it (decision 2
 
 ### 4.2 What is recorded
 
-`JobLog` (Core, static, reset on scene load like `JobAlert`) counts, for the current run:
+`JobLog` (Core, static) counts, for the current run. Its lifetime follows the level's `JobLayout`, not scene loads: `JobLayout.Awake` calls `Begin(this, rooms, entrances)`, which sizes and clears the counts, and its `OnDestroy` calls `End(this)`. Only the layout that began the log may end it, because on an async scene load (restarts use `LoadSceneAsync`) the old layout can be destroyed after the new one has begun. A level without a layout records nothing. A `sceneLoaded` reset is deliberately not used: it fires after the new scene's `Awake`s and would wipe the fresh log.
 
 - **Room transitions:** `transitions[from × rooms + to]`, incremented whenever the player's room changes. A flat array, because `JsonUtility` serializes neither 2D arrays nor dictionaries.
 - **Entrance crossings:** `entries[entrance]`, every inbound crossing.
 
-`PlayerRoom` reports room changes to `JobLog` through `RoomChanged`; each `Entrance` reports its own crossings. Loot order, tools and detections (concept 6.4) are not logged yet: nothing in this level uses them.
+`PlayerRoom` calls `JobLog.RecordRoomChange(from, to)` when a room change settles; each inbound `Entrance` calls `JobLog.RecordEntry(index)`. Out-of-range indices (an unlisted entrance is −1) are ignored. `JobLogReadout` (Core, on the `Job` object) shows every transition and entrance used so far by name; its text is rebuilt only when `JobLog.Recorded` fires, never per frame. Loot order, tools and detections (concept 6.4) are not logged yet: nothing in this level uses them.
 
 ### 4.3 What is saved
 
@@ -162,8 +162,9 @@ The record of what the player did, kept whether or not anyone saw it (decision 2
 
 - **Written on completion only.** On `JobOutcome.Completed`, the stored counts are decayed and the run is added: `C ← 0.8 · C + run`, the same for `entries`, and `completedRuns` goes up by one. A failed run teaches security nothing and never makes the next try harder, the same rule as progress and the police record.
 - **A layout change discards the record.** If the stored room or entrance **names** differ from the level's `JobLayout` (in count or in order), the record is dropped with a warning and the level plays as a first run. Comparing names rather than counts catches rooms that were reordered without being added or removed.
-- **`SecurityRecord` and `SecurityStore` live in Core,** plain data with no NPC types, so the main menu can read them. The model that reads them lives in NPC.
-- Tools/Suspect Unknown/Security logs, reveals or deletes the file, and can fake a number of completed runs through a chosen entrance, for testing.
+- **Who writes it:** `SecurityRecorder` (Core, on the `Job` object) on `JobOutcome.Completed`: load the save, find the record for the scene name, replace it with a warning if it no longer fits the layout, create it if missing, then `AddRun(decay)` and save. `decay` is a field on the recorder, 0.8.
+- **`SecurityRecord`, `SecuritySave` and `SecurityStore` live in Core,** plain data with no NPC types, so the main menu can read them. `SecurityRecord.For(location, layout)` builds an empty record with the layout's names; `Fits(layout)` compares names in order; `AddRun` decays, adds the run from `JobLog`, and counts the run. `SecurityStore` follows `ProgressStore`: a missing or broken file loads as an empty save, a failed write warns instead of throwing. The model that reads them lives in NPC.
+- Tools/Suspect Unknown/Security Record logs the file as JSON, reveals the save folder, or deletes it. Faking completed runs through a chosen entrance comes in S2b.
 
 ---
 
@@ -295,11 +296,19 @@ _Check:_ fill the bag, walk to the van's side door, press G: the bag empties, th
 
 ### Track S — adaptive security
 
-**S1. `JobLog`.** Room transitions and inbound crossings for the current run, reset on scene load, with a readout line.
-_Check:_ walk street → front left → shop front → shop back → stockroom: the readout shows those four transitions and one crossing.
+**S1. `JobLog`.** Done and checked 2026-10-17. Room transitions and inbound crossings for the current run, begun and ended by `JobLayout` (4.2), with `JobLogReadout`.
+_Check:_ walk street → front right → shop front → shop middle → shop back → stockroom: the readout shows those transitions and one crossing. A restart empties it and keeps it active. The apartment records nothing and shows no errors.
 
-**S2. `SecurityRecord` and `SecurityStore`.** The JSON file, the decay-and-add on completion, the layout check, and the Tools menu.
-_Check:_ complete a run: `security.json` holds it with `completedRuns` 1. Fail a run: the file is unchanged. Complete again: the old counts are 0.8 times what they were, plus the new run. Change the room list (add one, or swap two): the next load warns and plays as a first run.
+**S2. `SecurityRecord` and `SecurityStore`.** Built 2026-10-17, compiles; **play-mode check still to run.** `SecurityRecord`, `SecuritySave`, `SecurityStore`, `SecurityRecorder` on `Job`, and the Security Record menu (Log, Reveal, Delete).
+_Check, to run:_
+1. Complete a run, then Log Record: Thriftshop with `completedRuns` 1, the room and entrance names, and counts equal to the readout.
+2. Get caught: `security.json` is unchanged (its timestamp too).
+3. Complete again the same way: every old count is 0.8 times what it was plus the new run (Street → Shop front goes from 1 to 1.8), `completedRuns` 2.
+4. Swap two zones in `JobLayout.rooms` and complete: a "layout changed" warning, and the record restarts at `completedRuns` 1. Swap them back.
+5. Delete Record, then complete: a fresh file.
+
+**S2b. Fake Runs.** A small editor window under Security Record: choose an entrance of the open scene's `JobLayout` and a number of runs, and add that many completed runs through it (an entry at the entrance and a transition from the street into the room it opens into, decayed as real runs are). Needed for the S5 check; S3 and S4 tests build their records in code.
+_Check:_ fake two runs through the emergency exit: Log Record shows `completedRuns` 2, the emergency exit entry at 1.8, and Street → Emergency exit at 1.8.
 
 **S3. Stage A** (`SecurityModel`, NPC, pure logic). Transition probabilities with Laplace smoothing, the entrance Dirichlet, forward propagation. EditMode tests: rows sum to 1; unseen transitions are above 0; a record of three runs through one entrance gives that entrance the highest probability; occupancy sums to 1 and leaves the street out.
 _Check:_ the tests pass.
