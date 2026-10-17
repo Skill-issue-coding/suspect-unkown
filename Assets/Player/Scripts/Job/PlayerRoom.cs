@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,9 +17,6 @@ public class PlayerRoom : MonoBehaviour
     private bool logChanges = true;
 
     public int Current { get; private set; }
-
-    // from, to
-    public event Action<int, int> RoomChanged;
 
     // Entry order matters: the newest zone still occupied is the raw room
     private readonly List<Zone> inside = new();

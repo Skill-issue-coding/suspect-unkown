@@ -28,7 +28,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: ThriftshopSign
-    second: {fileID: 2100000, guid: dffb1b44a8c454146b062078fc503b90, type: 2}
+    second: {fileID: 2100000, guid: 21b00b241a0624255b38e0b48d27ac14, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

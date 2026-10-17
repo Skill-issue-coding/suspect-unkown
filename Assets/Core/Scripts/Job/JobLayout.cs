@@ -28,6 +28,16 @@ public class JobLayout : MonoBehaviour
     public string EntranceName(int entrance) =>
         entrance >= 0 && entrance < entrances.Length && entrances[entrance] != null ? entrances[entrance].name : $"Entrance {entrance}";
 
+    // The room an entrance opens into, from list positions rather than the numbers Awake hands out,
+    // so it works in edit mode. -1 when the entrance is missing or opens into an unlisted room
+    public int EntranceRoom(int entrance)
+    {
+        if (entrance < 0 || entrance >= EntranceCount || entrances[entrance] == null) return -1;
+        Zone zone = entrances[entrance].OpensInto;
+        int index = Array.IndexOf(rooms, zone);
+        return index < 0 ? -1 : index + 1;
+    }
+
     private void Awake()
     {
         for (int i = 0; i < rooms.Length; i++)

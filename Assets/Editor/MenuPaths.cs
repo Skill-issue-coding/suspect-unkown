@@ -36,6 +36,7 @@ public static class MenuPaths
     public const string SecurityLog = Security + "Log Record";
     public const string SecurityReveal = Security + "Reveal Save Folder";
     public const string SecurityDelete = Security + "Delete Record";
+    public const string SecurityFakeRuns = Security + "Fake Runs Window";
 
     // Priorities: blocks of 100 so there is always a separator between groups
     public const int WindowsPriority = 0;
