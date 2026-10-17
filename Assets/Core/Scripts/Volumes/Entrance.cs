@@ -41,6 +41,7 @@ public class Entrance : MonoBehaviour
         if (!enabled || !enteredFromStreet || OnStreetSide(other.transform.position)) return;
 
         enteredFromStreet = false;
+        JobLog.RecordEntry(Index);
         if (logCrossings) Debug.Log($"{name} inbound crossing (entrance {Index} -> room {opensInto.Room})", this);
     }
 

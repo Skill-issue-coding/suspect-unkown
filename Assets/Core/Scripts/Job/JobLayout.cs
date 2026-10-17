@@ -34,6 +34,8 @@ public class JobLayout : MonoBehaviour
             if (rooms[i] != null) rooms[i].AssignRoom(i + 1);
         for (int i = 0; i < entrances.Length; i++)
             if (entrances[i] != null) entrances[i].AssignIndex(i);
+
+        JobLog.Begin(this, RoomCount, EntranceCount);
     }
 
     private void Start() => CheckScene();
@@ -44,6 +46,8 @@ public class JobLayout : MonoBehaviour
         WarnOnGaps(rooms, "room");
         WarnOnGaps(entrances, "entrance");
     }
+
+    private void OnDestroy() => JobLog.End(this);
 
     private void WarnOnGaps<T>(T[] list, string label) where T : UnityEngine.Object
     {

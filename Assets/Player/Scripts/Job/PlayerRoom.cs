@@ -79,7 +79,7 @@ public class PlayerRoom : MonoBehaviour
 
         int from = Current;
         Current = room;
+        JobLog.RecordRoomChange(from, room);
         if (logChanges) Debug.Log($"{name} room {from} -> {room}", this);
-        RoomChanged?.Invoke(from, room);
     }
 }

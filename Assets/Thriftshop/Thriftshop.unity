@@ -926,7 +926,7 @@ Transform:
   m_GameObject: {fileID: 58948278}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 21.5, y: 0, z: 17}
+  m_LocalPosition: {x: 19.25, y: 0, z: 15.25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -967,8 +967,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 6.159914, y: 3.4259586, z: 6.597558}
-  m_Center: {x: -2.4131556, y: 1.7129793, z: -1.6847558}
+  m_Size: {x: 6.1570473, y: 3.4259586, z: 6.5940113}
+  m_Center: {x: -0.15464973, y: 1.7129793, z: 0.06978893}
 --- !u!1001 &73472620
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2906,8 +2906,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 9.647898, y: 3.4259586, z: 11.201092}
-  m_Center: {x: -0.6472769, y: 1.7129793, z: -0.53017616}
+  m_Size: {x: 9.647898, y: 3.4259586, z: 10.771599}
+  m_Center: {x: -0.6472769, y: 1.7129793, z: -0.3154297}
 --- !u!1001 &289985430
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4372,7 +4372,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 1
-  sharedProfile: {fileID: 11400000, guid: 5e657c09f90c9b649a3cb936d05af1c7, type: 2}
+  sharedProfile: {fileID: 11400000, guid: 4c26dec5cfa13414484d481cb23f8cb5, type: 2}
 --- !u!4 &423424107
 Transform:
   m_ObjectHideFlags: 0
@@ -19117,6 +19117,7 @@ GameObject:
   - component: {fileID: 1727077502}
   - component: {fileID: 1727077503}
   - component: {fileID: 1727077505}
+  - component: {fileID: 1727077506}
   m_Layer: 0
   m_Name: Job
   m_TagString: Untagged
@@ -19193,6 +19194,20 @@ MonoBehaviour:
   - {fileID: 1322335084}
   - {fileID: 828429295}
   - {fileID: 2106651957}
+--- !u!114 &1727077506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1727077501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86b1684e8eab14ee68c8de8dfd327cff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JobLogReadout
+  show: 1
+  position: {x: 615, y: 50}
 --- !u!1001 &1728047820
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -22957,8 +22972,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.1182156, y: 3.4259586, z: 3.2026281}
-  m_Center: {x: 0.36097622, y: 1.7129793, z: -0.0988822}
+  m_Size: {x: 1.1785355, y: 3.4259586, z: 3.2026281}
+  m_Center: {x: 0.39113617, y: 1.7129793, z: -0.0988822}
 --- !u!1001 &1966993829
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -26303,7 +26318,7 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 8faeae0a3329f6e47ba84615e9a30424, type: 2}
-  - {fileID: 2100000, guid: dffb1b44a8c454146b062078fc503b90, type: 2}
+  - {fileID: 2100000, guid: 21b00b241a0624255b38e0b48d27ac14, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
