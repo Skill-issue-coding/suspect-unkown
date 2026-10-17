@@ -3,19 +3,19 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Adds completed runs through one entrance to the open level's security record, so adaptive security can
+// Adds completed runs through one entrance to the open level's action record, so adaptive security can
 // be tested (S5) without playing the same run again and again. A fake run is an entry at the entrance and
 // one transition from the street into the room behind it, no route through the shop. It fills JobLog and
-// saves through SecurityRecorder.RecordRun, so it decays exactly as a real run does
-public class SecurityFakeRunsWindow : EditorWindow
+// saves through ActionRecorder.RecordRun, so it decays exactly as a real run does
+public class ActionFakeRunsWindow : EditorWindow
 {
     private int entrance;
     private int runs = 2;
 
     private string[] entranceNames = Array.Empty<string>();
 
-    [MenuItem(MenuPaths.SecurityFakeRuns, priority = MenuPaths.SecurityPriority + 3)]
-    private static void Open() => GetWindow<SecurityFakeRunsWindow>("Fake Runs");
+    [MenuItem(MenuPaths.ActionRecordFakeRuns, priority = MenuPaths.ActionRecordPriority + 3)]
+    private static void Open() => GetWindow<ActionFakeRunsWindow>("Fake Runs");
 
     private void OnGUI()
     {
@@ -27,10 +27,10 @@ public class SecurityFakeRunsWindow : EditorWindow
         }
 
         JobLayout layout = FindAnyObjectByType<JobLayout>();
-        SecurityRecorder recorder = FindAnyObjectByType<SecurityRecorder>();
+        ActionRecorder recorder = FindAnyObjectByType<ActionRecorder>();
         if (layout == null || recorder == null)
         {
-            EditorGUILayout.HelpBox("Open a level with JobLayout and SecurityRecorder", MessageType.Error);
+            EditorGUILayout.HelpBox("Open a level with JobLayout and ActionRecorder", MessageType.Error);
             return;
         }
 
@@ -53,12 +53,12 @@ public class SecurityFakeRunsWindow : EditorWindow
         if (GUILayout.Button("Add runs")) AddRuns(layout, recorder);
     }
 
-    private void AddRuns(JobLayout layout, SecurityRecorder recorder)
+    private void AddRuns(JobLayout layout, ActionRecorder recorder)
     {
         int room = layout.EntranceRoom(entrance);
         if (room < 0)
         {
-            Debug.LogWarning($"Security: {layout.EntranceName(entrance)} opens into no listed room; nothing faked", layout);
+            Debug.LogWarning($"Action record: {layout.EntranceName(entrance)} opens into no listed room; nothing faked", layout);
             return;
         }
 
@@ -68,10 +68,10 @@ public class SecurityFakeRunsWindow : EditorWindow
             JobLog.Begin(this, layout.RoomCount, layout.EntranceCount);
             JobLog.RecordEntry(entrance);
             JobLog.RecordRoomChange(0, room);
-            SecurityRecorder.RecordRun(SceneManager.GetActiveScene().name, layout, recorder.Decay, layout);
+            ActionRecorder.RecordRun(SceneManager.GetActiveScene().name, layout, recorder.Decay, layout);
             JobLog.End(this);
         }
 
-        Debug.Log($"Security: faked {runs} runs through {layout.EntranceName(entrance)}");
+        Debug.Log($"Action record: faked {runs} runs through {layout.EntranceName(entrance)}");
     }
 }

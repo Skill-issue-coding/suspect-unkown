@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 // try harder. A record saved against another layout is replaced, with a warning. The editor's Fake Runs
 // goes through the same RecordRun, so a faked run decays exactly as a real one
 [RequireComponent(typeof(JobLayout))]
-public class SecurityRecorder : MonoBehaviour
+public class ActionRecorder : MonoBehaviour
 {
     [SerializeField, Range(0f, 1f), Tooltip("Weight kept by the stored counts per completed run; 0.8 means a run five jobs ago counts a third")]
     private float decay = 0.8f;
@@ -27,24 +27,24 @@ public class SecurityRecorder : MonoBehaviour
     {
         if (!JobLog.IsActive) return;
 
-        SecuritySave save = SecurityStore.Load();
-        SecurityRecord record = save.Find(location);
+        ActionSave save = ActionStore.Load();
+        ActionRecord record = save.Find(location);
 
         if (record != null && !record.Fits(layout))
         {
-            Debug.LogWarning($"Security: the layout of {location} changed since its record was saved; starting over", context);
+            Debug.LogWarning($"Action record: the layout of {location} changed since its record was saved; starting over", context);
             save.locations.Remove(record);
             record = null;
         }
 
         if (record == null)
         {
-            record = SecurityRecord.For(location, layout);
+            record = ActionRecord.For(location, layout);
             save.locations.Add(record);
         }
 
         record.AddRun(decay);
-        SecurityStore.Save(save);
+        ActionStore.Save(save);
     }
 
     private void OnCompleted() => RecordRun(SceneManager.GetActiveScene().name, layout, decay, this);

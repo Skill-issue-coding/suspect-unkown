@@ -5,7 +5,7 @@ using System;
 // no NPC types, so the main menu can read it. The room and entrance names are kept so a changed layout is
 // noticed: counts saved against another room list would be read into the wrong rooms
 [Serializable]
-public class SecurityRecord
+public class ActionRecord
 {
     public string location;
     public int completedRuns;
@@ -15,9 +15,9 @@ public class SecurityRecord
     public float[] entries = Array.Empty<float>();
 
     // An empty record shaped by the level's layout: its names, and zeroed counts of the right size
-    public static SecurityRecord For(string location, JobLayout layout)
+    public static ActionRecord For(string location, JobLayout layout)
     {
-        var record = new SecurityRecord
+        var record = new ActionRecord
         {
             location = location,
             rooms = new string[layout.RoomCount],
