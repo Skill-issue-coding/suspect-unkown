@@ -146,13 +146,13 @@ _Check:_ the glass pane shows the same prompt and outline as everything else; E 
 
 Record the decision (one `Interactable`, one behaviour per interaction, `PlayerInteraction`) in `roadmap_npc.md` or the roadmap file that covers player interaction, update the file tables, update `doors-and-lockpicking.md` and `apartment-level.md` where they name `DoorReach`, `PlayerDoorInteraction` or `PlayerLootInteraction`, and add a dated changelog line.
 
-## 5. Open questions
+## 5. Open questions (agreed 2026-10-18)
 
-1. **Prompt point for doors.** `Door.PromptPoint` is `anomaly.SightPoint`, a computed point kept in open air. `promptTarget` is an authored transform, so a door needs a small empty at the doorway middle. Proposed: use `promptTarget` and author the empty. Alternative: add `PromptPoint` to the interface.
-2. **Conduct during a hold.** `PlayerLootInteraction.IsTaking` is what `PlayerConduct` reads for `Stealing`. Proposed: `PlayerInteraction` raises `HoldStarted` and `HoldEnded` and `PlayerConduct` maps `LootPickup` to `Stealing`. Alternative: a flag on the behaviour.
-3. **A view is open.** `PlayerLootInteraction` checks `lockpicking.IsPicking` to stop a loot hold during a pick, and `PlayerDoorInteraction` refreshes on `lockpicking.Ended`. Proposed: `PlayerInteraction.IsBusy` plus `Refresh()`, used by both views.
-4. **Other keys.** The van stash (G) stays a separate input action and `PlayerVanStash`. Agreed?
-5. **Where the glass cutter's behaviour lives.** Player folder, unless it needs only Core types.
+1. **Prompt point for doors.** Use `promptTarget` (an authored Transform empty). ✅
+2. **Conduct during a hold.** `PlayerInteraction` raises `HoldStarted`/`HoldEnded`; `PlayerConduct` maps `LootPickup` to `Stealing`. ✅
+3. **A view is open.** `PlayerInteraction.IsBusy` plus `Refresh()`, used by both views. ✅
+4. **Other keys.** Van stash stays separate (`PlayerVanStash`, G key). ✅
+5. **Where the glass cutter's behaviour lives.** Player folder (`Assets/Player/Scripts/Interaction/`). ✅
 
 ## 6. Tidy-up found on the way
 

@@ -9,9 +9,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5710076932427595418}
-  - component: {fileID: 1055840133535633990}
   - component: {fileID: 8966869268595971603}
   - component: {fileID: 1108453073155920058}
+  - component: {fileID: 860535070438770798}
+  - component: {fileID: 3263110903524204734}
   m_Layer: 16
   m_Name: Cash
   m_TagString: Untagged
@@ -36,22 +37,6 @@ Transform:
   - {fileID: 419146269034356033}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1055840133535633990
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2642679860828871298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a3196304a370588499e802e40bc35229, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LootPickup
-  item: {fileID: 11400000, guid: bff0602fadaacb3468a5a0a7a2c1d2f2, type: 2}
-  prompt: {fileID: 4839809526351441806}
-  outline: {fileID: 8966869268595971603}
-  promptOffset: {x: 0, y: 0.2, z: 0}
 --- !u!114 &8966869268595971603
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -89,6 +74,40 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &860535070438770798
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2642679860828871298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f140072e95e293e488830f9e62e4c9e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  prompt: {fileID: 4839809526351441806}
+  outline: {fileID: 8966869268595971603}
+  promptTarget: {fileID: 0}
+  promptOffset: {x: 0, y: 0.2, z: 0}
+  useText: E
+  holdSeconds: 0
+--- !u!114 &3263110903524204734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2642679860828871298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3196304a370588499e802e40bc35229, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPickup
+  item: {fileID: 11400000, guid: bff0602fadaacb3468a5a0a7a2c1d2f2, type: 2}
+  prompt: {fileID: 4839809526351441806}
+  outline: {fileID: 8966869268595971603}
+  promptOffset: {x: 0, y: 0.2, z: 0}
 --- !u!1 &2692200822097229858
 GameObject:
   m_ObjectHideFlags: 0

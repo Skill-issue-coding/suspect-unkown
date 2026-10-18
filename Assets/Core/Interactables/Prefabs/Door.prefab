@@ -416,6 +416,37 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5695431921938550742
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1621063976301216477}
+  m_Layer: 0
+  m_Name: PromtTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1621063976301216477
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5695431921938550742}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.615, y: 1.25, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3761034442329859497}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5873354322520344028
 GameObject:
   m_ObjectHideFlags: 0
@@ -519,6 +550,7 @@ GameObject:
   - component: {fileID: 2767033526572923613}
   - component: {fileID: 3094306196608635000}
   - component: {fileID: 9080589023950854612}
+  - component: {fileID: 609680213973105169}
   m_Layer: 0
   m_Name: Door
   m_TagString: Untagged
@@ -543,6 +575,7 @@ Transform:
   - {fileID: 1453054754798147057}
   - {fileID: 82396915964300785}
   - {fileID: 7716186018000772111}
+  - {fileID: 1621063976301216477}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
 --- !u!114 &4872094226141908942
@@ -610,6 +643,18 @@ MonoBehaviour:
   outlines:
   - {fileID: 4673928071435429467}
   alwaysVisible: 0
+--- !u!114 &609680213973105169
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5913889740103233751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb334453d02df0d4a989346ff1ea9212, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DoorInteraction
 --- !u!1 &6019224543652670092
 GameObject:
   m_ObjectHideFlags: 0
@@ -893,7 +938,7 @@ GameObject:
   m_Component:
   - component: {fileID: 82396915964300785}
   - component: {fileID: 1112768511199736359}
-  - component: {fileID: 1698093503704747085}
+  - component: {fileID: 3549937900598159419}
   m_Layer: 16
   m_Name: ReachBack
   m_TagString: Untagged
@@ -938,7 +983,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.2813416, y: 2.446367, z: 2.0559437}
   m_Center: {x: 0, y: 0, z: 1}
---- !u!114 &1698093503704747085
+--- !u!114 &3549937900598159419
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -947,10 +992,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 7675229539665619810}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2fb510f8f73609a40acea439b511f6d1, type: 3}
+  m_Script: {fileID: 11500000, guid: f140072e95e293e488830f9e62e4c9e5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DoorReach
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
   prompt: {fileID: 8489257035473146587}
+  outline: {fileID: 9080589023950854612}
+  promptTarget: {fileID: 1621063976301216477}
+  promptOffset: {x: 0, y: 0.2, z: 0}
+  useText: E
+  holdSeconds: 0
 --- !u!1 &8924674298568270811
 GameObject:
   m_ObjectHideFlags: 0
@@ -962,6 +1012,7 @@ GameObject:
   - component: {fileID: 1453054754798147057}
   - component: {fileID: 9216349966825725930}
   - component: {fileID: 3239325875117374922}
+  - component: {fileID: 1061427851102805923}
   m_Layer: 16
   m_Name: ReachFront
   m_TagString: Untagged
@@ -1019,6 +1070,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DoorReach
   prompt: {fileID: 8396527505757452581}
+--- !u!114 &1061427851102805923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8924674298568270811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f140072e95e293e488830f9e62e4c9e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Interactable
+  prompt: {fileID: 8396527505757452581}
+  outline: {fileID: 9080589023950854612}
+  promptTarget: {fileID: 1621063976301216477}
+  promptOffset: {x: 0, y: 0.2, z: 0}
+  useText: E
+  holdSeconds: 0
 --- !u!1001 &7792966873459012728
 PrefabInstance:
   m_ObjectHideFlags: 0

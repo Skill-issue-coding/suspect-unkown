@@ -7,7 +7,7 @@ using UnityEngine;
 // CharacterController: adding a Rigidbody to the player would make all 17 bone 
 // triggers fire zone events too. A zone disabled while the player is inside never 
 // sends OnTriggerExit; zones are static level geometry, so that is accepted.
-// Lockpicking comes from PlayerLockpicking, Stealing from PlayerLootInteraction.
+// Lockpicking comes from PlayerLockpicking, Stealing from PlayerInteraction.
 [RequireComponent(typeof(PlayerMotor))]
 public class PlayerConduct : MonoBehaviour
 {
@@ -15,7 +15,8 @@ public class PlayerConduct : MonoBehaviour
 
     private PlayerMotor motor;
     private PlayerLockpicking lockpicking;
-    private PlayerLootInteraction loot;
+    private PlayerInteraction interaction;
+    private bool isStealing;
 
     public ConductFlags Current
     {
@@ -25,7 +26,7 @@ public class PlayerConduct : MonoBehaviour
             if (motor.IsSprinting) flags |= ConductFlags.Sprinting;
             if (IsInStaffArea()) flags |= ConductFlags.InStaffArea;
             if (lockpicking != null && lockpicking.IsPicking) flags |= ConductFlags.Lockpicking;
-            if (loot != null && loot.IsTaking) flags |= ConductFlags.Stealing;
+            if (isStealing) flags |= ConductFlags.Stealing;
             return flags;
         }
     }
@@ -58,11 +59,41 @@ public class PlayerConduct : MonoBehaviour
         else zoneCounts[zone] = count - 1;
     }
 
+    private void OnEnable()
+    {
+        if (interaction != null)
+        {
+            interaction.HoldStarted += OnHoldStarted;
+            interaction.HoldEnded += OnHoldEnded;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (interaction != null)
+        {
+            interaction.HoldStarted -= OnHoldStarted;
+            interaction.HoldEnded -= OnHoldEnded;
+        }
+        isStealing = false;
+    }
+
+    private void OnHoldStarted(Interactable interactable)
+    {
+        if (interactable != null && interactable.GetComponentInParent<LootPickup>() != null)
+            isStealing = true;
+    }
+
+    private void OnHoldEnded(Interactable interactable)
+    {
+        isStealing = false;
+    }
+
     private void Awake()
     {
         motor = GetComponent<PlayerMotor>();
         lockpicking = GetComponent<PlayerLockpicking>();
-        loot = GetComponent<PlayerLootInteraction>();
+        interaction = GetComponent<PlayerInteraction>();
     }
 
 }

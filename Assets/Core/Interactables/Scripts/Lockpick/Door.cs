@@ -44,14 +44,9 @@ public class Door : MonoBehaviour
     // the heist, so a slip teaches the player something
     public float SweetSpot { get; private set; }
 
-    // The middle of the doorway, already kept in open air for the anomaly's sight line
-    public Vector3 PromptPoint => anomaly.SightPoint;
-
-    public event Action<Door> Opened;
-
     private Anomaly anomaly;
     private NavMeshObstacle obstacle;
-    private DoorReach[] reaches;
+    private Interactable[] reaches;
     private Quaternion closedRotation;
     private Tween swing;
 
@@ -59,7 +54,7 @@ public class Door : MonoBehaviour
     {
         anomaly = GetComponent<Anomaly>();
         obstacle = GetComponent<NavMeshObstacle>();
-        reaches = GetComponentsInChildren<DoorReach>(true);
+        reaches = GetComponentsInChildren<Interactable>(true);
 
         // RequireComponent only adds components when Door itself is added, not to existing objects
         if (anomaly == null || obstacle == null)
@@ -90,7 +85,6 @@ public class Door : MonoBehaviour
         SetReachable(false);
         Swing(openAngle, swingDuration);
         anomaly.Raise();
-        Opened?.Invoke(this);
     }
 
     [ContextMenu("Close")]
@@ -120,7 +114,7 @@ public class Door : MonoBehaviour
     // The reach triggers exist only while the door is shut: an open door offers nothing to use
     private void SetReachable(bool reachable)
     {
-        foreach (DoorReach reach in reaches)
+        foreach (Interactable reach in reaches)
             reach.SetReachable(reachable);
     }
 

@@ -103,9 +103,6 @@ public class WorldPrompt : MonoBehaviour
 
         label.text = text;
         SetBlocked(blocked);
-
-        label.text = text;
-        SetBlocked(blocked);
         SetProgress(0f);
 
         if (visible) return;

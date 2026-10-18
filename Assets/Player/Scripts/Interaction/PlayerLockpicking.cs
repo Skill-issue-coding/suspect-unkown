@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 
 // Runs one lockpicking session at a door: feeds input to the LockpickModel, shows the view, holds the
-// player still with the cursor locked, and opens the door when the lock turns. PlayerDoorInteraction
+// player still with the cursor locked, and opens the door when the lock turns. DoorInteraction
 // starts it; the model decides, the view draws
 [RequireComponent(typeof(PlayerInputs))]
 [RequireComponent(typeof(PlayerMotor))]
@@ -15,6 +15,7 @@ public class PlayerLockpicking : MonoBehaviour
     private LockpickView view;
 
     private PlayerMotor playerMotor;
+    private PlayerInteraction interaction;
 
     public bool IsPicking { get; private set; }
 
@@ -34,6 +35,7 @@ public class PlayerLockpicking : MonoBehaviour
     {
         _input = GetComponent<PlayerInputs>();
         playerMotor = GetComponent<PlayerMotor>();
+        interaction = GetComponent<PlayerInteraction>();
 
         if (tuning == null || view == null)
         {
@@ -54,6 +56,8 @@ public class PlayerLockpicking : MonoBehaviour
 
         view.gameObject.SetActive(true);
         view.Begin(model, door.LockLevel);
+
+        if (interaction != null) interaction.IsBusy = true;
 
         playerMotor.IsMovementSuspended = true;
 
@@ -78,6 +82,8 @@ public class PlayerLockpicking : MonoBehaviour
 
         playerMotor.IsMovementSuspended = false;
         _input.SetCursorLocked(cursorWasLocked);
+
+        if (interaction != null) interaction.IsBusy = false;
 
         Ended?.Invoke();
     }
