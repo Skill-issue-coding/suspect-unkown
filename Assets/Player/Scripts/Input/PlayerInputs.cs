@@ -24,6 +24,8 @@ public class PlayerInputs : MonoBehaviour
     [Header("Mouse Cursor Settings")]
     public bool cursorLocked = false;
 
+    public event Action SecurityDebugPressed;
+
     private bool m_IgnoreInput;
 
     static void ResetStatics() { }
@@ -69,10 +71,15 @@ public class PlayerInputs : MonoBehaviour
         if (value.isPressed) InteractPressed?.Invoke();
     }
 
-
     public void OnTension(InputValue value) { tension = value.isPressed; }
 
     public void OnCancel(InputValue value) { cancel = value.isPressed; }
+
+    // Developer key for the adaptive-security overlay
+    public void OnSecurityDebug(InputValue value)
+    {
+        if (value.isPressed) SecurityDebugPressed?.Invoke();
+    }
 
     // The one place the cursor is locked or freed, so regaining window focus restores the right state
     public void SetCursorLocked(bool locked)

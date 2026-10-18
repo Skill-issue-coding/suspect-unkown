@@ -7,15 +7,9 @@ using System.Collections.Generic;
 // submodular, so greedy is within (1 − 1/e) of the best set
 public static class SecurityPlanner
 {
-    // The thrift shop's budget table: one guard, a second after two completed runs, never fewer
-    public static int GuardCount(int completedRuns) => completedRuns >= 2 ? 2 : 1;
-
-    // One adaptive POI per guard, but none before the first completed run
-    public static int AdaptivePoiCount(int completedRuns) => completedRuns == 0 ? 0 : GuardCount(completedRuns);
-
-    public static SecurityPlan Plan(ActionRecord record, ActionModel model, IReadOnlyList<PoiCandidate> candidates, float detection)
+    public static SecurityPlan Plan(ActionRecord record, ActionModel model, IReadOnlyList<PoiCandidate> candidates, float detection, SecurityTier tier)
     {
-        int budget = Math.Min(AdaptivePoiCount(record.completedRuns), candidates.Count);
+        int budget = Math.Max(0, Math.Min(tier.adaptivePois, candidates.Count));
         List<SecurityPick> picks = new List<SecurityPick>(budget);
         bool[] chosen = new bool[candidates.Count];
 
@@ -23,6 +17,10 @@ public static class SecurityPlanner
         var roomMiss = Filled(model.RoomCount);
         var entranceMiss = Filled(model.EntranceCount);
         float firstGain = 0f;
+
+        float[] standalone = new float[candidates.Count];
+        for (int c = 0; c < candidates.Count; c++)
+            standalone[c] = Gain(candidates[c], model, roomMiss, entranceMiss, detection);
 
         for (int k = 0; k < budget; k++)
         {
@@ -42,7 +40,7 @@ public static class SecurityPlanner
             Cover(candidates[best], roomMiss, entranceMiss, detection);
         }
 
-        return new SecurityPlan(GuardCount(record.completedRuns), picks);
+        return new SecurityPlan(tier.guards, picks, standalone);
     }
 
     // How much Score(S) grows if this candidate joins: each covered target's weight × its remaining miss × d

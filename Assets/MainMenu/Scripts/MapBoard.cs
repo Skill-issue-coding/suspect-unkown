@@ -26,6 +26,7 @@ public class MapBoard : MonoBehaviour
 
     private MapLocation selected;
     private ProgressSave progress;
+    private ActionSave actions;
 
     public bool IsActive { get; private set; }
     public MapLocation Selected => selected;
@@ -39,6 +40,7 @@ public class MapBoard : MonoBehaviour
             return;
         }
         progress = ProgressStore.Load();
+        actions = ActionStore.Load();
         SetActive(false);
     }
 
@@ -68,7 +70,7 @@ public class MapBoard : MonoBehaviour
         jobType.text = selected.JobType;
         // Electrolize is a static ASCII atlas, so the difficulty meter is slashes, not stars
         stars.text = "<color=#F2B33D>" + new string('/', selected.Difficulty * 2) + "</color><color=#FFFFFF30>" + new string('/', (5 - selected.Difficulty) * 2) + "</color>";
-        security.text = selected.Security;
+        security.text = selected.SecurityLine(actions);
         // Either part may be missing: a job with no known loot shows only the estimate
         string known = selected.KnownTake > 0 ? Wallet.Money(selected.KnownTake) + " <size=70%><color=#B8B8B8>known</color></size>" : "";
         string estimate = selected.EstimatedTake > 0 ? Wallet.Money(selected.EstimatedTake) + " <size=70%><color=#B8B8B8>estimated</color></size>" : "";

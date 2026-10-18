@@ -33,20 +33,21 @@ public class JobLayout : MonoBehaviour
     public int EntranceRoom(int entrance)
     {
         if (entrance < 0 || entrance >= EntranceCount || entrances[entrance] == null) return -1;
-        Zone zone = entrances[entrance].OpensInto;
-        int index = Array.IndexOf(rooms, zone);
-        return index < 0 ? -1 : index + 1;
+        return RoomIndex(entrances[entrance].OpensInto);
     }
 
-    // A room's number from its list position, so it works before Awake; -1 when unlisted
+    // A room's number from its list position, so it works before Awake; -1 when unlisted.
+    // The null check matters: IndexOf(null) would match an empty slot and return its number
     public int RoomIndex(Zone zone)
     {
+        if (zone == null) return -1;
         int index = Array.IndexOf(rooms, zone);
         return index < 0 ? -1 : index + 1;
     }
 
-    // An entrance's index from its list position; -1 when unlisted
-    public int EntranceIndex(Entrance entrance) => Array.IndexOf(entrances, entrance);
+    // An entrance's index from its list position; -1 when unlisted or null
+    public int EntranceIndex(Entrance entrance) =>
+        entrance == null ? -1 : Array.IndexOf(entrances, entrance);
 
     private void Awake()
     {

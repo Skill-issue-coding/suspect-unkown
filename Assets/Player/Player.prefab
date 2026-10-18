@@ -1713,7 +1713,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93c88e5ac9fa93046bcb6461a3f876f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAppearance
-  logChanges: 1
+  logChanges: 0
 --- !u!114 &7596070796813075446
 MonoBehaviour:
   m_ObjectHideFlags: 0

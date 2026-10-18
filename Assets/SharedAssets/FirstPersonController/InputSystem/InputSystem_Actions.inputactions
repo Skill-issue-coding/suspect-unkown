@@ -90,7 +90,7 @@
                     "name": "Next",
                     "type": "Button",
                     "id": "b7230bb6-fc9b-4f52-8b25-f5e19cb2c2ba",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false,
@@ -120,6 +120,16 @@
                     "name": "Cancel",
                     "type": "Button",
                     "id": "8303963f-5c5d-429a-9e0e-3af2883329e7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "SecurityDebug",
+                    "type": "Button",
+                    "id": "ed59864f-43a3-4e9d-b808-870be271f924",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -543,6 +553,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8d336e1c-d0ec-4f1b-a39e-6883e7b0a6a7",
+                    "path": "<Keyboard>/f3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SecurityDebug",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

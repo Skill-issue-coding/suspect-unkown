@@ -15994,6 +15994,7 @@ MonoBehaviour:
   jobType: Cheap job. Good for shaping the profile
   difficulty: 2
   security: 1 tired clerk, 1-2 guards
+  securityBudget: {fileID: 11400000, guid: 15862500da0a41b429ebedcf0959a314, type: 2}
   knownTake: 0
   estimatedTake: 900
   intel: 'Perfect burn job: wear the red jacket here on purpose.'
@@ -60955,6 +60956,7 @@ MonoBehaviour:
   jobType: Unknown
   difficulty: 3
   security: Unknown
+  securityBudget: {fileID: 0}
   knownTake: 0
   estimatedTake: 0
   intel: Unkown
@@ -64801,6 +64803,7 @@ MonoBehaviour:
   jobType: Burglary, lower floor
   difficulty: 1
   security: 1 half asleep tenant
+  securityBudget: {fileID: 0}
   knownTake: 550
   estimatedTake: 0
   intel: The tenant dozes in the armchair. Move while he sleeps.
@@ -66002,6 +66005,7 @@ MonoBehaviour:
   jobType: Unknown
   difficulty: 5
   security: Unkown
+  securityBudget: {fileID: 0}
   knownTake: 0
   estimatedTake: 0
   intel: 'Security has adapted: patrols now favour the vault corridor.'
