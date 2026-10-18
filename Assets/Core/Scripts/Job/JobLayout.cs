@@ -38,6 +38,16 @@ public class JobLayout : MonoBehaviour
         return index < 0 ? -1 : index + 1;
     }
 
+    // A room's number from its list position, so it works before Awake; -1 when unlisted
+    public int RoomIndex(Zone zone)
+    {
+        int index = Array.IndexOf(rooms, zone);
+        return index < 0 ? -1 : index + 1;
+    }
+
+    // An entrance's index from its list position; -1 when unlisted
+    public int EntranceIndex(Entrance entrance) => Array.IndexOf(entrances, entrance);
+
     private void Awake()
     {
         for (int i = 0; i < rooms.Length; i++)
