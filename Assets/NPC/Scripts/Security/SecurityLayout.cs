@@ -3,8 +3,9 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-// SecurityLayout holds the level's guard spawns and candidate POIs.
-// It is read alongside JobLayout
+// SecurityLayout holds the level's guard spawns, candidate POIs and a reference to its security budget
+// asset. It is read alongside JobLayout. The tiers live in the asset, not here, so the main menu can
+// read the same numbers without loading the level
 public class SecurityLayout : MonoBehaviour
 {
     private static readonly Color spawnColor = Color.cyan;
@@ -19,10 +20,11 @@ public class SecurityLayout : MonoBehaviour
     private SecurityCandidate[] candidates;
 
     [Header("Budget")]
-    [SerializeField, Tooltip("Guards and adaptive POIs per completed-run count; the tier from 0 is the first run")]
-    private SecurityTier[] tiers;
+    [SerializeField, Tooltip("This level's guards and adaptive POIs per completed-run count. Shared with the main menu")]
+    private SecurityBudget budget;
 
-    public SecurityTier TierFor(int completedRuns) => SecurityTier.For(tiers, completedRuns);
+    // A missing budget gives the zero tier, so the director spawns no guards; OnValidate warns about it
+    public SecurityTier TierFor(int completedRuns) => budget != null ? budget.TierFor(completedRuns) : default;
 
     public Transform[] GuardSpawns => guardSpawns;
     public SecurityCandidate[] Candidates => candidates;
@@ -31,6 +33,8 @@ public class SecurityLayout : MonoBehaviour
     {
         if (guardSpawns == null || guardSpawns.Length == 0)
             Debug.LogWarning($"{name}: no guard spawns, the director cannot place guards", this);
+
+        ValidateTiers();
 
         if (candidates == null) return;
         for (int i = 0; i < candidates.Length; i++)
@@ -46,40 +50,28 @@ public class SecurityLayout : MonoBehaviour
             if (candidate.poi.gameObject.activeSelf)
                 Debug.LogWarning($"{name}: candidate {i} ({candidate.poi.name}) is active; it would run as a base POI every run", this);
         }
-
-        ValidateTiers();
     }
 
+    // Only what needs this scene: the budget asset checks its own tiers (SecurityBudget.OnValidate)
     private void ValidateTiers()
     {
-        if (tiers == null || tiers.Length == 0)
+        if (budget == null)
         {
-            Debug.LogWarning($"{name}: no tiers, the director has no budget", this);
+            Debug.LogWarning($"{name}: no security budget assigned, the director has no budget", this);
             return;
         }
 
         int spawns = guardSpawns != null ? guardSpawns.Length : 0;
         int candidateCount = candidates != null ? candidates.Length : 0;
-        bool hasFirstRun = false;
 
-        for (int i = 0; i < tiers.Length; i++)
+        for (int i = 0; i < budget.Tiers.Count; i++)
         {
-            SecurityTier tier = tiers[i];
-            if (tier.fromCompletedRuns == 0) hasFirstRun = true;
-            if (tier.guards < 1)
-                Debug.LogWarning($"{name}: tier {i} has no guards", this);
+            SecurityTier tier = budget.Tiers[i];
             if (tier.guards > spawns)
                 Debug.LogWarning($"{name}: tier {i} wants {tier.guards} guards but there are {spawns} spawns", this);
             if (tier.adaptivePois > candidateCount)
                 Debug.LogWarning($"{name}: tier {i} wants {tier.adaptivePois} adaptive POIs but there are {candidateCount} candidates", this);
-            if (i > 0 && tier.fromCompletedRuns <= tiers[i - 1].fromCompletedRuns)
-                Debug.LogWarning($"{name}: tier {i} is not after tier {i - 1}; keep tiers sorted by completed runs", this);
-            if (i > 0 && tier.guards < tiers[i - 1].guards)
-                Debug.LogWarning($"{name}: tier {i} has fewer guards than tier {i - 1}; the guard count never shrinks", this);
         }
-
-        if (!hasFirstRun)
-            Debug.LogWarning($"{name}: no tier starts at 0 completed runs, a first run has no budget", this);
     }
 
     private void OnDrawGizmos()

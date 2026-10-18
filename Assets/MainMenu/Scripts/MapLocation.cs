@@ -21,6 +21,9 @@ public class MapLocation : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField, Tooltip("Security summary line")]
     private string security = "1 guard";
 
+    [SerializeField, Tooltip("Optional. This job's security budget; with it, the saved completed runs decide whether the line reads 'Raised security'. Empty: the line above is shown as typed")]
+    private SecurityBudget securityBudget;
+
     [SerializeField, Tooltip("Value of the loot known before the job, dollars")]
     private int knownTake = 0;
 
@@ -56,7 +59,17 @@ public class MapLocation : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public string DisplayName => displayName;
     public string JobType => jobType;
     public int Difficulty => difficulty;
-    public string Security => security;
+
+    // The card's security line: the typed text, or "Raised security" in red once the saved runs raise it
+    public string SecurityLine(ActionSave actions)
+    {
+        if (securityBudget == null || !IsBuilt) return security;
+
+        ActionRecord record = actions.Find(sceneName);
+        int completedRuns = record != null ? record.completedRuns : 0;
+        return securityBudget.IsRaised(completedRuns) ? "<color=#FF4D4D>Raised security</color>" : security;
+    }
+
     public int KnownTake => knownTake;
     public int EstimatedTake => estimatedTake;
     public string Intel => intel;

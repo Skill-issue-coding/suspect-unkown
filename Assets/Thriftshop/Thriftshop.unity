@@ -2163,19 +2163,7 @@ MonoBehaviour:
     - {fileID: 1014517892}
     entrances:
     - {fileID: 1429720728}
-  tiers:
-  - fromCompletedRuns: 0
-    guards: 1
-    adaptivePois: 0
-  - fromCompletedRuns: 1
-    guards: 1
-    adaptivePois: 1
-  - fromCompletedRuns: 2
-    guards: 2
-    adaptivePois: 2
-  - fromCompletedRuns: 3
-    guards: 2
-    adaptivePois: 3
+  budget: {fileID: 11400000, guid: 15862500da0a41b429ebedcf0959a314, type: 2}
 --- !u!4 &186547591
 Transform:
   m_ObjectHideFlags: 0

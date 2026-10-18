@@ -223,7 +223,7 @@ Greedy maximum coverage over **authored candidate POIs** (decision 15, extended 
 
 ### 5.4 Visibility
 
-- **To the player:** nothing in the level itself. POIs are never shown in game. In the main menu, the thrift shop's security line on the map board reads **"Raised security"** in red once the second guard is hired (two or more completed runs), read from `ActionStore`. `MapLocation`'s fixed security string becomes a computed one for this location.
+- **To the player:** nothing in the level itself. POIs are never shown in game. In the main menu, the thrift shop's security line on the map board reads **"Raised security"** in red once the level has more guards than a first run (the second guard, after two completed runs). `MapBoard` loads `actions.json` once in `Awake`; `MapLocation.SecurityLine` asks the location's `SecurityBudget` (`IsRaised(completedRuns)`), the same asset the level's `SecurityLayout` reads, so the menu and the level share one set of tiers. A location without a budget (the apartment) shows its typed text. The menu cannot compare the saved room names with the layout, so after a layout change it reads "Raised security" until the next completed run replaces the record.
 - **To developers and the presentation:** an in-game debug overlay (`SecurityDebugOverlay`, NPC, toggled by a debug key through `PlayerInputs`) shows the transition matrix as a heatmap, the entrance probabilities, the occupancy per room, every candidate with its score and gain, the chosen POIs with their multipliers, and the explanation lines. In the world it marks each active POI with its coverage.
 
 ---
@@ -321,7 +321,7 @@ _Check:_ the tests pass.
 **S4. Stage B** (`SecurityPlanner`, NPC, pure logic). Done 2026-10-18: `SecurityPlanner` with `PoiCandidate`, `SecurityPick` and `SecurityPlan`; `SecurityPlannerTests` pass. Greedy marginal gain over candidates, deterministic ties, the drain multipliers, and the explanation lines. The budget is no longer in the planner (changed 2026-10-18): `Plan` takes a `SecurityTier`. EditMode tests: zero completed runs pick nothing; one run picks the candidate at the most used entrance; two runs pick two different candidates; the same record always gives the same plan; a tier sets the guard count and number of picks, a tier asking for more POIs than candidates picks them all, a negative count picks none.
 _Check:_ the tests pass.
 
-**S4b. `SecurityTier` and the per-level budget.** Done 2026-10-18. `SecurityTier` (NPC, `[Serializable]` struct) with the static lookup `For`; `SecurityLayout` holds `tiers`, exposes `TierFor`, and validates them. `Tier_FollowsCompletedRuns` covers the thrift shop's table. The scene's tiers are 0 → 1 guard, 0 POIs; 1 → 1, 1; 2 → 2, 2; 3 → 2, 3.
+**S4b. `SecurityTier` and the per-level budget.** Done 2026-10-18 (the tiers moved into the shared `SecurityBudget` asset by S7). `SecurityTier` (Core, `[Serializable]` struct) with the static lookup `For`; `SecurityLayout` reads its budget asset through `TierFor` and validates guards against spawns and POIs against candidates. `Tier_FollowsCompletedRuns` covers the thrift shop's table. The scene's tiers are 0 → 1 guard, 0 POIs; 1 → 1, 1; 2 → 2, 2; 3 → 2, 3.
 _Check:_ the Console shows no `SecurityLayout` warnings with those tiers; each rule warns when broken on purpose.
 
 **S5. `SecurityDirector`.** Done and checked 2026-10-18. Builds the plan at load with the level's tier, spawns the guards at random free spawns, activates the chosen POIs and sets their multipliers. Remove the hand-placed guard from G1.
@@ -330,7 +330,7 @@ _Check:_ with Tools → Fake Runs (two runs through the right side door): two gu
 **S6. The debug overlay.** Done and checked 2026-10-18. `SecurityDebugOverlay` (NPC, on the `Security` object, IMGUI) toggled by F3 (`SecurityDebug` action, `PlayerInputs.SecurityDebugPressed`); hides the job HUD while open. `SecurityDirector` exposes `Record`, `Model`, `Candidates` and `Plan`; `SecurityPlan` carries `StandaloneGains` so every candidate's gain shows, not only the picks'. It shows the entrance bars, occupancy per room with its heatmap index (street = 0), every candidate with its standalone gain and its pick mark, the explanation lines, the room-transition heatmap, and in the world a label above each picked POI with its multiplier, rooms and entrance. The text, heatmap and marker data are built once, on first open, since the plan never changes during a run.
 _Check:_ the overlay's matrix, entrance bars and chosen POIs match the record and the plan in the log.
 
-**S7. "Raised security" in the main menu.**
+**S7. "Raised security" in the main menu.** Done and checked 2026-10-18. `SecurityBudget` (Core `ScriptableObject`, asset `ThriftshopSecurityBudget`) holds the tiers, `TierFor` and `IsRaised`, and validates its own data; `SecurityLayout` and the thrift shop's `MapLocation` both reference it. `SecurityBudgetTests` pass.
 _Check:_ after two completed runs the thrift shop's security line reads "Raised security" in red; with a deleted `actions.json` it reads as before.
 
 ### Track R — recognition
