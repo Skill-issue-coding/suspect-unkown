@@ -74,7 +74,7 @@ Aim for a practical industry standard: code another developer could pick up, ext
 ### Robustness patterns used throughout the codebase
 
 - **Guard dependencies** in `Awake` or `Start`: if a required reference is missing, `Debug.LogWarning($"{name} …", this)` and set `enabled = false`. Never let a missing reference throw every frame.
-- **Subscribe in `OnEnable`, unsubscribe in `OnDisable`**, null-guarding both.
+- **Subscribe in `OnEnable`, unsubscribe in `OnDisable`**, null-guarding both. Exception: a component on the same GameObject that `[RequireComponent]` guarantees needs no guard, here or in the `Awake` check above, since it is added with this one and `OnEnable` never runs before `Awake`. Guard every other reference (scene objects, other GameObjects, anything found at runtime).
 - **Raise events with `?.Invoke`.**
 - **No runtime state in ScriptableObjects** (decision 1). Archetypes hold tuning only. Expose curves through methods (`EvaluateDistance`), not by handing out the mutable `AnimationCurve`.
 - **Validate data in `OnValidate`** (for example threshold order, all-zero weights, empty curves).

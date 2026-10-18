@@ -139,7 +139,7 @@ _Check:_ an unlocked door opens with E; a locked door within skill starts the lo
 
 ### I5. Glass cutter on the new base
 
-`GlassCutterInteraction` implements `IInteractionBehaviour` and begins the cutter view. The view marks `PlayerInteraction` busy while open and refreshes when it ends. If the cutter is finished before I2 to I4, build it against the interfaces in 3.1 and 3.2 from the start and finish the migration afterwards.
+The cutter follows the lockpick split: `GlassCutterModel` (rules), `GlassCutterTuning`, `GlassCutterView` (Core, draws only), and `PlayerGlassCutting` (Player, runs the session). `GlassCutterInteraction` implements `IInteractionBehaviour` and calls `PlayerGlassCutting.Begin`. `PlayerGlassCutting` marks `PlayerInteraction` busy while the view is open and clears it when it ends, as `PlayerLockpicking` does; the view cannot, because Core must not reference Player. If the cutter is finished before I2 to I4, build it against the interfaces in 3.1 and 3.2 from the start and finish the migration afterwards.
 _Check:_ the glass pane shows the same prompt and outline as everything else; E starts the cutter view; closing the view brings the prompt back.
 
 ### I6. Docs
