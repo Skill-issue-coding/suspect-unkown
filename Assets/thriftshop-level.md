@@ -15,7 +15,7 @@ Read `CLAUDE.md` first, then decisions 6, 15, 18, 19, 22, 23, 24 and 25 in `road
 1. **Introduce the guard.** The first NPC who patrols, reads the cone the apartment taught, and catches. A catch fails the job at once (`FailReason.Caught`).
 2. **The first real heist.** One required item, the register till, and a randomised spread of bonus loot, as in Payday's stores: the layout is learnable, what is worth taking changes every run.
 3. **Teach the bag and the van.** The bag holds two items. With more than two worth taking, the player learns (optionally) to fill the bag, walk to the van, empty it with **G**, and go back for more.
-4. **Introduce adaptive security.** Security watches the player's completed runs of this level. The first run has one guard serving the developers' base POIs. After one completed run, one extra POI appears where the player tends to go (the door they always use, the room they always cross). After two completed runs a second guard is hired and two extra POIs appear.
+4. **Introduce adaptive security.** Security watches the player's completed runs of this level. The first run has one guard serving the developers' base POIs. After one completed run, one extra POI appears where the player tends to go (the door they always use, the room they always cross). After two completed runs a second guard is hired and two extra POIs appear; after three, a third extra POI.
 5. **Close the witness loop.** The police description saved by the apartment (W8) is now acted on: a guard who sees the player in a described outfit grows suspicious (decision 25). The counter is to change clothes **between** jobs; the player can never change appearance during a job (decision 23).
 
 ### 1.1 The layout and what each part teaches
@@ -100,9 +100,12 @@ The till's `ProgressUnlock` is `None` until the next job exists; the unlock flag
 
 ### 3.2 The randomised roll
 
-- **`LootSlot`** (Core): an authored spot with a pool of `LootItem`s, each with a weight, and an empty weight.
-- **`LootSpawner`** (Core, one per level, on the `Job` object): at load, picks a fixed number of slots to fill (a range, for example 4–6, so the value per run stays fair), then picks an item for each from its pool, and instantiates the item's pickup. A fresh roll every run, from an unseeded `System.Random`; a debug seed field in the inspector repeats a roll while testing.
-- **`LootItem`** gains the pickup prefab it spawns as.
+- **`LootSlot`** (Core): a hand-placed `LootDisplay` (or other authored spot) that already holds its loot pickup. The developers choose the item and the place; the roll only decides which slots are live this run. A slot that is not live is switched off with its pickup.
+- **`LootSpawner`** (Core, one per level, on the `Job` object; the roll does not go on `JobLayout`, which only numbers rooms and entrances): a `randomized` toggle.
+  - **Off:** every slot stays as authored, so a level can ship with fixed loot.
+  - **On:** at load, picks `count` slots at random and switches the rest off. `count` is rolled from a range, base 3 and up to 4 (`minCount`, `maxCount` fields), so the value per run stays fair.
+  - A fresh roll every run, from an unseeded `System.Random`; a debug seed field in the inspector repeats a roll while testing.
+- **Deferred:** weighted item pools per slot and spawning pickups from `LootItem`s. Not built until a level needs a slot whose item varies; hand-placed displays cover this level.
 - The required till is a placed `LootPickup`, not a slot.
 - **Security does not see the roll.** The security model never uses where loot spawned (section 5): loot that moves every run would only add noise to the route model.
 
@@ -195,25 +198,26 @@ Greedy maximum coverage over **authored candidate POIs** (decision 15, extended 
   ```
 
 - **Greedy:** repeatedly add the candidate with the largest marginal gain. Deterministic: no sampling, ties go to the lower index. The objective is submodular, so greedy carries the (1 − 1/e) guarantee.
-- **How many:** as many adaptive POIs as there are guards, and only from the first completed run on:
+- **How many:** set per level, as data. `SecurityLayout` holds a list of `SecurityTier`s (`fromCompletedRuns`, `guards`, `adaptivePois`); the tier with the highest `fromCompletedRuns` not above the player's completed runs applies (`SecurityTier.For`). The director looks the tier up and hands it to the planner, which stays pure. `SecurityLayout.OnValidate` warns when a level breaks the rules: no tier at 0, tiers out of order, fewer guards than the tier before (the guard count never shrinks), a tier with no guards, more guards than spawns, or more adaptive POIs than candidates. The thrift shop's tiers:
 
   | Completed runs | Guards | Adaptive POIs      |
   | -------------- | ------ | ------------------ |
   | 0              | 1      | 0 (base POIs only) |
   | 1              | 1      | 1                  |
-  | 2 or more      | 2      | 2                  |
+  | 2              | 2      | 2                  |
+  | 3 or more      | 2      | 3                  |
 
-  This is the fixed budget for this level: it grows per completed run and is capped at two. The guard count never shrinks.
+  Another level defines its own tiers and its own spawn count: nothing in the planner or the director is specific to the thrift shop.
 
 - **Drain.** Each chosen POI's `DecayMultiplier` is `1 + gain / bestGain` (between 1 and 2), so the strongest pick drains twice as fast as its base rate. "The side entrance now drains twice as fast" is one number.
-- **Solvability by authoring.** No candidate covers the register, and none covers more than one entrance. With at most two picks out of four entrances, at least two entrances always stay without an adaptive POI.
+- **Solvability by authoring.** No candidate covers the register, and none covers more than one entrance. With at most three picks out of four entrances, at least one entrance always stays without an adaptive POI. A tier that picks as many POIs as there are entrances would break this, so keep the largest `adaptivePois` below the entrance count.
 
 ### 5.3 Applying the plan
 
 `SecurityDirector` (NPC, one per level) runs in `Awake`:
 
-1. Loads the record, builds the plan (stages A and B).
-2. Spawns the guards. Guard _i_ spawns at the spawn candidate nearest (straight line) to the _i_-th chosen POI, or at the first spawn candidates on a first run. Spawning in `Awake` means the guards' own `Awake` runs at once and their `Start` runs with everyone else's, so `NpcPerception` still finds the player.
+1. Loads the record, looks up the level's tier for its completed runs, and builds the plan (stages A and B) with that tier.
+2. Spawns the guards, each at a random free spawn from `SecurityLayout`'s spawns (a spawn is used once; `System.Random` with a debug seed field). Where a guard starts carries no plan information: guards pick POIs by importance, so the plan's effect does not depend on the spawn. Keep spawns away from the street entrances by authoring. Spawning in `Awake` means the guards' own `Awake` runs at once and their `Start` runs with everyone else's, so `NpcPerception` still finds the player.
 3. Activates the chosen candidate POIs and sets their `DecayMultiplier`.
 4. Writes the explanation: one line per pick from its marginal-gain step, phrased in POI terms, for example "Guards now check Side door: you come in through Emergency exit on 64 % of runs, drains 2.0× faster." The record holds decayed sums, not a run history, so the line quotes the model's probabilities rather than a count of runs. The lines go to the debug overlay and the log; the AI report quotes them.
 
@@ -282,8 +286,8 @@ _Check:_ the clerk spends most of the time at the register and leaves for each e
 
 ### Track L — loot
 
-**L1. `LootSlot` and `LootSpawner`.** Authored slots, weighted pools, a fixed fill count, a fresh roll per run and a debug seed.
-_Check:_ three restarts give three different spreads with the same number of items; the same debug seed gives the same spread.
+**L1. `LootSlot` and `LootSpawner`.** Hand-placed loot displays as slots; `LootSpawner` with a `randomized` toggle, a count range (3–4), a fresh roll per run and a debug seed. Randomization off leaves every slot live.
+_Check:_ with the toggle off every display holds its item. With it on, three restarts give three different sets of live displays, each with 3 or 4 items; the same debug seed gives the same set.
 
 **L2. The till and the objective.** The required till at the register, `JobObjectives` listing it, extraction unlocking when it is taken.
 _Check:_ the van zone stays grey until the till is taken.
@@ -301,6 +305,7 @@ _Check:_ walk street → front right → shop front → shop middle → shop bac
 
 **S2. `ActionRecord` and `ActionStore`.** Done and checked 2026-10-17. `ActionRecord`, `ActionSave`, `ActionStore`, `ActionRecorder` on `Job`, and the Action Record menu (Log, Reveal, Delete).
 _Check:_
+
 1. Complete a run, then Log Record: Thriftshop with `completedRuns` 1, the room and entrance names, and counts equal to the readout.
 2. Get caught: `actions.json` is unchanged (its timestamp too).
 3. Complete again the same way: every old count is 0.8 times what it was plus the new run (Street → Shop front goes from 1 to 1.8), `completedRuns` 2.
@@ -313,13 +318,16 @@ _Check:_ fake two runs through the emergency exit: Log Record shows `completedRu
 **S3. Stage A** (`ActionModel`, NPC, pure logic: the model of the player's actions). Done 2026-10-18; seven tests in `Assets/Testing/Editor/ActionModelTests.cs` pass. Transition probabilities with Laplace smoothing, the entrance Dirichlet, forward propagation. EditMode tests: rows sum to 1; unseen transitions are above 0 and the diagonal is 0; a record of three runs through one entrance gives that entrance the highest probability; occupancy sums to 1 and leaves the street out.
 _Check:_ the tests pass.
 
-**S4. Stage B** (`SecurityPlanner`, NPC, pure logic). Done 2026-10-18: `SecurityPlanner` with `PoiCandidate`, `SecurityPick` and `SecurityPlan`; `SecurityPlannerTests` pass. Greedy marginal gain over candidates, deterministic ties, the budget table, the drain multipliers, and the explanation lines. EditMode tests: zero completed runs pick nothing; one run picks the candidate at the most used entrance; two runs pick two different candidates; the same record always gives the same plan.
+**S4. Stage B** (`SecurityPlanner`, NPC, pure logic). Done 2026-10-18: `SecurityPlanner` with `PoiCandidate`, `SecurityPick` and `SecurityPlan`; `SecurityPlannerTests` pass. Greedy marginal gain over candidates, deterministic ties, the drain multipliers, and the explanation lines. The budget is no longer in the planner (changed 2026-10-18): `Plan` takes a `SecurityTier`. EditMode tests: zero completed runs pick nothing; one run picks the candidate at the most used entrance; two runs pick two different candidates; the same record always gives the same plan; a tier sets the guard count and number of picks, a tier asking for more POIs than candidates picks them all, a negative count picks none.
 _Check:_ the tests pass.
 
-**S5. `SecurityDirector`.** Builds the plan at load, spawns the guards at spawn candidates, activates the chosen POIs and sets their multipliers. Remove the hand-placed guard from G1.
-_Check:_ with Tools → Fake Runs (two runs through the right side door): two guards spawn, and one of them visibly spends its time at the right side door.
+**S4b. `SecurityTier` and the per-level budget.** Done 2026-10-18. `SecurityTier` (NPC, `[Serializable]` struct) with the static lookup `For`; `SecurityLayout` holds `tiers`, exposes `TierFor`, and validates them. `Tier_FollowsCompletedRuns` covers the thrift shop's table. The scene's tiers are 0 → 1 guard, 0 POIs; 1 → 1, 1; 2 → 2, 2; 3 → 2, 3.
+_Check:_ the Console shows no `SecurityLayout` warnings with those tiers; each rule warns when broken on purpose.
 
-**S6. The debug overlay.**
+**S5. `SecurityDirector`.** Done and checked 2026-10-18. Builds the plan at load with the level's tier, spawns the guards at random free spawns, activates the chosen POIs and sets their multipliers. Remove the hand-placed guard from G1.
+_Check:_ with Tools → Fake Runs (two runs through the right side door): two guards spawn at random spawns, and one of them visibly spends its time at the right side door.
+
+**S6. The debug overlay.** Done and checked 2026-10-18. `SecurityDebugOverlay` (NPC, on the `Security` object, IMGUI) toggled by F3 (`SecurityDebug` action, `PlayerInputs.SecurityDebugPressed`); hides the job HUD while open. `SecurityDirector` exposes `Record`, `Model`, `Candidates` and `Plan`; `SecurityPlan` carries `StandaloneGains` so every candidate's gain shows, not only the picks'. It shows the entrance bars, occupancy per room with its heatmap index (street = 0), every candidate with its standalone gain and its pick mark, the explanation lines, the room-transition heatmap, and in the world a label above each picked POI with its multiplier, rooms and entrance. The text, heatmap and marker data are built once, on first open, since the plan never changes during a run.
 _Check:_ the overlay's matrix, entrance bars and chosen POIs match the record and the plan in the log.
 
 **S7. "Raised security" in the main menu.**
@@ -348,7 +356,7 @@ _Check:_ on the third run the player notices without being told that the guards 
 ## 8. Open questions
 
 - **Clerk errands.** Are 20–35 s at the register, with bin runs and restocking in between, enough openings? Playtest.
-- **The bonus count.** Is 4–6 bonus items plus 1–3 money stacks enough to make a second van trip tempting but not required?
+- **The bonus count.** Is 3–4 live displays plus 1–3 money stacks enough to make a second van trip tempting but not required?
 - **Recognition strength.** Is 0.6 for guards right, and is "never past Investigating on its own" too kind? A burned outfit should feel costly without making the level unwinnable.
 - **Smoothing and propagation.** α = 0.5 and T = 6 are starting values. With only a few runs of data, does the first adaptive POI land where the player expects it to?
 - **Two guards and the open safe.** The raised baseline is per guard. Should the guard who finds the safe open put the other guard on edge too (the first use of `Reporting`)?

@@ -6,10 +6,12 @@ public class SecurityPlan
 {
     public int Guards { get; }
     public IReadOnlyList<SecurityPick> Picks { get; }
+    public IReadOnlyList<float> StandaloneGains { get; }
 
-    public SecurityPlan(int guards, IReadOnlyList<SecurityPick> picks)
+    public SecurityPlan(int guards, IReadOnlyList<SecurityPick> picks, IReadOnlyList<float> standaloneGains)
     {
         Guards = guards;
         Picks = picks;
+        StandaloneGains = standaloneGains;
     }
 }

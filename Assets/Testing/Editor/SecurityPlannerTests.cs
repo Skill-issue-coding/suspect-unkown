@@ -19,6 +19,13 @@ public class SecurityPlannerTests
         new PoiCandidate("Room 2",     new[] { 2 }, new int[0]),
     };
 
+    private static readonly SecurityTier[] ThriftShopTiers =
+    {
+        new SecurityTier { fromCompletedRuns = 0, guards = 1, adaptivePois = 0 },
+        new SecurityTier { fromCompletedRuns = 1, guards = 1, adaptivePois = 1 },
+        new SecurityTier { fromCompletedRuns = 2, guards = 2, adaptivePois = 2 },
+    };
+
     private static ActionRecord Record(int completedRuns) => new ActionRecord
     {
         location = "Test",
@@ -39,16 +46,21 @@ public class SecurityPlannerTests
     }
 
     private static SecurityPlan Plan(ActionRecord record) =>
-        SecurityPlanner.Plan(record, new ActionModel(record, EntranceRooms, Alpha, Steps), Candidates, Detection);
+        Plan(record, SecurityTier.For(ThriftShopTiers, record.completedRuns));
+
+    private static SecurityPlan Plan(ActionRecord record, SecurityTier tier) =>
+        SecurityPlanner.Plan(record, new ActionModel(record, EntranceRooms, Alpha, Steps), Candidates, Detection, tier);
 
     [TestCase(0, 1, 0)]
     [TestCase(1, 1, 1)]
     [TestCase(2, 2, 2)]
     [TestCase(5, 2, 2)]
-    public void Budget_FollowsCompletedRuns(int runs, int guards, int adaptivePois)
+    public void Tier_FollowsCompletedRuns(int runs, int guards, int adaptivePois)
     {
-        Assert.AreEqual(guards, SecurityPlanner.GuardCount(runs));
-        Assert.AreEqual(adaptivePois, SecurityPlanner.AdaptivePoiCount(runs));
+        SecurityTier tier = SecurityTier.For(ThriftShopTiers, runs);
+
+        Assert.AreEqual(guards, tier.guards);
+        Assert.AreEqual(adaptivePois, tier.adaptivePois);
     }
 
     [Test]
@@ -110,5 +122,57 @@ public class SecurityPlannerTests
         SecurityPlan plan = Plan(Record(1));
 
         Assert.AreEqual(0, plan.Picks[0].candidate);
+    }
+
+    [Test]
+    public void Tier_SetsGuardsAndPicks()
+    {
+        // A bigger level: 7 guards, 3 adaptive POIs, independent of the thrift shop's table
+        SecurityTier tier = new SecurityTier { fromCompletedRuns = 0, guards = 7, adaptivePois = 3 };
+
+        SecurityPlan plan = Plan(SideDoorRecord(1, 1f), tier);
+
+        Assert.AreEqual(7, plan.Guards);
+        Assert.AreEqual(3, plan.Picks.Count);
+    }
+
+    [Test]
+    public void Tier_MorePoisThanCandidates_PicksAllCandidates()
+    {
+        SecurityTier tier = new SecurityTier { fromCompletedRuns = 0, guards = 1, adaptivePois = 10 };
+
+        SecurityPlan plan = Plan(SideDoorRecord(1, 1f), tier);
+
+        Assert.AreEqual(Candidates.Length, plan.Picks.Count);
+    }
+
+    [Test]
+    public void Tier_NegativePois_PicksNothing()
+    {
+        SecurityTier tier = new SecurityTier { fromCompletedRuns = 0, guards = 1, adaptivePois = -1 };
+
+        SecurityPlan plan = Plan(SideDoorRecord(1, 1f), tier);
+
+        Assert.AreEqual(0, plan.Picks.Count);
+    }
+
+    [Test]
+    public void StandaloneGains_CoverEveryCandidate_EvenWithNoPicks()
+    {
+        SecurityPlan plan = Plan(Record(0));
+
+        Assert.AreEqual(0, plan.Picks.Count);
+        Assert.AreEqual(Candidates.Length, plan.StandaloneGains.Count);
+    }
+
+    [Test]
+    public void FirstPick_HasTheLargestStandaloneGain()
+    {
+        SecurityPlan plan = Plan(SideDoorRecord(2, 1.8f));
+        int first = plan.Picks[0].candidate;
+
+        for (int c = 0; c < plan.StandaloneGains.Count; c++)
+            Assert.LessOrEqual(plan.StandaloneGains[c], plan.StandaloneGains[first]);
+        Assert.AreEqual(plan.StandaloneGains[first], plan.Picks[0].gain, 1e-6f);
     }
 }
