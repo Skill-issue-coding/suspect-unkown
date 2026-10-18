@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using UnityEngine;
+using System.Collections.Generic;
 
 // One description of the player's appearance: per outfit slot, log-odds beliefs about style and color.
 // NpcWitness keeps a live one as its memory and hands out a copy at job end; JobWitnesses merges the copies
@@ -111,5 +112,24 @@ public class WitnessReport
                 text.AppendLine($"{slot} —");
         }
         return text.ToString();
+    }
+
+    public List<(OutfitFeature feature, float confidence)> DescribeTop(FeatureSlot slot, int maxCount = 3, float minScore = 0.05f)
+    {
+        int i = (int)slot;
+        var topStyles = styles[i].GetRanked(minScore);
+        var topColors = colors[i].GetRanked(minScore);
+
+        int count = Mathf.Min(maxCount, Mathf.Min(topStyles.Count, topColors.Count));
+        List<(OutfitFeature feature, float confidence)> results = new(count);
+
+        for (int k = 0; k < count; k++)
+        {
+            OutfitFeature feature = new OutfitFeature(topStyles[k].value, (AppearanceColor)topColors[k].value);
+            float combinedConfidence = (topStyles[k].confidence + topColors[k].confidence) * 0.5f;
+            results.Add((feature, combinedConfidence));
+        }
+
+        return results;
     }
 }
