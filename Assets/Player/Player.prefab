@@ -1685,10 +1685,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1281951801932075715}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 200fdce656a4ed54f957ca266ed9d836, type: 3}
+  m_Script: {fileID: 11500000, guid: d1e6f619704368949a9131bca0e79861, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDoorInteraction
-  useText: E
+  tuning: {fileID: 11400000, guid: 2283f0033beda6343864383734ddc2a3, type: 2}
+  view: {fileID: 0}
+  successHold: 0.45
 --- !u!114 &5916406596137029354
 MonoBehaviour:
   m_ObjectHideFlags: 0

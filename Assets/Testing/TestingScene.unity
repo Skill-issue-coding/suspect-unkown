@@ -1054,6 +1054,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -9086269151619823552, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: view
+      value: 
+      objectReference: {fileID: 713540689}
     - target: {fileID: -1011108268404151007, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
       propertyPath: view
       value: 
