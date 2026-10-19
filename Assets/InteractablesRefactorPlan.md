@@ -22,7 +22,7 @@ They differ in three things only: what E does (hold against press), whether the 
 | --- | --- |
 | `Assets/Core/Scripts/Loot/LootPickup.cs` | Loot trigger; owns `item`, `prompt`, `outline`, `promptOffset`; `Take()`; static `Taken` event |
 | `Assets/Core/Interactables/Scripts/Lockpick/DoorReach.cs` | Door reach trigger (one per side); owns the door-side `prompt` |
-| `Assets/Core/Interactables/Scripts/Lockpick/Door.cs` | The door: lock, swing, anomaly; switches its `DoorReach`es off while open; `Opened` event; `PromptPoint` from the anomaly |
+| `Assets/Core/Interactables/Door.cs` (moved from `Scripts/Lockpick/` on 2026-10-19) | The door: lock, swing, anomaly; switches its `DoorReach`es off while open; `Opened` event; `PromptPoint` from the anomaly |
 | `Assets/Core/Interactables/Scripts/WorldPrompt.cs` | The world-space E hint; `Show(follower, target, text, blocked)`, `SetProgress`, `Hide` |
 | `Assets/Core/Interactables/Scripts/InteractOutline.cs` | Rim highlight; `SetVisible`; shared by both sides of one door |
 | `Assets/Player/Scripts/Interaction/PlayerLootInteraction.cs` | Tracks pickups in reach, hold-to-take, `IsTaking` (read by `PlayerConduct` for `Stealing`) |

@@ -7,7 +7,8 @@ using UnityEngine.AI;
 // doorway, and the leaf (on the Occluder layer) blocks sight. Open, it is a route and evidence: the
 // obstacle is off and its Anomaly is raised. The door knows nothing about the player or skills. It
 // holds its lock level and sweet spot and opens when asked, so any opener (the lockpick now, a
-// crowbar or keycard later) calls the same Open()
+// crowbar or keycard later) calls the same Open(). It slams when an NPC resolves its anomaly, so
+// NPCs never reference the door to shut it
 [RequireComponent(typeof(Anomaly))]
 [RequireComponent(typeof(NavMeshObstacle))]
 public class Door : MonoBehaviour
@@ -81,6 +82,9 @@ public class Door : MonoBehaviour
         SweetSpot = UnityEngine.Random.Range(-130f, 130f);
         obstacle.enabled = true;
     }
+
+    private void OnEnable() { if (anomaly != null) anomaly.Resolved += Slam; }
+    private void OnDisable() { if (anomaly != null) anomaly.Resolved -= Slam; }
 
     [ContextMenu("Open")]
     public void Open()

@@ -61,6 +61,10 @@ public class GuardBehaviour : MonoBehaviour
     [SerializeField, Tooltip("Seconds the head stays on a sound the guard is not otherwise reacting to")]
     private float glanceDuration = 1.5f;
 
+    [Header("Errands")]
+    [SerializeField, Tooltip("Seconds the guard stands confused at an open door before slamming it")]
+    private float confusedDuration = 1.5f;
+
     [Header("Debug")]
     [SerializeField] private bool debug = true;
 
@@ -69,40 +73,34 @@ public class GuardBehaviour : MonoBehaviour
 
     public GuardActivity Activity { get; private set; } = GuardActivity.Patrolling;
 
-    public bool IsSearching => arrived &&
+    public bool IsSearching => arrived && errand == null &&
         (Activity == GuardActivity.Investigating || (Activity == GuardActivity.Pursuing && LostSight));
 
     public bool IsDwelling => Activity == GuardActivity.Patrolling && target != null && arrived;
 
     private NavMeshAgent agent;
     private NavMeshPath path;
-
-    private PointOfInterest target;
-    private bool arrived;
-    private float dwellTimer;
-    private float nextChooseTime;
-
     private NpcFacing facing;
     private NpcSuspicion suspicion;
     private NpcPerception perception;
     private NpcHearing hearing;
     private NpcAnomalySight anomalySight;
 
+    // The anomaly this guard has claimed and is walking to or standing at (decision 18)
+    private Anomaly errand;
+    private float errandTimer;
+    private PointOfInterest target;
+    private bool arrived;
+    private float dwellTimer;
+    private float nextChooseTime;
     private Vector3 glancePoint;
     private float glanceUntil = float.NegativeInfinity;
-
     private bool seesPlayer;
     private bool hasLastKnown;
     private Vector3 lastKnownPosition;
-
     private float searchBaseYaw;
-
     private float searchTimer;
     private bool caught;
-
-    private float lastSeenTime = float.NegativeInfinity;
-
-    private bool LostSight => Time.time - lastSeenTime > lostSightGrace;
 
     // Crossing a door's NavMeshLink the door this guard opened, whether it will close it once
     // clear of the reach, and when the door has swung far enough to walk through
@@ -110,6 +108,11 @@ public class GuardBehaviour : MonoBehaviour
     private bool closeBehind;
     private bool crossing;
     private float passageReadyTime;
+    private float lastSeenTime = float.NegativeInfinity;
+
+    private bool LostSight => Time.time - lastSeenTime > lostSightGrace;
+
+    public bool IsResolving => errand != null && arrived && Activity == GuardActivity.Investigating;
 
     private void Awake()
     {
@@ -142,6 +145,8 @@ public class GuardBehaviour : MonoBehaviour
         if (target != null)
             target.Release(this);
 
+        DropErrand();
+
         target = null;
 
         if (hearing != null)
@@ -149,6 +154,7 @@ public class GuardBehaviour : MonoBehaviour
 
         if (anomalySight != null)
             anomalySight.Noticed -= OnNoticed;
+
     }
 
     private void Update()
@@ -241,6 +247,7 @@ public class GuardBehaviour : MonoBehaviour
         seesPlayer = perception.TryGetLatest(out Observation observation);
         if (!seesPlayer) return;
 
+        DropErrand();
         lastSeenTime = Time.time;
 
         float threshold = Activity == GuardActivity.Pursuing ? 0.1f : repathDistance;
@@ -265,6 +272,8 @@ public class GuardBehaviour : MonoBehaviour
             target.Release(this);
             target = null;
         }
+
+        if (next != GuardActivity.Investigating) DropErrand();
 
         Activity = next;
 
@@ -302,6 +311,7 @@ public class GuardBehaviour : MonoBehaviour
         agent.SetDestination(position);
         arrived = false;
         searchTimer = 0f;
+        errandTimer = 0f;
     }
 
     private void OccupyNearby()
@@ -315,6 +325,9 @@ public class GuardBehaviour : MonoBehaviour
 
     private void UpdateInvestigating()
     {
+        // Closed by someone else on the way: Clear() already freed the claim, so search the spot as usual
+        if (errand != null && !errand.IsRaised) errand = null;
+
         if (!arrived)
         {
             if (agent.HasArrived())
@@ -326,7 +339,28 @@ public class GuardBehaviour : MonoBehaviour
             return;
         }
 
+        if (errand != null)
+        {
+            ResolveErrand();
+            return;
+        }
+
         Search();
+    }
+
+    // The confused beat: face the door, wait, then ask the anomaly's owner to fix it. Afterwards the guard
+    // searches from where it stands until suspicion decays, then gives up as usual
+    private void ResolveErrand()
+    {
+        facing.LookAt(errand.SightPoint);
+
+        errandTimer += Time.deltaTime;
+        if (errandTimer < confusedDuration) return;
+
+        Anomaly resolved = errand;
+        DropErrand();
+        resolved.Resolve();
+        searchBaseYaw = transform.eulerAngles.y;
     }
 
     private void Search()
@@ -475,6 +509,8 @@ public class GuardBehaviour : MonoBehaviour
         bool matters = noise.Alarm > 0f;
         if (!matters || !LostSight) return;
 
+        DropErrand();
+
         bool moved = !hasLastKnown
             || (noise.Position - lastKnownPosition).sqrMagnitude > repathDistance * repathDistance;
 
@@ -485,13 +521,16 @@ public class GuardBehaviour : MonoBehaviour
             MoveTo(lastKnownPosition);
     }
 
-    // A noticed anomaly becomes the last-known position while the player is out of sight, the same rule
-    // as an alarming sound. 2.4 turns arriving there into the confused look and the slam
+    // An open door the guard can deal with becomes an errand: claim it and walk to its resolve point. A chase
+    // ignores doors (decision 19), and a door another guard has claimed only raises suspicion (NpcSuspicion)
     private void OnNoticed(Anomaly anomaly)
     {
-        if (!LostSight) return;
+        if (!LostSight || Activity == GuardActivity.Pursuing) return;
+        if (errand != null || !anomaly.TryClaim(this)) return;
 
-        Vector3 point = anomaly.SightPoint;
+        errand = anomaly;
+        Vector3 point = anomaly.ResolvePoint;
+
         bool moved = !hasLastKnown
             || (point - lastKnownPosition).sqrMagnitude > repathDistance * repathDistance;
 
@@ -500,6 +539,13 @@ public class GuardBehaviour : MonoBehaviour
 
         if (moved && (Activity == GuardActivity.Investigating || Activity == GuardActivity.Pursuing))
             MoveTo(lastKnownPosition);
+    }
+
+    private void DropErrand()
+    {
+        if (errand == null) return;
+        errand.Release(this);
+        errand = null;
     }
 
     private void OnDrawGizmos()
@@ -511,6 +557,7 @@ public class GuardBehaviour : MonoBehaviour
         if (target != null) label += $" → {target.name}";
         if (IsSearching) label += " (searching)";
         if (IsDwelling) label += " (dwelling)";
+        if (errand != null) label += $" (resolving {errand.Kind})";
         UnityEditor.Handles.Label(transform.position + Vector3.up * 2.4f, label);
 #endif
 

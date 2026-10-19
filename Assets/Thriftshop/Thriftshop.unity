@@ -13876,6 +13876,14 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4872094226141908942, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: resolveOffset.x
+      value: -0.615
+      objectReference: {fileID: 0}
+    - target: {fileID: 4872094226141908942, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: resolveOffset.z
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5873354322520344028, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 0
