@@ -53,6 +53,14 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         fovScale = Mathf.Clamp01(fov);
     }
 
+    // For a spawner that builds different kinds of NPC from one prefab: call it right after Instantiate,
+    // before Start. Nothing caches the archetype (every reader asks this component each time), and Start
+    // only takes its tick rate, so a swap this early is complete
+    public void AssignArchetype(NpcArchetype value)
+    {
+        if (value != null) archetype = value;
+    }
+
     public bool TryGetLatest(out Observation observation)
     {
         observation = latest;

@@ -11,7 +11,6 @@ using UnityEngine;
 public static class ClerkLocomotionBuilder
 {
     private const string ControllerPath = "Assets/NPC/Animators/ClerkAnimator.controller";
-    private const string MaskPath = "Assets/NPC/Animators/ClerkUpperBody.mask";
     private const string ClipFile = "Assets/NPC/Art/Clerk/Animations/Clerk_Animations.fbx";
     private const string LogPrefix = "[ClerkLocomotionBuilder]";
 
@@ -35,7 +34,7 @@ public static class ClerkLocomotionBuilder
         AnimatorController controller = PrepareController();
         AddParameters(controller);
         BuildBaseLayer(controller, sleep, stir, awake, standUp, sitDown, idle, walk, snack);
-        BuildPhoneLayer(controller, reach, call);
+        AnimatorBuildUtility.AddPhoneLayer(controller, reach, call);
 
         AssetDatabase.SaveAssets();
         Debug.Log($"{LogPrefix} Rebuilt {ControllerPath}", controller);
@@ -70,8 +69,8 @@ public static class ClerkLocomotionBuilder
         controller.AddParameter(NpcAnimatorParams.TurnRate, AnimatorControllerParameterType.Float);
         controller.AddParameter(ResidentAnimatorParams.Phase, AnimatorControllerParameterType.Int);
         controller.AddParameter(ResidentAnimatorParams.Scared, AnimatorControllerParameterType.Bool);
-        controller.AddParameter(ResidentAnimatorParams.Deliberating, AnimatorControllerParameterType.Bool);
-        controller.AddParameter(ResidentAnimatorParams.Calling, AnimatorControllerParameterType.Bool);
+        controller.AddParameter(NpcAnimatorParams.Deliberating, AnimatorControllerParameterType.Bool);
+        controller.AddParameter(NpcAnimatorParams.Calling, AnimatorControllerParameterType.Bool);
     }
 
     private static void BuildBaseLayer(AnimatorController controller, AnimationClip sleep, AnimationClip stir,
@@ -99,11 +98,13 @@ public static class ClerkLocomotionBuilder
 
         // The snack run
         AfterClip(rising, standing, 0.3f);
-        Transition(standing, snacking, 0.4f,
+        AnimatorBuildUtility.AddTransition(standing, snacking, 0.4f,
             (AnimatorConditionMode.Equals, (int)ResidentPhase.Snacking, ResidentAnimatorParams.Phase),
             (AnimatorConditionMode.IfNot, 0, ResidentAnimatorParams.Scared));
-        Transition(snacking, standing, 0.4f, (AnimatorConditionMode.NotEqual, (int)ResidentPhase.Snacking, ResidentAnimatorParams.Phase));
-        Transition(snacking, standing, 0.3f, (AnimatorConditionMode.If, 0, ResidentAnimatorParams.Scared));
+        AnimatorBuildUtility.AddTransition(snacking, standing, 0.4f,
+            (AnimatorConditionMode.NotEqual, (int)ResidentPhase.Snacking, ResidentAnimatorParams.Phase));
+        AnimatorBuildUtility.AddTransition(snacking, standing, 0.3f,
+            (AnimatorConditionMode.If, 0, ResidentAnimatorParams.Scared));
         OnPhase(standing, sittingDown, ResidentPhase.Awake, 0.3f);      // back at the armchair
         AfterClip(sittingDown, sitting, 0.4f);
     }
@@ -117,73 +118,14 @@ public static class ClerkLocomotionBuilder
         return tree;
     }
 
-    // Head and arms only, so the phone clips sit on top of whatever the legs and spine are doing. Weight 0
-    // until ResidentAnimation fades it in: on a Humanoid, a layer at full weight with no clip playing still
-    // writes the neutral muscle pose for every masked part (arms raised, head stiff)
-    private static void BuildPhoneLayer(AnimatorController controller, AnimationClip reach, AnimationClip call)
-    {
-        AnimatorStateMachine machine = new AnimatorStateMachine { name = "Phone", hideFlags = HideFlags.HideInHierarchy };
-        AssetDatabase.AddObjectToAsset(machine, controller);
-        controller.AddLayer(new AnimatorControllerLayer
-        {
-            name = "Phone",
-            stateMachine = machine,
-            avatarMask = UpperBodyMask(),
-            blendingMode = AnimatorLayerBlendingMode.Override,
-            defaultWeight = 0f,
-        });
-
-        // Where the layer rests while its weight is 0
-        AnimatorState none = AnimatorBuildUtility.AddState(machine, "None", null);
-        AnimatorState reaching = AnimatorBuildUtility.AddState(machine, "PhoneReach", reach);
-        AnimatorState calling = AnimatorBuildUtility.AddState(machine, "PhoneCall", call);
-        machine.defaultState = none;
-
-        Transition(none, reaching, 0.35f, (AnimatorConditionMode.If, 0, ResidentAnimatorParams.Deliberating));
-        Transition(none, calling, 0.35f, (AnimatorConditionMode.If, 0, ResidentAnimatorParams.Calling));
-        Transition(reaching, calling, 0.4f, (AnimatorConditionMode.If, 0, ResidentAnimatorParams.Calling));
-        Transition(reaching, none, 0.4f,
-            (AnimatorConditionMode.IfNot, 0, ResidentAnimatorParams.Deliberating),
-            (AnimatorConditionMode.IfNot, 0, ResidentAnimatorParams.Calling));
-    }
-
-    // Updated in place, like the controller, so its GUID survives a rebuild
-    private static AvatarMask UpperBodyMask()
-    {
-        AvatarMask mask = AssetDatabase.LoadAssetAtPath<AvatarMask>(MaskPath);
-        if (mask == null)
-        {
-            mask = new AvatarMask();
-            AssetDatabase.CreateAsset(mask, MaskPath);
-        }
-
-        for (int i = 0; i < (int)AvatarMaskBodyPart.LastBodyPart; i++)
-            mask.SetHumanoidBodyPartActive((AvatarMaskBodyPart)i, false);
-        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.Head, true);
-        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftArm, true);
-        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightArm, true);
-        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftFingers, true);
-        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightFingers, true);
-        EditorUtility.SetDirty(mask);
-        return mask;
-    }
-
     private static void OnPhase(AnimatorState from, AnimatorState to, ResidentPhase phase, float duration) =>
-        Transition(from, to, duration, (AnimatorConditionMode.Equals, (int)phase, ResidentAnimatorParams.Phase));
+        AnimatorBuildUtility.AddTransition(from, to, duration,
+            (AnimatorConditionMode.Equals, (int)phase, ResidentAnimatorParams.Phase));
 
     // Plays a one-shot nearly to its end, then blends on
     private static void AfterClip(AnimatorState from, AnimatorState to, float duration)
     {
         AnimatorStateTransition transition = from.AddTransition(to);
         AnimatorBuildUtility.Configure(transition, duration, hasExitTime: true, exitTime: 0.92f);
-    }
-
-    private static void Transition(AnimatorState from, AnimatorState to, float duration,
-        params (AnimatorConditionMode mode, float threshold, string parameter)[] conditions)
-    {
-        AnimatorStateTransition transition = from.AddTransition(to);
-        foreach (var (mode, threshold, parameter) in conditions)
-            transition.AddCondition(mode, threshold, parameter);
-        AnimatorBuildUtility.Configure(transition, duration, hasExitTime: false);
     }
 }

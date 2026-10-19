@@ -20,10 +20,15 @@ public class CivilianSpot : MonoBehaviour
     [SerializeField, Tooltip("Minimum and maximum seconds a civilian stays, picked at random each visit")]
     private Vector2 dwellSeconds = new Vector2(4f, 10f);
 
+    [SerializeField, Tooltip("Which dwell clip a civilian plays here")]
+    private CivilianStation station = CivilianStation.Shelf;
+
     public CivilianRole Role => role;
     public CivilianBehaviour ClaimedBy { get; private set; }
 
     public float RandomDwell() => Random.Range(dwellSeconds.x, dwellSeconds.y);
+
+    public CivilianStation Station => station;
 
     public bool TryClaim(CivilianBehaviour civilian)
     {

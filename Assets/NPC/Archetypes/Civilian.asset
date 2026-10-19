@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Civilian
   m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
   viewDistance: 10
-  fovDegrees: 120
+  fovDegrees: 95
   eyeHeight: 1.65
   distanceFalloff:
     serializedVersion: 2
@@ -87,18 +87,18 @@ MonoBehaviour:
   anomalyWeights:
     openDoor: 0
   conductWeights:
-    sprinting: 0.1
-    inStaffArea: 0.1
+    sprinting: 0.25
+    inStaffArea: 0.4
     lockpicking: 1
     stealing: 1
-  riseRate: 0.3
+  riseRate: 0.4
   decayRate: 0.2
   decayDelay: 1
   curiousAt: 0.25
   investigatingAt: 0.55
   alertedAt: 0.9
   hysteresis: 0.05
-  observerSkill: 0.6
+  observerSkill: 0.35
   featureVisibility:
     head: 1
     chest: 1

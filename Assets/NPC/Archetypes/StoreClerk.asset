@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c1f479f0caeb42399171ea0310394d8, type: 3}
-  m_Name: TiredClerk
+  m_Name: StoreClerk
   m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
-  viewDistance: 8
-  fovDegrees: 80
-  eyeHeight: 1.6
+  viewDistance: 12
+  fovDegrees: 100
+  eyeHeight: 1.65
   distanceFalloff:
     serializedVersion: 2
     m_Curve:
@@ -27,15 +27,6 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0
-    - serializedVersion: 3
-      time: 0.3
-      value: 0.6
-      inSlope: -1.4996208
-      outSlope: -1.4996208
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
       value: 0
@@ -61,17 +52,17 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0
     - serializedVersion: 3
-      time: 0.4
-      value: 0.4
-      inSlope: -1.4999933
-      outSlope: -1.4999933
+      time: 0.5
+      value: 0.6
+      inSlope: -1.4999934
+      outSlope: -1.4999934
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
       time: 1
-      value: 0
+      value: 0.1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -81,36 +72,36 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  crouchVisibilityFactor: 0.4
-  darkVisibilityFactor: 0.2
+  crouchVisibilityFactor: 0.5
+  darkVisibilityFactor: 0.25
   regionWeights:
     head: 1
-    upperBody: 0.5
-    hands: 0
-    lowerBody: 0
+    upperBody: 0.8
+    hands: 0.3
+    lowerBody: 0.2
     feet: 0
-  tickRate: 4
-  hearingSensitivity: 0.6
-  hearingSuspicion: 0.4
-  anomalySuspicion: 0.4
+  tickRate: 5
+  hearingSensitivity: 1.5
+  hearingSuspicion: 0.5
+  anomalySuspicion: 0.3
   anomalyWeights:
-    openDoor: 0
+    openDoor: 0.6
   conductWeights:
-    sprinting: 0.1
-    inStaffArea: 0.25
+    sprinting: 0.3
+    inStaffArea: 0.5
     lockpicking: 1
     stealing: 1
-  riseRate: 0.2
-  decayRate: 0.3
-  decayDelay: 0.5
-  curiousAt: 0.3
-  investigatingAt: 0.6
+  riseRate: 0.35
+  decayRate: 0.2
+  decayDelay: 1
+  curiousAt: 0.25
+  investigatingAt: 0.55
   alertedAt: 0.9
   hysteresis: 0.05
-  observerSkill: 0.4
+  observerSkill: 0.5
   featureVisibility:
     head: 1
-    chest: 0.8
-    legs: 0.4
-    feet: 0.2
-  memoryHalfLife: 90
+    chest: 1
+    legs: 0.7
+    feet: 0.4
+  memoryHalfLife: 120

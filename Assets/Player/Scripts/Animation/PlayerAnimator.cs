@@ -4,6 +4,9 @@ using UnityEngine;
 // The character faces the cursor while moving camera-relative, so MoveX/MoveY are in local
 // space: that is what lets the strafe clips play instead of always walking forward.
 //
+// After the player has stood still for a while it also fires an idle break: a random variant of the
+// stance's idle, picked here and played by the controller.
+//
 // The Animator lives on the character rig, which is a child of this object, so this script
 // must not require one here. Foot IK lives in PlayerFootIk for the same reason: Unity sends
 // OnAnimatorIK only to components sharing the Animator's GameObject.
@@ -20,6 +23,11 @@ public class PlayerAnimator : MonoBehaviour
     // Below this planar speed the character counts as standing still.
     private const float MoveThreshold = 0.1f;
 
+    // How many variants each stance's idle break holds. Must match the clips PlayerLocomotionBuilder
+    // puts in its two idle break states.
+    private const int StandingIdleVariants = 2;
+    private const int CrouchingIdleVariants = 2;
+
     private static readonly int MoveXId = Animator.StringToHash("MoveX");
     private static readonly int MoveYId = Animator.StringToHash("MoveY");
     private static readonly int SpeedId = Animator.StringToHash("Speed");
@@ -27,19 +35,22 @@ public class PlayerAnimator : MonoBehaviour
     private static readonly int GroundedId = Animator.StringToHash("Grounded");
     private static readonly int TurnId = Animator.StringToHash("Turn");
     private static readonly int JumpId = Animator.StringToHash("Jump");
-
-    // Override layers holding the arm poses, one per stance. PlayerLocomotionBuilder names them.
-    private const string StandingArmsLayer = "Standing Arms";
-    private const string CrouchArmsLayer = "Crouch Arms";
+    private static readonly int IdleBreakId = Animator.StringToHash("IdleBreak");
+    private static readonly int IdleVariantId = Animator.StringToHash("IdleVariant");
 
     [Header("Damping")]
     [Tooltip("Seconds for the direction parameters to catch up. Smooths diagonal changes.")]
     [SerializeField] private float _directionDamping = 0.1f;
     [Tooltip("Seconds for the speed parameter to catch up.")]
     [SerializeField] private float _speedDamping = 0.1f;
-    [Tooltip("Seconds for the arm overrides to swap stance. Too fast and the arms snap pose as the " +
-             "character drops into the crouch.")]
-    [SerializeField] private float _armsDamping = 0.2f;
+
+    [Header("Idle breaks")]
+    [Tooltip("Fewest seconds of standing still before a random idle plays. Keep it above the longest " +
+             "idle clip (6.4 s), or one break would start before the last has ended.")]
+    [SerializeField, Min(7.0f)] private float _idleBreakMin = 8.0f;
+    [Tooltip("Most seconds of standing still before a random idle plays. The same wait repeats while " +
+             "the player stays still, so the breaks keep coming at random intervals.")]
+    [SerializeField, Min(7.0f)] private float _idleBreakMax = 16.0f;
 
     private Animator _animator;
     private PlayerMotor _motor;
@@ -49,12 +60,12 @@ public class PlayerAnimator : MonoBehaviour
     // Kept so the blend tree holds its last direction while idle instead of snapping to centre.
     private Vector2 _direction = Vector2.up;
 
-    // -1 when the controller has no such layer, which is the case for the crouch one if the crouch
-    // clips are missing and the builder skipped it.
-    private int _standingArmsLayer = -1;
-    private int _crouchArmsLayer = -1;
-    private float _crouchArmsWeight;
-    private float _crouchArmsVelocity;
+    // The wait runs only while the player is still. Leaving it clears the trigger, so a break that
+    // was fired but never started cannot play later, in the middle of something else.
+    private bool _waiting;
+    private float _nextBreakAt;
+    private int _lastStandingVariant;
+    private int _lastCrouchingVariant;
 
     private void Awake()
     {
@@ -77,9 +88,6 @@ public class PlayerAnimator : MonoBehaviour
             enabled = false;
             return;
         }
-
-        _standingArmsLayer = _animator.GetLayerIndex(StandingArmsLayer);
-        _crouchArmsLayer = _animator.GetLayerIndex(CrouchArmsLayer);
 
         // PlayerMotor owns movement via the CharacterController. Leaving root motion on lets the
         // clips displace the rig as well, so the mesh drifts out of the capsule.
@@ -116,25 +124,53 @@ public class PlayerAnimator : MonoBehaviour
         // Set after Speed, so the standing/running choice is made against this frame's value.
         if (_motor.ConsumeJump()) _animator.SetTrigger(JumpId);
 
-        UpdateArms();
+        UpdateIdleBreak(speed);
     }
 
-    // The strafe clips hold a torch, so masked layers replay the forward clips' arms over them,
-    // one layer per stance. The crossfade is a fade rather than a switch: swapping weight in one
-    // frame makes the arms jump pose as the character drops into the crouch.
-    private void UpdateArms()
+    // Still means not moving, not turning and on the ground. A suspended player (lockpicking) is busy,
+    // not idle, so it never counts.
+    private void UpdateIdleBreak(float speed)
     {
-        float target = _stance.Current == Stance.Crouching ? 1.0f : 0.0f;
-        _crouchArmsWeight = Mathf.SmoothDamp(_crouchArmsWeight, target, ref _crouchArmsVelocity,
-            _armsDamping);
+        bool still = speed <= MoveThreshold && _motor.IsGrounded && !_motor.IsMovementSuspended
+                     && _aim.TurnDirection == 0;
 
-        if (_crouchArmsLayer >= 0) _animator.SetLayerWeight(_crouchArmsLayer, _crouchArmsWeight);
+        if (!still)
+        {
+            if (_waiting)
+            {
+                _waiting = false;
+                _animator.ResetTrigger(IdleBreakId);
+            }
+            return;
+        }
 
-        // Complementary, so the arms are never driven from both stances at once. Without a crouch
-        // layer to hand over to, the standing one stays on and keeps the torch pose off the arms.
-        if (_standingArmsLayer >= 0)
-            _animator.SetLayerWeight(_standingArmsLayer,
-                _crouchArmsLayer >= 0 ? 1.0f - _crouchArmsWeight : 1.0f);
+        if (!_waiting)
+        {
+            _waiting = true;
+            _nextBreakAt = Time.time + Random.Range(_idleBreakMin, _idleBreakMax);
+            return;
+        }
+
+        if (Time.time < _nextBreakAt) return;
+
+        _nextBreakAt = Time.time + Random.Range(_idleBreakMin, _idleBreakMax);
+        _animator.SetFloat(IdleVariantId, PickVariant());
+        _animator.SetTrigger(IdleBreakId);
+    }
+
+    // A whole number from 1 to the stance's variant count, never the one played last time in that stance
+    private int PickVariant()
+    {
+        bool crouching = _stance.Current == Stance.Crouching;
+        int count = crouching ? CrouchingIdleVariants : StandingIdleVariants;
+        int last = crouching ? _lastCrouchingVariant : _lastStandingVariant;
+
+        int variant = Random.Range(1, count + 1);
+        if (variant == last && count > 1) variant = variant % count + 1;
+
+        if (crouching) _lastCrouchingVariant = variant;
+        else _lastStandingVariant = variant;
+        return variant;
     }
 
     // Maps metres per second onto the blend tree's thresholds, so retuning the motor's

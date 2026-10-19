@@ -10,6 +10,7 @@ using UnityEngine;
 public static class AnimatorBuildUtility
 {
     private const string LogPrefix = "[AnimatorBuild]";
+    private const string UpperBodyMaskPath = "Assets/NPC/Animators/ClerkUpperBody.mask";
 
     // Below this, a measured speed is treated as "no root motion" rather than a very slow clip
     private const float MinMeasurableSpeed = 0.05f;
@@ -138,6 +139,71 @@ public static class AnimatorBuildUtility
 
         AnimatorStateTransition exit = state.AddTransition(home);
         Configure(exit, exitDuration, hasExitTime: true, exitTime);
+    }
+
+    // A transition taken as soon as every condition holds, with no exit time
+    public static void AddTransition(AnimatorState from, AnimatorState to, float duration,
+        params (AnimatorConditionMode mode, float threshold, string parameter)[] conditions)
+    {
+        AnimatorStateTransition transition = from.AddTransition(to);
+        foreach (var (mode, threshold, parameter) in conditions)
+            transition.AddCondition(mode, threshold, parameter);
+        Configure(transition, duration, hasExitTime: false);
+    }
+
+    // The upper-body Phone layer every NPC with a decision window shares: the phone out while
+    // deliberating, at the ear while calling (NpcAnimatorParams.Deliberating and Calling, which the
+    // builder must add). Head and arms only, so the phone clips sit on top of whatever the legs and spine
+    // are doing, seated or standing. Weight 0 until the role's animation component fades it in: on a
+    // Humanoid, a layer at full weight with no clip playing still writes the neutral muscle pose for
+    // every masked part (arms raised, head stiff)
+    public static void AddPhoneLayer(AnimatorController controller, AnimationClip reach, AnimationClip call)
+    {
+        AnimatorStateMachine machine = new AnimatorStateMachine { name = "Phone", hideFlags = HideFlags.HideInHierarchy };
+        AssetDatabase.AddObjectToAsset(machine, controller);
+        controller.AddLayer(new AnimatorControllerLayer
+        {
+            name = "Phone",
+            stateMachine = machine,
+            avatarMask = UpperBodyMask(),
+            blendingMode = AnimatorLayerBlendingMode.Override,
+            defaultWeight = 0f,
+        });
+
+        // Where the layer rests while its weight is 0
+        AnimatorState none = AddState(machine, "None", null);
+        AnimatorState reaching = AddState(machine, "PhoneReach", reach);
+        AnimatorState calling = AddState(machine, "PhoneCall", call);
+        machine.defaultState = none;
+
+        AddTransition(none, reaching, 0.35f, (AnimatorConditionMode.If, 0, NpcAnimatorParams.Deliberating));
+        AddTransition(none, calling, 0.35f, (AnimatorConditionMode.If, 0, NpcAnimatorParams.Calling));
+        AddTransition(reaching, calling, 0.4f, (AnimatorConditionMode.If, 0, NpcAnimatorParams.Calling));
+        AddTransition(reaching, none, 0.4f,
+            (AnimatorConditionMode.IfNot, 0, NpcAnimatorParams.Deliberating),
+            (AnimatorConditionMode.IfNot, 0, NpcAnimatorParams.Calling));
+    }
+
+    // Updated in place, like the controllers, so its GUID survives a rebuild. One mask for every NPC; the
+    // file keeps the clerk's name, its first user
+    private static AvatarMask UpperBodyMask()
+    {
+        AvatarMask mask = AssetDatabase.LoadAssetAtPath<AvatarMask>(UpperBodyMaskPath);
+        if (mask == null)
+        {
+            mask = new AvatarMask();
+            AssetDatabase.CreateAsset(mask, UpperBodyMaskPath);
+        }
+
+        for (int i = 0; i < (int)AvatarMaskBodyPart.LastBodyPart; i++)
+            mask.SetHumanoidBodyPartActive((AvatarMaskBodyPart)i, false);
+        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.Head, true);
+        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftArm, true);
+        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightArm, true);
+        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.LeftFingers, true);
+        mask.SetHumanoidBodyPartActive(AvatarMaskBodyPart.RightFingers, true);
+        EditorUtility.SetDirty(mask);
+        return mask;
     }
 
     // Shared setup for every code-built transition. Fixed duration means seconds, not a fraction of the

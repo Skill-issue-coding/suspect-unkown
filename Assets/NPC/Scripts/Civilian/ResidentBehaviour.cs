@@ -5,9 +5,10 @@ using UnityEngine.AI;
 // (the tell: the view eases open), stays awake a moment, then dozes again. Anything above Idle wakes them
 // at once: full view, looking toward the stimulus for a while, and every later doze is shorter. Sets the
 // view scale on NpcPerception, so the cone and perception change together. Asks NpcFacing for a
-// facing; never turns itself
+// facing; never turns itself. The decision window lives in NpcDecisionWindow.
 [RequireComponent(typeof(NpcPerception), typeof(NpcSuspicion))]
 [RequireComponent(typeof(NpcFacing), typeof(NavMeshAgent))]
+[RequireComponent(typeof(NpcDecisionWindow))]
 public class ResidentBehaviour : MonoBehaviour
 {
     [Header("Rythm")]
@@ -53,19 +54,13 @@ public class ResidentBehaviour : MonoBehaviour
     [SerializeField, Tooltip("Walking speed, metres per second")]
     private float walkSpeed = 1.2f;
 
-    [Header("Decision window")]
-    [SerializeField, Min(0.1f), Tooltip("Seconds of seeing the player to fill the window and start calling")]
-    private float windowSeconds = 2.5f;
-
-    [SerializeField, Min(0f), Tooltip("Seconds from starting the call until it connects and the job fails")]
-    private float callSeconds = 1.5f;
-
     [Header("Debug")]
     [SerializeField, Tooltip("Label the phase and its timer above the clerk in the Scene view")]
     private bool debug = true;
 
     private NpcPerception perception;
     private NpcSuspicion suspicion;
+    private NpcDecisionWindow window;
     private NpcFacing facing;
     private NavMeshAgent agent;
 
@@ -78,17 +73,12 @@ public class ResidentBehaviour : MonoBehaviour
     private float dozeFactor = 1f;
     private bool scared;
     private float seatYaw;
-    private bool deliberating;
-    private float callConnects = -1f;
 
     public ResidentPhase Phase { get; private set; }
-    public float WindowProgress { get; private set; }
-    public bool IsCalling => callConnects >= 0f;
     public bool IsScared => scared;
-    public bool IsDeliberating => deliberating;
     public CivilianActivity Activity =>
-            IsCalling ? CivilianActivity.Calling :
-            deliberating ? CivilianActivity.Deliberating :
+            window.IsCalling ? CivilianActivity.Calling :
+            window.IsDeliberating ? CivilianActivity.Deliberating :
             Phase switch
             {
                 ResidentPhase.Dozing => CivilianActivity.Dozing,
@@ -101,6 +91,7 @@ public class ResidentBehaviour : MonoBehaviour
 
     private void Awake()
     {
+        window = GetComponent<NpcDecisionWindow>();
         perception = GetComponent<NpcPerception>();
         suspicion = GetComponent<NpcSuspicion>();
         facing = GetComponent<NpcFacing>();
@@ -126,14 +117,11 @@ public class ResidentBehaviour : MonoBehaviour
             return;
         }
 
-        if (IsCalling)
+        if (window.IsCalling)
         {
             Face();
-            if (Time.time >= callConnects) JobOutcome.Fail(FailReason.PoliceCalled);
             return;
         }
-
-        if (deliberating) Deliberate();
 
         if (suspicion.State > NpcAlertState.Idle) Scare();
         else if (scared && Time.time >= scaredUntil) CalmDown();
@@ -144,10 +132,6 @@ public class ResidentBehaviour : MonoBehaviour
         Face();
         EaseView();
     }
-
-    private void OnEnable() => suspicion.AlertStateChanged += OnAlertStateChanged;
-
-    private void OnDisable() => suspicion.AlertStateChanged -= OnAlertStateChanged;
 
     private void Advance()
     {
@@ -200,24 +184,6 @@ public class ResidentBehaviour : MonoBehaviour
         phaseEnd = Time.time + Mathf.Max(shortestDoze, length);
     }
 
-    // Fills while the player is in sight, drains while not. Full: the call starts. Empty, with the player
-    // out of sight: they lost them, and the scare carries on as usual
-    private void Deliberate()
-    {
-        bool seesPlayer = perception.TryGetLatest(out _);
-        WindowProgress = Mathf.MoveTowards(WindowProgress, seesPlayer ? 1f : 0f, Time.deltaTime / windowSeconds);
-
-        if (WindowProgress >= 1f)
-        {
-            deliberating = false;
-            callConnects = Time.time + callSeconds;
-        }
-        else if (WindowProgress <= 0f && !seesPlayer)
-        {
-            deliberating = false;
-        }
-    }
-
     // The phase sets a target; openness eases toward it at one full opening per stirSeconds, and the
     // perception scale follows. Bails while it is already there, which is most frames
     private void EaseView()
@@ -264,22 +230,14 @@ public class ResidentBehaviour : MonoBehaviour
         agent.isStopped = false;
     }
 
-    // The window opens on reaching Alerted, once; it does not reopen until suspicion drops and climbs again
-    private void OnAlertStateChanged(NpcAlertState from, NpcAlertState to)
-    {
-        if (to != NpcAlertState.Alerted || deliberating || IsCalling) return;
-        deliberating = true;
-        WindowProgress = 0f;
-    }
-
     private void OnDrawGizmos()
     {
         if (!debug || !Application.isPlaying) return;
 #if UNITY_EDITOR
         string label = $"{Phase}  {Mathf.Max(0f, phaseEnd - Time.time):F1}s  view {openness:P0}";
         if (scared) label += "  (scared)";
-        if (IsCalling) label += "  CALLING";
-        else if (deliberating) label += $"  window {WindowProgress:P0}";
+        if (window.IsCalling) label += "  CALLING";
+        else if (window.IsDeliberating) label += $"  window {window.Progress:P0}";
         UnityEditor.Handles.Label(transform.position + Vector3.up * 2.2f, label);
 #endif
     }
