@@ -1294,6 +1294,7 @@ GameObject:
   - component: {fileID: 8765663326230433307}
   - component: {fileID: 8514781745732433137}
   - component: {fileID: 4074924595445057992}
+  - component: {fileID: 3025382400330967118}
   m_Layer: 0
   m_Name: SM_Veh_Car_Van_Door_r
   m_TagString: Untagged
@@ -1374,6 +1375,28 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &3025382400330967118
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7690460466080575638}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300016, guid: 97982d8a36ff16f4a88f291ef2443e49, type: 3}
 --- !u!1 &7729236708502180240
 GameObject:
   m_ObjectHideFlags: 0
@@ -1587,6 +1610,7 @@ GameObject:
   - component: {fileID: 3318146947560286279}
   - component: {fileID: 7188339723878929541}
   - component: {fileID: 8902353835128106499}
+  - component: {fileID: 8137881406081686667}
   m_Layer: 0
   m_Name: SM_Veh_Car_Van_Door_l
   m_TagString: Untagged
@@ -1667,3 +1691,25 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &8137881406081686667
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8188526479059771704}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300012, guid: 97982d8a36ff16f4a88f291ef2443e49, type: 3}

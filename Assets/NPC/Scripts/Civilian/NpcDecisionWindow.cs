@@ -34,6 +34,9 @@ public class NpcDecisionWindow : MonoBehaviour
     // since this component owns the police timer
     public event Action<CivilianActivity> Decided;
 
+    // The call is under way: from now until the job fails. Read by NpcAlertReporter for the ALARM tag
+    public event Action CallStarted;
+
     // For the readout: what the tree was given, the leaf it reached and the outcome's share of that leaf,
     // kept after the window closes so the last decision stays visible. Leaf is null without a tree
     public ReactionContext Context { get; private set; }
@@ -87,7 +90,11 @@ public class NpcDecisionWindow : MonoBehaviour
         if (Progress >= 1f)
         {
             IsDeliberating = false;
-            if (PendingOutcome == CivilianActivity.Calling) callConnects = Time.time + callSeconds;
+            if (PendingOutcome == CivilianActivity.Calling)
+            {
+                callConnects = Time.time + callSeconds;
+                CallStarted?.Invoke();
+            }
             else Decided?.Invoke(PendingOutcome);
         }
         else if (Progress <= 0f && !seesPlayer)

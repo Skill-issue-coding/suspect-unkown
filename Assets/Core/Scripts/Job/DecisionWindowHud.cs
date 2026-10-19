@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-// A ring beside the HUD's status text that shows the fullest decision window any NPC has open: how close
-// someone is to calling the police. Fills while they can see the player, drains while not, and turns red
-// and pulses once a call is under way. Hidden while no window is open. Reads JobAlert, so it works with
-// the NPC off screen. On JobHud.prefab's root
+// A ring beside the HUD's status text that shows the fullest decision window leaning toward a call: how
+// close someone is to calling the police. Fills while they can see the player, drains while not, and turns
+// red and pulses once a call is under way. Hidden while no such window is open. Reads JobAlert, so it works
+// with the NPC off screen. On JobHud.prefab's root
 public class DecisionWindowHud : MonoBehaviour
 {
     [SerializeField, Tooltip("Radial filled image: the window's progress")]
@@ -13,7 +13,7 @@ public class DecisionWindowHud : MonoBehaviour
     [SerializeField, Tooltip("Faint full ring behind it, so the empty part reads as a track")]
     private Image track;
 
-    [SerializeField, Tooltip("Ring color while someone is deciding")]
+    [SerializeField, Tooltip("Ring color while someone is deciding whether to call")]
     private Color decidingColor = new Color(1f, 0.5f, 0.2f, 1f);
 
     [SerializeField, Tooltip("Ring color once a call is under way")]

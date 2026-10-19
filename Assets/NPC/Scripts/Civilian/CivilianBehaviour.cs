@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -15,7 +16,7 @@ using UnityEditor;
 [RequireComponent(typeof(NavMeshAgent), typeof(NpcSuspicion))]
 [RequireComponent(typeof(NpcFacing), typeof(NpcDecisionWindow))]
 [RequireComponent(typeof(NpcPerception))]
-public class CivilianBehaviour : MonoBehaviour
+public class CivilianBehaviour : MonoBehaviour, ICivilianActivity
 {
     [Header("Role")]
     [SerializeField, Tooltip("Customer browses; Employee and Manager work. Also decides which spots it uses")]
@@ -57,6 +58,10 @@ public class CivilianBehaviour : MonoBehaviour
     // Raised when AssignRole changes the role, so what depends on it (the outfit) can follow
     public event System.Action<CivilianRole, CivilianRole> RoleChanged;
 
+    // From and to, once per change, including the ones the window makes (Deliberating, Calling). Read by
+    // the suspicion indicator's icon and the HUD's reaction reporter
+    public event System.Action<CivilianActivity, CivilianActivity> ActivityChanged;
+
     private readonly List<CivilianSpot> candidates = new();
 
     private NavMeshAgent agent;
@@ -72,6 +77,7 @@ public class CivilianBehaviour : MonoBehaviour
     private float nextChooseTime;
     private float calmTime;
     private CivilianActivity activity;
+    private CivilianActivity reported;
 
     private void Awake()
     {
@@ -83,6 +89,7 @@ public class CivilianBehaviour : MonoBehaviour
 
         agent.speed = walkSpeed;
         activity = ActivityFor(role);
+        reported = activity;
     }
 
     private static CivilianActivity ActivityFor(CivilianRole role) =>
@@ -97,6 +104,7 @@ public class CivilianBehaviour : MonoBehaviour
         CivilianRole previous = role;
         role = newRole;
         activity = ActivityFor(role);
+        reported = activity;
         ReleaseSpot();
         RoleChanged?.Invoke(previous, role);
     }
@@ -165,6 +173,18 @@ public class CivilianBehaviour : MonoBehaviour
             ReleaseSpot();
             ChooseSpot();
         }
+    }
+
+    // After every Update, so a change the window made this frame is seen this frame, whichever component
+    // Unity updated first
+    private void LateUpdate()
+    {
+        CivilianActivity now = Activity;
+        if (now == reported) return;
+
+        CivilianActivity from = reported;
+        reported = now;
+        ActivityChanged?.Invoke(from, now);
     }
 
     private void CalmDown()

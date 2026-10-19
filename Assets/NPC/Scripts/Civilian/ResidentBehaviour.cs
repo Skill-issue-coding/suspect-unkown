@@ -5,11 +5,12 @@ using UnityEngine.AI;
 // (the tell: the view eases open), stays awake a moment, then dozes again. Anything above Idle wakes them
 // at once: full view, looking toward the stimulus for a while, and every later doze is shorter. Sets the
 // view scale on NpcPerception, so the cone and perception change together. Asks NpcFacing for a
-// facing; never turns itself. The decision window lives in NpcDecisionWindow.
+// facing; never turns itself. The decision window lives in NpcDecisionWindow. Reports its activity like
+// any civilian (ICivilianActivity), so the indicator shows the lean and the call for the resident too.
 [RequireComponent(typeof(NpcPerception), typeof(NpcSuspicion))]
 [RequireComponent(typeof(NpcFacing), typeof(NavMeshAgent))]
 [RequireComponent(typeof(NpcDecisionWindow))]
-public class ResidentBehaviour : MonoBehaviour
+public class ResidentBehaviour : MonoBehaviour, ICivilianActivity
 {
     [Header("Rythm")]
     [SerializeField, Tooltip("Seconds of one doze, min and max")]
@@ -73,6 +74,9 @@ public class ResidentBehaviour : MonoBehaviour
     private float dozeFactor = 1f;
     private bool scared;
     private float seatYaw;
+    private CivilianActivity reported;
+
+    public event System.Action<CivilianActivity, CivilianActivity> ActivityChanged;
 
     public ResidentPhase Phase { get; private set; }
     public bool IsScared => scared;
@@ -107,6 +111,19 @@ public class ResidentBehaviour : MonoBehaviour
         ApplyView();
         runAfter = Random.Range(snackEvery.x, snackEvery.y);
         BeginDoze();
+        reported = Activity;
+    }
+
+    // As CivilianBehaviour: after every Update, so a change the window made this frame is seen this frame.
+    // Activity is worked out from the window and the phase, so there is no single setter to raise it from
+    private void LateUpdate()
+    {
+        CivilianActivity now = Activity;
+        if (now == reported) return;
+
+        CivilianActivity from = reported;
+        reported = now;
+        ActivityChanged?.Invoke(from, now);
     }
 
     private void Update()

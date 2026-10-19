@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SecurityBudget
   tiers:
   - fromCompletedRuns: 0
-    guards: 0
+    guards: 1
     adaptivePois: 0
   - fromCompletedRuns: 1
     guards: 1

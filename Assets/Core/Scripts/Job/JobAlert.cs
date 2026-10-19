@@ -22,6 +22,9 @@ public static class JobAlert
 
     public static event Action<JobAlertLevel, JobAlertLevel> Changed;
 
+    // Once per reaction, for the HUD's toast. No source: the toast does not care who it was
+    public static event Action<JobReaction> Reacted;
+
     public static void Report(object source, JobAlertLevel level)
     {
         reports[source] = level;
@@ -49,10 +52,12 @@ public static class JobAlert
 
     public static bool AnyWindowOpen => windows.Count > 0;
 
-    // progress: 0 to 1 while deciding. calling: the window is full and the call is under way
+    public static void ReportReaction(JobReaction reaction) => Reacted?.Invoke(reaction);
+
+    // progress: 0 to 1, how full the window is (1 once the call is under way). calling: the call is under way
     public static void ReportWindow(object source, float progress, bool calling)
     {
-        windows[source] = calling ? 1f : progress;
+        windows[source] = progress;
         if (calling) callers.Add(source);
         else callers.Remove(source);
     }
@@ -78,6 +83,7 @@ public static class JobAlert
         windows.Clear();
         callers.Clear();
         reports.Clear();
+        Reacted = null;
         Level = JobAlertLevel.Undetected;
         Peak = JobAlertLevel.Undetected;
         Changed = null;
