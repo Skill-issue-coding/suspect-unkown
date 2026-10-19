@@ -1459,7 +1459,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   _directionDamping: 0.1
   _speedDamping: 0.1
-  _armsDamping: 0.2
+  _idleBreakMin: 8
+  _idleBreakMax: 16
 --- !u!114 &7942761872725299111
 MonoBehaviour:
   m_ObjectHideFlags: 0

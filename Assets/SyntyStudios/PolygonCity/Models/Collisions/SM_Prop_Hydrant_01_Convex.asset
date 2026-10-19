@@ -3,8 +3,9 @@
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -17,15 +18,17 @@ MonoBehaviour:
 --- !u!43 &43494689567649082
 Mesh:
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Generated convex submesh 1
-  serializedVersion: 8
+  serializedVersion: 12
   m_SubMeshes:
   - serializedVersion: 2
     firstByte: 0
     indexCount: 84
     topology: 0
+    baseVertex: 0
     firstVertex: 0
     vertexCount: 16
     localAABB:
@@ -39,20 +42,47 @@ Mesh:
   m_BindPose: []
   m_BoneNameHashes: 
   m_RootBoneNameHash: 0
+  m_BonesAABB: []
+  m_VariableBoneCountWeights:
+    m_Data: 
   m_MeshCompression: 0
   m_IsReadable: 1
-  m_KeepVertices: 1
-  m_KeepIndices: 1
-  m_IndexBuffer: 010009000f00040000000500020001000600040005000600080004000900010002000900030007000a00080003000a00020007000b00070003000b00030008000b00080009000b00090002000b00020006000c00060005000c00070002000c00050007000c00000004000d00040008000d000a0000000d0008000a000d00050000000e00070005000e0000000a000e000a0007000e00060001000f00040006000f00090004000f00
-  m_Skin: []
+  m_KeepVertices: 0
+  m_KeepIndices: 0
+  m_IndexFormat: 0
+  m_IndexBuffer: 010009000f00040000000500020001000600040005000600080004000900010002000900030007000a00080003000a00020007000b00070003000b00030008000b00080009000b00090002000b00020006000c00060005000c00070002000c00050007000c00000004000d00040008000d000a0000000d0008000a000d00050000000e00070005000e0000000a000e000a0007000e00060001000f00040006000f00090004000f00y
   m_VertexData:
-    m_CurrentChannels: 1
+    serializedVersion: 3
     m_VertexCount: 16
     m_Channels:
     - stream: 0
       offset: 0
       format: 0
       dimension: 3
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
+    - stream: 0
+      offset: 0
+      format: 0
+      dimension: 0
     - stream: 0
       offset: 0
       format: 0
@@ -138,7 +168,29 @@ Mesh:
   m_LocalAABB:
     m_Center: {x: 0.00026899576, y: 0.50445443, z: -0.002722919}
     m_Extent: {x: 0.26746878, y: 0.5128136, z: 0.27580017}
-  m_MeshUsageFlags: 0
+  m_CookingOptions: 30
+  m_PreBakeConvexCollisionMesh: 1
+  m_PreBakeTriangleCollisionMesh: 0
   m_BakedConvexCollisionMesh: 
   m_BakedTriangleCollisionMesh: 
-  m_MeshOptimized: 0
+  'm_MeshMetrics[0]': 1
+  'm_MeshMetrics[1]': 1
+  m_MeshOptimizationFlags: -1
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
+  m_MeshLodInfo:
+    serializedVersion: 2
+    m_LodSelectionCurve:
+      serializedVersion: 1
+      m_LodSlope: 0
+      m_LodBias: 0
+    m_NumLevels: 1
+    m_SubMeshes:
+    - serializedVersion: 2
+      m_Levels:
+      - serializedVersion: 1
+        m_IndexStart: 0
+        m_IndexCount: 0

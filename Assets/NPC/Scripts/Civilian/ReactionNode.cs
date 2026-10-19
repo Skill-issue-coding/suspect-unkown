@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ReactionNode", menuName = "Scriptable Objects/ReactionNode")]
+[CreateAssetMenu(fileName = "ReactionNode", menuName = "Suspect Unknown/NPC/ReactionNode")]
 public class ReactionNode : ScriptableObject
 {
-    
+
 }

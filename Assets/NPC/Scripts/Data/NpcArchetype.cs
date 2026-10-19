@@ -6,7 +6,7 @@ using UnityEngine;
 // block arrives in M7. Every archetype shares the guard's rise rate, so a conduct weight means the
 // same thing for every observer (decision 22). Shared by every NPC using the asset, so never write
 // runtime state into it, and never branch on which archetype it is.
-[CreateAssetMenu(fileName = "NpcArchetype", menuName = "Suspect Unknown/NPC Archetype")]
+[CreateAssetMenu(fileName = "NpcArchetype", menuName = "Suspect Unknown/NPC/Archetype")]
 public class NpcArchetype : ScriptableObject
 {
     [Header("Vision")]

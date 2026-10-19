@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 // The decision window any civilian shares (concept 6.8, decision 22), extracted from ResidentBehaviour so
@@ -20,6 +21,8 @@ public class NpcDecisionWindow : MonoBehaviour
     private float callConnects = -1f;
 
     public bool IsDeliberating { get; private set; }
+    public CivilianActivity PendingOutcome { get; private set; }
+    public event Action<CivilianActivity> Decided;
     public float Progress { get; private set; }
     public bool IsCalling => callConnects >= 0f;
 

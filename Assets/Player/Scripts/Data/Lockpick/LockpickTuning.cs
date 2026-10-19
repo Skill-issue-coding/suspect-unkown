@@ -6,18 +6,18 @@ public struct LockLevelTuning
 {
     [Tooltip("Half-width of the zone where the lock turns all the way")]
     public float sweetSpot;
-    
+
     [Tooltip("Half-width beyond the sweet spot where it turns partway")]
     public float margin;
-    
+
     [Tooltip("Full turns per second while turning freely")]
     public float turnSpeed;
-    
+
     [Tooltip("How long the lock can bind before the pick slips")]
     public float slipTime;
 }
 
-[CreateAssetMenu(menuName = "Data/Lockpick Tuning")]
+[CreateAssetMenu(menuName = "Suspect Unknown/Interactables/Lockpick Tuning")]
 public class LockpickTuning : ScriptableObject
 {
     public LockLevelTuning[] levels = new LockLevelTuning[3]
@@ -38,7 +38,7 @@ public class LockpickTuning : ScriptableObject
         {
             if (levels[i].sweetSpot > levels[i].margin)
                 Debug.LogWarning($"Lock level {i + 1}: sweetSpot ({levels[i].sweetSpot}) exceeds margin ({levels[i].margin}).");
-            
+
             if (levels[i].sweetSpot <= 0 || levels[i].margin <= 0 || levels[i].turnSpeed <= 0 || levels[i].slipTime <= 0)
                 Debug.LogWarning($"Lock level {i + 1}: Values must be greater than zero.");
         }

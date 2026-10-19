@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Tuning for the glass cutter minigame: how fast it cuts and how forgiving the aim is. Tuning only;
 // the running state lives in GlassCutterModel
-[CreateAssetMenu(menuName = "Data/Glass Cutter Tuning")]
+[CreateAssetMenu(menuName = "Suspect Unknown/Interactables/Glass Cutter Tuning")]
 public class GlassCutterTuning : ScriptableObject
 {
     [SerializeField, Tooltip("Degrees per second the cutter turns while aligned and holding tension")]

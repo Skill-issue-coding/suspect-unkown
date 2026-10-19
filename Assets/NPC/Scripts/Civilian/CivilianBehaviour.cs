@@ -6,9 +6,10 @@ using UnityEditor;
 #endif
 
 // A civilian's own life (decision 22): picks a free CivilianSpot for its role, walks there, stays a
-// random time facing the spot's forward, and picks again. Customers roam, staff work. Until the decision
-// window exists (M6), the only reaction is a placeholder: from Investigating up it stops and looks at
-// the stimulus, and carries on when suspicion drops. Asks NpcFacing for a facing; never turns itself
+// random time facing the spot's forward, and picks again. Customers roam, staff work. The call itself
+// belongs to NpcDecisionWindow; until the reaction tree (C6) picks an outcome, the only reaction here is a
+// placeholder: from Investigating up it stops and looks at the stimulus, and carries on when suspicion
+// drops. Asks NpcFacing for a facing; never turns itself
 [RequireComponent(typeof(NavMeshAgent), typeof(NpcSuspicion))]
 [RequireComponent(typeof(NpcFacing))]
 public class CivilianBehaviour : MonoBehaviour

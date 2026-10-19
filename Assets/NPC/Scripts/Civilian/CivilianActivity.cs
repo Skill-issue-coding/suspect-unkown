@@ -9,8 +9,6 @@ public enum CivilianActivity
     Frozen,
     Calling,
     Fleeing,
-    Filming,
-    Confronting,
     Avoiding,
     PretendingNotToSee,
     Dozing,
