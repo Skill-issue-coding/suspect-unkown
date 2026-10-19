@@ -22560,7 +22560,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1876262237866924067, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
       propertyPath: ambientLevel
-      value: 0.5
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1876262237866924067, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: fullLightIntensity
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1971967266315921835, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
       propertyPath: m_StaticEditorFlags
