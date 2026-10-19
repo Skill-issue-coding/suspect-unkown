@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.Rendering;
 
 // The glass cutter minigame's screen: the 3D cutter and glass, the camera that films them into a
-// RenderTexture, the dotted guide ring, and the background blur. Reads a GlassCutterModel and decides
-// nothing. PlayerGlassCutting calls Begin and End, and asks TryGetAim where the pointer is on the glass
+// RenderTexture, the dotted guide ring, progressive cut groove, and background blur. Reads a GlassCutterModel
+// and decides nothing. PlayerGlassCutting calls Begin and End, and asks TryGetAim where the pointer is on the glass.
 [RequireComponent(typeof(LineRenderer))]
 public class GlassCutterView : MonoBehaviour
 {
@@ -47,18 +47,24 @@ public class GlassCutterView : MonoBehaviour
     [SerializeField, Tooltip("Cone color while holding tension out of alignment")]
     private Color warningColor = new Color(1f, 0.48f, 0.32f, 0.75f);
 
-    [Header("Dotted Circle")]
-    [SerializeField, Tooltip("Number of vertices in the dotted circle LineRenderer")]
-    private int circleSegments = 128;
+    [Header("Dotted Circle & Cut Line")]
+    [SerializeField, Tooltip("Number of dots / segments around the circle")]
+    private int circleSegments = 72;
 
-    [SerializeField, Tooltip("Thickness of the dotted guide line")]
+    [SerializeField, Tooltip("Thickness of the dotted guide line and cut line")]
     private float lineWidth = 0.02f;
 
-    [SerializeField, Tooltip("How many dots repeat around the circle")]
-    private float dotTiling = 30f;
+    [SerializeField, Tooltip("Color and opacity of the dotted guide line")]
+    private Color guideColor = new Color(1f, 1f, 1f, 0.35f);
+
+    [SerializeField, Tooltip("Color and opacity of the solid cut line")]
+    private Color cutColor = new Color(1f, 1f, 1f, 0.95f);
 
     [SerializeField, Tooltip("Slight local Z offset so the dotted line sits cleanly on the glass without z-fighting")]
     private float lineZOffset = -0.005f;
+
+    [SerializeField, Tooltip("Optional separate LineRenderer for the solid cut groove. Auto-created on child 'CutLine' if empty")]
+    private LineRenderer cutLineRenderer;
 
     [Header("Background Blur")]
     [SerializeField, Tooltip("Global Volume with Depth of Field, weight 0. Kept outside this object so it can fade out after the view hides")]
@@ -89,8 +95,14 @@ public class GlassCutterView : MonoBehaviour
     private Material coneMaterial;
     private Color coneColor;
     private Tween blurFade;
+    private SpriteRenderer coneSpriteRenderer;
 
-    // Store the initial transforms so we don't ruin the Blender setup
+    // Materials and textures created procedurally for cleanup
+    private Material proceduralDottedMat;
+    private Texture2D proceduralDotTex;
+    private Material proceduralSolidMat;
+
+    // Store the initial transforms
     private Quaternion initialCutterRotation;
     private Quaternion initialConeRotation;
     private Vector3 initialConePosition;
@@ -101,6 +113,10 @@ public class GlassCutterView : MonoBehaviour
     private float strainTimer;
     private bool cutClockwise;
     private bool celebrated;
+
+    // Progressive cut line tracking
+    private float startAngle;
+    private float cutDirectionSign = 1f;
 
     private void Awake()
     {
@@ -125,10 +141,20 @@ public class GlassCutterView : MonoBehaviour
         baseFov = cutterCamera.fieldOfView;
         aimDirection = conePivot.up;
 
-        if (coneRenderer != null) coneMaterial = coneRenderer.material;
+        if (coneRenderer is SpriteRenderer sr)
+            coneSpriteRenderer = sr;
+        else if (coneRenderer != null)
+            coneMaterial = coneRenderer.material;
 
         cutterRadius = Vector3.Distance(cutterMesh.position, cutterTip.position);
         SetupDottedCircle();
+    }
+
+    private void OnDestroy()
+    {
+        if (proceduralDottedMat != null) Destroy(proceduralDottedMat);
+        if (proceduralDotTex != null) Destroy(proceduralDotTex);
+        if (proceduralSolidMat != null) Destroy(proceduralSolidMat);
     }
 
     public void Begin(GlassCutterModel model, bool clockwise)
@@ -148,6 +174,29 @@ public class GlassCutterView : MonoBehaviour
         coneVisual.localPosition = initialConePosition;
         cutterCamera.fieldOfView = baseFov;
 
+        Vector3 localCenter = transform.InverseTransformPoint(cutterMesh.position);
+        Vector3 startTipLocal = transform.InverseTransformPoint(cutterTip.position);
+        Vector3 startDiff = startTipLocal - localCenter;
+        startAngle = Mathf.Atan2(startDiff.y, startDiff.x);
+
+        // Determine angular direction sign (+1 or -1) in 2D circle plane
+        Quaternion testRot = initialCutterRotation * Quaternion.AngleAxis(cutClockwise ? 5f : -5f, cutterRotationAxis);
+        cutterMesh.localRotation = testRot;
+        Vector3 testTipLocal = transform.InverseTransformPoint(cutterTip.position);
+        Vector3 testDiff = testTipLocal - localCenter;
+        float testAngle = Mathf.Atan2(testDiff.y, testDiff.x);
+        float deltaAngle = Mathf.DeltaAngle(startAngle * Mathf.Rad2Deg, testAngle * Mathf.Rad2Deg);
+        cutDirectionSign = deltaAngle >= 0f ? 1f : -1f;
+
+        // Restore initial rotation
+        cutterMesh.localRotation = initialCutterRotation;
+
+        if (cutLineRenderer != null)
+        {
+            cutLineRenderer.positionCount = 0;
+            cutLineRenderer.enabled = false;
+        }
+
         FadeBlur(1f);
         currentModel.Misaligned += OnMisaligned;
     }
@@ -159,6 +208,12 @@ public class GlassCutterView : MonoBehaviour
         FadeBlur(0f);
         currentModel.Misaligned -= OnMisaligned;
         currentModel = null;
+
+        if (cutLineRenderer != null)
+        {
+            cutLineRenderer.positionCount = 0;
+            cutLineRenderer.enabled = false;
+        }
     }
 
     private void OnDisable()
@@ -177,10 +232,13 @@ public class GlassCutterView : MonoBehaviour
             return false;
 
         Rect rect = screenRect.rect;
+        if (!rect.Contains(local))
+            return false;
+
         Vector2 viewport = new Vector2((local.x - rect.x) / rect.width, (local.y - rect.y) / rect.height);
         Ray ray = cutterCamera.ViewportPointToRay(viewport);
 
-        Plane glassPlane = new Plane(transform.forward, cutterMesh.position);
+        Plane glassPlane = new Plane(-transform.forward, cutterMesh.position);
         if (!glassPlane.Raycast(ray, out float enterDistance)) return false;
 
         Vector3 tipToPointer = ray.GetPoint(enterDistance) - cutterTip.position;
@@ -202,7 +260,7 @@ public class GlassCutterView : MonoBehaviour
     {
         if (currentModel == null) return;
 
-        float signedAngle = cutClockwise ? -currentModel.CutAngle : currentModel.CutAngle;
+        float signedAngle = cutClockwise ? currentModel.CutAngle : -currentModel.CutAngle;
         cutterMesh.localRotation = initialCutterRotation * Quaternion.AngleAxis(signedAngle, cutterRotationAxis);
 
         // The cone rides the cutting wheel and points where the pointer is
@@ -228,6 +286,9 @@ public class GlassCutterView : MonoBehaviour
             SetConeColor(currentModel.IsAligned ? alignedColor : idleColor);
         }
 
+        // Progressive cut groove line
+        UpdateCutLine();
+
         // Smooths only what is displayed: the camera eases toward the progress, the model stays exact.
         // Exponential smoothing, so the feel does not depend on frame rate
         float targetFov = baseFov - pushInFov * currentModel.Progress;
@@ -237,9 +298,40 @@ public class GlassCutterView : MonoBehaviour
         if (!celebrated && currentModel.IsComplete)
         {
             celebrated = true;
+            lineRenderer.enabled = false;
             SetConeColor(alignedColor);
             if (cutterRoot != null)
                 Tween.PunchScale(cutterRoot, Vector3.one * completePunch, duration: 0.35f, frequency: 6);
+        }
+    }
+
+    private void UpdateCutLine()
+    {
+        if (cutLineRenderer == null || currentModel == null) return;
+
+        float cutAngleDeg = currentModel.CutAngle;
+        if (cutAngleDeg <= 0.5f)
+        {
+            cutLineRenderer.positionCount = 0;
+            cutLineRenderer.enabled = false;
+            return;
+        }
+
+        cutLineRenderer.enabled = true;
+        int arcPoints = Mathf.Max(2, Mathf.CeilToInt((cutAngleDeg / 360f) * circleSegments) + 1);
+        cutLineRenderer.positionCount = arcPoints;
+
+        float localRadius = cutterRadius / transform.lossyScale.x;
+        Vector3 localCenter = transform.InverseTransformPoint(cutterMesh.position);
+        float totalAngleRad = (cutAngleDeg * Mathf.Deg2Rad) * cutDirectionSign;
+
+        for (int i = 0; i < arcPoints; i++)
+        {
+            float t = (float)i / (arcPoints - 1);
+            float angle = startAngle + totalAngleRad * t;
+            float x = Mathf.Cos(angle) * localRadius;
+            float y = Mathf.Sin(angle) * localRadius;
+            cutLineRenderer.SetPosition(i, localCenter + new Vector3(x, y, lineZOffset - 0.001f));
         }
     }
 
@@ -250,10 +342,13 @@ public class GlassCutterView : MonoBehaviour
 
     private void SetConeColor(Color color)
     {
-        if (coneMaterial == null || color == coneColor) return;
-
+        if (color == coneColor) return;
         coneColor = color;
-        coneMaterial.color = color;
+
+        if (coneSpriteRenderer != null)
+            coneSpriteRenderer.color = color;
+        else if (coneMaterial != null)
+            coneMaterial.color = color;
     }
 
     private void FadeBlur(float to)
@@ -272,28 +367,72 @@ public class GlassCutterView : MonoBehaviour
         lineRenderer.positionCount = circleSegments;
         lineRenderer.startWidth = lineWidth;
         lineRenderer.endWidth = lineWidth;
-        lineRenderer.textureMode = LineTextureMode.Tile;
+        lineRenderer.startColor = guideColor;
+        lineRenderer.endColor = guideColor;
+        lineRenderer.textureMode = LineTextureMode.RepeatPerSegment;
 
         if (lineRenderer.sharedMaterial == null || lineRenderer.sharedMaterial.name == "Default-Line")
         {
-            Texture2D dotTex = new Texture2D(16, 1, TextureFormat.RGBA32, false)
+            proceduralDotTex = new Texture2D(32, 1, TextureFormat.RGBA32, false)
             {
                 wrapMode = TextureWrapMode.Repeat,
-                filterMode = FilterMode.Point
+                filterMode = FilterMode.Bilinear
             };
 
-            for (int x = 0; x < 16; x++)
-                dotTex.SetPixel(x, 0, x < 8 ? Color.white : Color.clear);
-
-            dotTex.Apply();
-
-            Material dottedMat = new Material(Shader.Find("Sprites/Default"))
+            for (int x = 0; x < 32; x++)
             {
-                mainTexture = dotTex,
-                mainTextureScale = new Vector2(dotTiling, 1f)
+                // Soft circular dot in the first ~40% of the segment, transparent in the rest
+                float alpha = (x < 14) ? Mathf.Sin((x / 14f) * Mathf.PI) : 0f;
+                proceduralDotTex.SetPixel(x, 0, new Color(1f, 1f, 1f, alpha));
+            }
+            proceduralDotTex.Apply();
+
+            proceduralDottedMat = new Material(Shader.Find("Sprites/Default"))
+            {
+                name = "GlassCutter_DottedGuide",
+                mainTexture = proceduralDotTex
             };
-            lineRenderer.material = dottedMat;
+            lineRenderer.material = proceduralDottedMat;
         }
+
+        // Setup cutLineRenderer if not assigned in inspector
+        if (cutLineRenderer == null)
+        {
+            Transform existingCut = transform.Find("CutLine");
+            if (existingCut != null)
+            {
+                cutLineRenderer = existingCut.GetComponent<LineRenderer>();
+            }
+            else
+            {
+                GameObject cutObj = new GameObject("CutLine");
+                cutObj.transform.SetParent(transform, false);
+                cutObj.layer = gameObject.layer;
+                cutLineRenderer = cutObj.AddComponent<LineRenderer>();
+            }
+        }
+
+        cutLineRenderer.useWorldSpace = false;
+        cutLineRenderer.loop = false;
+        cutLineRenderer.startWidth = lineWidth * 1.05f;
+        cutLineRenderer.endWidth = lineWidth * 1.05f;
+        cutLineRenderer.startColor = cutColor;
+        cutLineRenderer.endColor = cutColor;
+        cutLineRenderer.textureMode = LineTextureMode.Stretch;
+        cutLineRenderer.sortingOrder = lineRenderer.sortingOrder + 1;
+
+        if (cutLineRenderer.sharedMaterial == null || cutLineRenderer.sharedMaterial.name == "Default-Line")
+        {
+            proceduralSolidMat = new Material(Shader.Find("Sprites/Default"))
+            {
+                name = "GlassCutter_SolidCut",
+                mainTexture = Texture2D.whiteTexture
+            };
+            cutLineRenderer.material = proceduralSolidMat;
+        }
+
+        cutLineRenderer.positionCount = 0;
+        cutLineRenderer.enabled = false;
 
         float localRadius = cutterRadius / transform.lossyScale.x;
         Vector3 localCenter = transform.InverseTransformPoint(cutterMesh.position);

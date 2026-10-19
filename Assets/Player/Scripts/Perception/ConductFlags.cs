@@ -11,4 +11,5 @@ public enum ConductFlags
     InStaffArea = 1 << 1,
     Lockpicking = 1 << 2,
     Stealing = 1 << 3,
+    GlassCutting = 1 << 4,
 }
