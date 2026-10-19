@@ -18,8 +18,9 @@ public static class MenuPaths
     public const string Npc = Root + "NPC/";
     public const string NpcRebuildLocomotion = Npc + "Rebuild Locomotion";
 
-    public const string GuardRebuildLocomotion = Npc + "Guard/" + "Rebuild Locomotion";
+    public const string CivilianRebuildLocomotion = Npc + "Civilian/" + "Rebuild Locomotion";
     public const string ClerkRebuildLocomotion = Npc + "Clerk/" + "Rebuild Locomotion";
+    public const string GuardRebuildLocomotion = Npc + "Guard/" + "Rebuild Locomotion";
 
     public const string Progress = Root + "Progress/";
     public const string ProgressLog = Progress + "Log Save";

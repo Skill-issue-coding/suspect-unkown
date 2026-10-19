@@ -30,7 +30,8 @@ public class PlayerAim : MonoBehaviour
     [Tooltip("The turn ends once the body is this close to the cursor. Keep it well under Twist " +
              "Limit, or a finished turn retriggers itself at the boundary.")]
     [SerializeField] private float _turnExitAngle = 5.0f;
-    [Tooltip("Degrees each turn clip covers. Both standing turn clips are 90.")]
+    [Tooltip("Degrees each turn clip covers, the same for all four. The Player.fbx turn clips carry almost no " +
+             "root rotation of their own, so tune this by eye until the feet stop skating.")]
     [SerializeField] private float _turnClipAngle = 90.0f;
     [Tooltip("Used while the turn state is still blending in, and if the clip length cannot be read.")]
     [SerializeField] private float _fallbackTurnSpeed = 150.0f;
@@ -135,8 +136,8 @@ public class PlayerAim : MonoBehaviour
     }
 
     // The clip sets the pace: its own angle over its own length. Rotating faster than the feet
-    // step is the skating this whole system exists to remove. Crouching has no turn clips, so it
-    // falls through to the fallback speed and turns without stepping.
+    // step is the skating this whole system exists to remove. Standing and crouching both have turn
+    // clips, tagged alike, so both are paced this way.
     private float TurnRate()
     {
         if (_animator == null) return _fallbackTurnSpeed;

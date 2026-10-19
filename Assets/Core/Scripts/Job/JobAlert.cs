@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 // How alarmed the job is right now: the highest level any NPC reports, the highest level it has reached this
 // job (Peak), and the fullest decision window any NPC has open (how close someone is to calling the police).
-// Each NPC reports for itself (NpcAlertReporter, ResidentWindowReporter, NPC side) and withdraws when it goes
+// Each NPC reports for itself (NpcAlertReporter, NpcWindowReporter, NPC side) and withdraws when it goes
 // away; the HUD listens to Changed and reads the window while one is open. Core never knows about NPCs, and
 // one clerk or a store full of guards works the same way. Cleared on play-mode entry; on a scene load the NPCs
 // withdraw as they are destroyed, and Peak is cleared so a restart starts a fresh job

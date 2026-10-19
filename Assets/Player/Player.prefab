@@ -1307,11 +1307,11 @@ GameObject:
   - component: {fileID: 45324365434288496}
   - component: {fileID: -818215352608075208}
   - component: {fileID: -1011108268404151007}
-  - component: {fileID: -9086269151619823552}
   - component: {fileID: 5916406596137029354}
   - component: {fileID: -1327982410260966809}
   - component: {fileID: 7596070796813075446}
   - component: {fileID: 6880438211409201768}
+  - component: {fileID: 944305229406221118}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -1459,7 +1459,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   _directionDamping: 0.1
   _speedDamping: 0.1
-  _armsDamping: 0.2
+  _idleBreakMin: 8
+  _idleBreakMax: 16
 --- !u!114 &7942761872725299111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1676,19 +1677,6 @@ MonoBehaviour:
   tuning: {fileID: 11400000, guid: 9eddadc2fae627343b962ab73e045ce6, type: 2}
   view: {fileID: 0}
   successHold: 0.45
---- !u!114 &-9086269151619823552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1281951801932075715}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 200fdce656a4ed54f957ca266ed9d836, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerDoorInteraction
-  useText: E
 --- !u!114 &5916406596137029354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1740,6 +1728,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f46426571b9c0a46bc1e36854d32dfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
+--- !u!114 &944305229406221118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1e6f619704368949a9131bca0e79861, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerGlassCutting
+  tuning: {fileID: 11400000, guid: 2283f0033beda6343864383734ddc2a3, type: 2}
+  view: {fileID: 0}
+  successHold: 0.45
 --- !u!1 &1386813031399317714
 GameObject:
   m_ObjectHideFlags: 0

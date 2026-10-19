@@ -4,7 +4,9 @@ using UnityEngine;
 // Picks one outfit for the civilian's role at random when it spawns, so a room of the same prefab doesn't
 // look like clones, and staff read as staff at a glance (concept 6.8: role is a tree input, and the
 // uniform makes it visible). Outfits are skinned meshes on one shared skeleton, so switching is only
-// turning objects on and off. Cosmetic only: civilians' clothes feed nothing in the witness model
+// turning objects on and off. Picks again when the civilian's role is assigned after spawning, since a
+// spawner builds every role from one prefab. Cosmetic only: civilians' clothes feed nothing in the
+// witness model
 [RequireComponent(typeof(CivilianBehaviour))]
 public class CivilianRandomOutfit : MonoBehaviour
 {
@@ -18,15 +20,34 @@ public class CivilianRandomOutfit : MonoBehaviour
     [SerializeField, Tooltip("Outfits a manager can wear")]
     private GameObject[] managerOutfits;
 
+    private CivilianBehaviour civilian;
+
     private void Awake()
     {
-        CivilianRole role = GetComponent<CivilianBehaviour>().Role;
+        civilian = GetComponent<CivilianBehaviour>();
+        Pick(civilian.Role);
+    }
+
+    private void OnEnable()
+    {
+        if (civilian != null) civilian.RoleChanged += OnRoleChanged;
+    }
+
+    private void OnDisable()
+    {
+        if (civilian != null) civilian.RoleChanged -= OnRoleChanged;
+    }
+
+    private void OnRoleChanged(CivilianRole from, CivilianRole to) => Pick(to);
+
+    // A role with no outfits only warns: the component stays on, or a later role change could not pick
+    private void Pick(CivilianRole role)
+    {
         GameObject[] pool = OutfitsFor(role);
 
         if (pool == null || pool.Length == 0)
         {
-            Debug.LogWarning($"{name} has no outfits for role {role}; CivilianRandomOutfit disabled.", this);
-            enabled = false;
+            Debug.LogWarning($"{name} has no outfits for role {role}; keeping the current one.", this);
             return;
         }
 

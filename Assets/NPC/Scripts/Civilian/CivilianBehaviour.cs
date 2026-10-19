@@ -1,7 +1,9 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 // A civilian's own life (decision 22): picks a free CivilianSpot for its role, walks there, stays a
 // random time facing the spot's forward, and picks again. Customers roam, staff work. Until the decision
@@ -28,6 +30,15 @@ public class CivilianBehaviour : MonoBehaviour
     public CivilianRole Role => role;
     public CivilianActivity Activity { get; private set; }
 
+    // Standing at the claimed spot, not stopped by a scare: the animation plays the spot's station clip
+    public bool IsDwelling => spot != null && arrived && !stopped;
+
+    // The claimed spot's station, read by the animation only while dwelling
+    public CivilianStation Station => spot != null ? spot.Station : default;
+
+    // Raised when AssignRole changes the role, so what depends on it (the outfit) can follow
+    public event System.Action<CivilianRole, CivilianRole> RoleChanged;
+
     private readonly List<CivilianSpot> candidates = new();
 
     private NavMeshAgent agent;
@@ -47,7 +58,23 @@ public class CivilianBehaviour : MonoBehaviour
         facing = GetComponent<NpcFacing>();
 
         agent.speed = walkSpeed;
-        Activity = role == CivilianRole.Customer ? CivilianActivity.Roaming : CivilianActivity.Working;
+        Activity = ActivityFor(role);
+    }
+
+    private static CivilianActivity ActivityFor(CivilianRole role) =>
+        role == CivilianRole.Customer ? CivilianActivity.Roaming : CivilianActivity.Working;
+
+    // For a spawner that builds every role from one prefab: call it right after Instantiate, before the
+    // first Update, since the role decides which CivilianSpots this civilian claims
+    public void AssignRole(CivilianRole newRole)
+    {
+        if (newRole == role) return;
+
+        CivilianRole previous = role;
+        role = newRole;
+        Activity = ActivityFor(role);
+        ReleaseSpot();
+        RoleChanged?.Invoke(previous, role);
     }
 
     private void OnDisable() => ReleaseSpot();

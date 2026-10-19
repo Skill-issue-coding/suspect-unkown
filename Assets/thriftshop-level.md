@@ -6,7 +6,7 @@ Read `CLAUDE.md` first, then decisions 6, 15, 18, 19, 22, 23, 24 and 25 in `road
 
 > Written 2026-10-16. Already in place: the street, the shop building (`Houses.fbx`), the `GetawayVan`, the player, the HUD, the `SketchBooth`, and empty `Loot`, `Cash`, `Doors` and `CivilianSpots` groups. Left over from copying the apartment and to be removed: `SnackPoint` and the single `StaffArea` zone.
 >
-> **Status (2026-10-17):** T1 is done and checked: nine room zones, `PlayerRoom` logging room changes with hysteresis, four `Entrance`s logging inbound crossings, and `JobLayout` numbering both. The NavMesh is baked (T2 still needs the guard door link, T2b). `InteriorReveal` fades the upper floor while the player is inside, as in the apartment. The sun is a low red-orange sunset matched to the `OasisSunset` skybox; T3 (interior lights, rebake) is still open. The level's post-processing profile, `ThriftShopVolume`, has a sunset grade (warmer white balance and color filter, violet shadows and orange highlights in split toning); bloom, depth of field, vignette and the other effects are untouched. S1 (`JobLog`) is done and checked. S2 (`ActionRecord`, `ActionStore`, `ActionRecorder`, the Action Record menu) and S2b (Fake Runs) are done and checked. S3 (`ActionModel`) and S4 (`SecurityPlanner`) are done, with their EditMode tests passing. Until L2, runs are completed with Test Complete on `JobOutcomeScreen`: `JobObjectives` still lists the apartment's laptop and cellphone, which are not in the scene. Changes made on the way: the room list grew from seven to ten, room and entrance names moved into `JobLayout` (Core), room tracking moved into its own `PlayerRoom`, and guards may now open doors to pass through (1.1, decision 19).
+> **Status (2026-10-17):** T1 is done and checked: nine room zones, `PlayerRoom` logging room changes with hysteresis, four `Entrance`s logging inbound crossings, and `JobLayout` numbering both. The NavMesh is baked (T2 still needs the guard door link, T2b). `InteriorReveal` fades the upper floor while the player is inside, as in the apartment. The sun is a low red-orange sunset matched to the `OasisSunset` skybox; T3 (interior lights, rebake) is still open. The level's post-processing profile, `ThriftShopVolume`, has a sunset grade (warmer white balance and color filter, violet shadows and orange highlights in split toning); bloom, depth of field, vignette and the other effects are untouched. S1 (`JobLog`) is done and checked. S2 (`ActionRecord`, `ActionStore`, `ActionRecorder`, the Action Record menu) and S2b (Fake Runs) are done and checked. S3 (`ActionModel`) and S4 (`SecurityPlanner`) are done, with their EditMode tests passing. Until L2, runs are completed with Test Complete on `JobOutcomeScreen`: `JobObjectives` still lists the apartment's laptop and cellphone, which are not in the scene. C1 (`NpcDecisionWindow`) is done and checked (2026-10-19), and C2 is mostly done: `CivilianSpawner` spawns the customers and the clerk, but the spot weights and the police-call check are still open. The rest of the civilian system (M6: witnessing, door chores, animation, the reaction tree, panic contagion, personalities) moved into this level as C3–C9 and section 2.4 on 2026-10-19. Changes made on the way: the room list grew from seven to ten, room and entrance names moved into `JobLayout` (Core), room tracking moved into its own `PlayerRoom`, and guards may now open doors to pass through (1.1, decision 19).
 
 ---
 
@@ -17,6 +17,7 @@ Read `CLAUDE.md` first, then decisions 6, 15, 18, 19, 22, 23, 24 and 25 in `road
 3. **Teach the bag and the van.** The bag holds two items. With more than two worth taking, the player learns (optionally) to fill the bag, walk to the van, empty it with **G**, and go back for more.
 4. **Introduce adaptive security.** Security watches the player's completed runs of this level. The first run has one guard serving the developers' base POIs. After one completed run, one extra POI appears where the player tends to go (the door they always use, the room they always cross). After two completed runs a second guard is hired and two extra POIs appear; after three, a third extra POI.
 5. **Close the witness loop.** The police description saved by the apartment (W8) is now acted on: a guard who sees the player in a described outfit grows suspicious (decision 25). The counter is to change clothes **between** jobs; the player can never change appearance during a job (decision 23).
+6. **Make civilians matter.** This is the first level that is not a tutorial, so the whole civilian system (M6) is built and played here, not only the apartment clerk's fixed police call: customers and staff who witness, a visible decision window, reactions that differ in what they cost and what they teach the witness model, panic that spreads, and idles that telegraph who is dangerous (2.4). Concept 6.8's "calm witnesses are the dangerous ones" is the done-when.
 
 ### 1.1 The layout and what each part teaches
 
@@ -55,9 +56,10 @@ Evening, sunset light from a low directional sun, the shop's interior lights on,
 | ----------- | --------------- | --------------------------------------------- | ---- | -------------------------------------------- |
 | Tired clerk | `TiredClerk`    | `CivilianBehaviour` with the clerk's spots    | No   | 1                                            |
 | Customers   | `Civilian`      | `CivilianBehaviour`, `DistractedShopper` role | No   | 3–5                                          |
+| Manager     | `CivilianRole.Manager` | `CivilianBehaviour`, Manager role      | No   | 1 (where they stay: open question)           |
 | Guard       | `SecurityGuard` | `GuardBehaviour`                              | Yes  | 1, or 2 after two completed runs (section 5) |
 
-**Civilians when Alerted** open the decision window and, if it fills, call the police, which fails the job with `PoliceCalled`. This is the apartment clerk's window (`apartment-level.md` 2.3) used by every civilian: it fills while the civilian sees the player and drains while not. The full reaction tree (M6) is still to come; this level uses the window alone. The window is extracted from `ResidentBehaviour` into a shared component (`NpcDecisionWindow`), as `apartment-level.md` 2.4 foresaw, so the clerk at home, the clerk at work and customers share one implementation.
+**Civilians when Alerted** open the decision window and, if it fills, act on the outcome the reaction tree chose (2.4); a call fails the job with `PoliceCalled`. This is the apartment clerk's window (`apartment-level.md` 2.3) used by every civilian: it fills while the civilian sees the player and drains while not. It is the `Deliberating` state of the reaction tree. The window is extracted from `ResidentBehaviour` into a shared component (`NpcDecisionWindow`), as `apartment-level.md` 2.4 foresaw, so the clerk at home, the clerk at work and customers share one implementation.
 
 **The tired clerk** works the register and leaves it on errands, which are the player's openings to take the till:
 
@@ -67,7 +69,7 @@ Evening, sunset light from a low directional sun, the shop's interior lights on,
 | Bin run    | The trash room                      | 6–10 s  | Now and then     |
 | Restocking | The stockroom                       | 8–12 s  | Now and then     |
 
-Errands use the existing `CivilianSpot` mechanism; the clerk's spots get weights so the register wins most picks. The clerk at work is calm (decision 22): ordinary oddness barely registers. `Stealing` (taking the till in view) and `Lockpicking` weigh 1.0, so being seen taking the till in front of the clerk opens the window within about two seconds. Door chores (the clerk shutting an open side door without suspicion, M6 step 3) are optional in this level.
+Errands use the existing `CivilianSpot` mechanism; the clerk's spots get weights so the register wins most picks. The clerk at work is calm (decision 22): ordinary oddness barely registers. `Stealing` (taking the till in view) and `Lockpicking` weigh 1.0, so being seen taking the till in front of the clerk opens the window within about two seconds. Door chores are part of this level (C4): the clerk shuts an open door without suspicion, and the manager investigates it and shuts it.
 
 **The guard** patrols the base POIs and any adaptive POIs (section 5), opens the StaffRoom door to reach the office and closes it behind them, slams doors the player has left open (M5 step 2.4; not while chasing, when they run straight through), investigates the open safe and closes it (section 2.3), and catches. The guard weighs `InStaffArea` heavily and also recognises a described outfit (decision 25). Guards spawn only inside the shop, at authored spawn candidates.
 
@@ -82,6 +84,19 @@ The safe in the office holds the bonus money: one to three money stacks (bag ite
   3. closes the safe as an errand, the same claim-walk-react-`Resolve()` mechanism as slamming a door.
 - **The office POI drains 1.5 times faster** for the rest of the job once the safe has been opened, so guards visibly check the office more often. This is a runtime factor on the POI, separate from the security plan's `DecayMultiplier`.
 - The baseline is per guard: only the guard who noticed the safe is on edge.
+
+### 2.4 Civilian reactions
+
+The rest of M6 (`roadmap_npc.md`), built here, with concept 6.8 and decision 22 as the rules. Civilians witness all the time and alarm only on criminal acts; what they do next is a reaction tree, so the player can read a room and guess who is dangerous.
+
+- **Witnessing (M6 step 2).** `NpcWitness` accumulates what each civilian has seen, calm or not, with the debug readout. It exists on civilians already; this level plays it. Customers, clerk and manager all feed the police description (W8).
+- **The tree.** `ReactionTree` and `ReactionNode` as ScriptableObjects, branch and leaf subclasses, one tree per archetype, so a role is data and not code. Coarse branching on the inputs in this order: severity of what was witnessed, role, whether they think the player saw them, social proof, distance to the player and to an exit, personality only as a tiebreaker (self-preservation versus civic duty). Weighted scores at the leaves, then sampled softly, not the top result.
+- **Outcomes in this level:** discreet call (visible phone, so interruptible; starts the police timer and fails the job with `PoliceCalled` when it connects), panic flee (a poor, error-prone description; loud; spreads), freeze or comply (a long, clean look: the most dangerous for the witness model), avoid or walk away (almost nothing), pretend not to see (keeps working and keeps observing). Film and confront stay out until a level needs them. The outcome decides the **evidence** the witness keeps, not only the alarm (concept 6.8's table).
+- **The decision window is the `Deliberating` state:** a pending reaction, a timer, the indicator showing which way the civilian leans, and **body language as the main signal** (reaching for a phone, backing away, freezing). It stays on `NpcDecisionWindow`; the tree picks the outcome, the window times it.
+- **One player counter-action** during the window, chosen in C7: breaking line of sight already works (the window drains); the new one is intimidating a civilian into compliance or knocking the phone away, whichever fits the existing verbs (decision 20, no physical throwing).
+- **Panic contagion.** `PanicContagion` spreads a panic value to nearby civilians with distance falloff and a capped cascade depth, so one trigger cannot empty the shop. Panic publishes a `NoiseEvent`, so the path from one frightened customer to an alerted guard is traceable in the overlay.
+- **Personality telegraphed by idles.** The fidgety customer, the one on a phone (`DistractedShopper`), the bored clerk, the manager who watches the floor read at a glance from their idle animation, so casing the shop is about finding the dangerous civilian. Two or three personality archetypes, not one per customer.
+- **Animation.** Civilian locomotion, browse, register-work and the phone reach go through an animator builder like `NPCLocomotionBuilder`, never a hand-edited controller. The body language above is the animation list.
 
 ---
 
@@ -278,11 +293,32 @@ _Check:_ open the safe and hide: the guard comes, closes it, and from then on re
 
 ### Track C — civilians
 
-**C1. The shared decision window.** Extract the window from `ResidentBehaviour` into `NpcDecisionWindow`; the apartment clerk uses it unchanged.
+**C1. The shared decision window.** Done and checked 2026-10-19. Extract the window from `ResidentBehaviour` into `NpcDecisionWindow`; the apartment clerk uses it unchanged. `NpcWindowReporter` replaces `ResidentWindowReporter`.
 _Check:_ the apartment plays exactly as before (B6 check).
 
-**C2. Customers and the clerk at work.** Customers browse with `CivilianBehaviour`. The clerk has the register, bin run and restocking spots with weights. Every civilian opens the window when Alerted and calls the police when it fills.
+**C2. Customers and the clerk at work.** Mostly done 2026-10-19; the police-call check is still to run. `CivilianSpawner` (groups of prefab, role, archetype, count range and points) spawns customers and the clerk at load. Customers browse with `CivilianBehaviour`. The clerk has the register, bin run and restocking spots with weights (the weight field on `CivilianSpot` is still to be added). Every civilian opens the window when Alerted and calls the police when it fills.
 _Check:_ the clerk spends most of the time at the register and leaves for each errand now and then. Taking the till in front of the clerk opens their window; staying in view fails the job with the police headline; ducking out of sight in time does not.
+
+**C3. Witness slice check** (M6 step 2). Play `NpcWitness` on customers, clerk and manager: the readout shows exposure growing only while the civilian sees the player, calm or not.
+_Check:_ walk past a calm customer in clear view for 10 s: their exposure rises and they stay Idle. Break line of sight and it stops rising. The police description after the job matches who saw you.
+
+**C4. Door chores** (M6 step 3, decision 18). The clerk shuts an open door they can reach without suspicion; the manager investigates it and shuts it. Same claim, walk, react and `Resolve()` as the guard. Customers ignore open doors. Civilians never use doors to pass (decision 19), so the chores are limited to doors on their own routes.
+_Check:_ leave the emergency exit open: a customer ignores it, the clerk shuts it on their next errand, the manager comes over and shuts it. Two civilians never claim the same door.
+
+**C5. Civilian animation.** An animator builder for civilians on `NPC.fbx`: locomotion, idle, browse, register work, and the phone reach and call (a masked layer, as the clerk's, faded in by the window state).
+_Check:_ a customer walks, browses a display and idles with no foot sliding; when the window fills they visibly reach for a phone, and the call is readable from animation alone.
+
+**C6. `ReactionTree` and the first tree.** `ReactionTree`, `ReactionNode` (branch and leaf subclasses) as ScriptableObjects, the inputs in 2.4, soft sampling at the leaves, and a debug readout of the inputs, scores and chosen outcome per civilian. One tree for customers with three outcomes: call, flee, walk away. The window is the `Deliberating` state.
+_Check:_ the same crime in view of the same customer from different distances and exits produces different outcomes across runs, but never an outcome the readout scores near 0.
+
+**C7. Outcomes and the counter-action.** Freeze or comply, pretend not to see, and the player's one counter-action during the window; each outcome writes the evidence it should into `NpcWitness` (a freeze gives a long clean look, a flee a poor one).
+_Check:_ intimidate a customer who is about to call and the call stops; a frozen customer's description in the newspaper is clearer than a fleeing one's.
+
+**C8. Panic contagion.** `PanicContagion` with distance falloff and a capped depth; a fleeing civilian publishes a `NoiseEvent` that a guard can hear.
+_Check:_ one customer flees and the two next to them get nervous, but the shop does not empty; a guard in earshot investigates the noise, and the overlay shows the chain.
+
+**C9. Roles and personality.** The manager (their tree, door chore, and where they stay), the clerk's tree (calm at the register, `Stealing` and `Lockpicking` open the window quickly), and two or three customer personalities whose idles telegraph them.
+_Check:_ a playtester who cases the shop for 30 s without being told can point at the civilian most likely to call the police, and is right most of the time. This is M6's done-when.
 
 ### Track L — loot
 
@@ -360,4 +396,8 @@ _Check:_ on the third run the player notices without being told that the guards 
 - **Recognition strength.** Is 0.6 for guards right, and is "never past Investigating on its own" too kind? A burned outfit should feel costly without making the level unwinnable.
 - **Smoothing and propagation.** α = 0.5 and T = 6 are starting values. With only a few runs of data, does the first adaptive POI land where the player expects it to?
 - **Two guards and the open safe.** The raised baseline is per guard. Should the guard who finds the safe open put the other guard on edge too (the first use of `Reporting`)?
+- **The manager.** Where do they stay (the office, the shop back, walking the floor), and do they take the register when the clerk is on an errand?
+- **Civilian counter-actions.** Which single action ends a call: intimidate, knock the phone away, or only breaking line of sight? It must fit the bought-verb rule (decisions 18–20).
+- **Contagion strength.** How far and how fast does panic spread, and how deep may it cascade, before one fleeing customer feels unfair?
+- **Hearing a civilian's panic.** How loud is it to a guard, and does it ever count as the first sign of a robbery?
 - **Which job the till unlocks.** Decided with the next level.
