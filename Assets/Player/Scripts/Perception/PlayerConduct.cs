@@ -17,7 +17,7 @@ public class PlayerConduct : MonoBehaviour
     private PlayerLockpicking lockpicking;
     private PlayerInteraction interaction;
     private bool isStealing;
-
+    private PlayerGlassCutting glasscutting;
     public ConductFlags Current
     {
         get
@@ -27,6 +27,7 @@ public class PlayerConduct : MonoBehaviour
             if (IsInStaffArea()) flags |= ConductFlags.InStaffArea;
             if (lockpicking != null && lockpicking.IsPicking) flags |= ConductFlags.Lockpicking;
             if (isStealing) flags |= ConductFlags.Stealing;
+            if (glasscutting != null && glasscutting.IsCutting) flags |= ConductFlags.GlassCutting;
             return flags;
         }
     }
@@ -94,6 +95,7 @@ public class PlayerConduct : MonoBehaviour
         motor = GetComponent<PlayerMotor>();
         lockpicking = GetComponent<PlayerLockpicking>();
         interaction = GetComponent<PlayerInteraction>();
+        glasscutting = GetComponent<PlayerGlassCutting>();
     }
 
 }

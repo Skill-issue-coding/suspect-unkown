@@ -25,6 +25,7 @@ public class PlayerGlassCutting : MonoBehaviour
     private float finishTimer;
     private bool isCutting;
     private bool cursorWasLocked;
+    public bool IsCutting => isCutting;
 
     private void Awake()
     {
@@ -63,7 +64,7 @@ public class PlayerGlassCutting : MonoBehaviour
         _input.cancel = false;
     }
 
-    private void End()
+    public void End()
     {
         if (!isCutting) return;
 

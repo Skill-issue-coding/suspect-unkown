@@ -11,6 +11,7 @@ public class PlayerJobEnd : MonoBehaviour
     private PlayerInputs inputs;
     private PlayerMotor motor;
     private PlayerLockpicking lockpicking;
+    private PlayerGlassCutting glassCutting;
 
     private void Awake()
     {
@@ -18,6 +19,7 @@ public class PlayerJobEnd : MonoBehaviour
         inputs = GetComponent<PlayerInputs>();
         motor = GetComponent<PlayerMotor>();
         lockpicking = GetComponent<PlayerLockpicking>();
+        glassCutting = GetComponent<PlayerGlassCutting>();
     }
 
     private void OnEnable()
@@ -37,6 +39,7 @@ public class PlayerJobEnd : MonoBehaviour
     private void End()
     {
         if (lockpicking != null) lockpicking.Cancel();
+        if (glassCutting != null) glassCutting.End();
 
         motor.IsMovementSuspended = true;
         inputs.MoveInput(Vector2.zero);
