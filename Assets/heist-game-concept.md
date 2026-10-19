@@ -252,9 +252,9 @@ The strategic layer does not save the second-to-second game. Removing guns leave
 
 **The rule: every tool should either move an NPC or change what an NPC can perceive.** Tools that only make the player quieter are passive and forgettable.
 
-**Verbs are bought abilities used at in-world devices.** There is no throwing. The player buys abilities, each with a few uses per heist, and uses them by reaching a device in the level: a router, the breaker, a desk phone. The tone is cartoony and relatable: disable the internet at the router, and the shoppers march over to complain to the manager. NPCs answer each ability with a short errand: walk somewhere, react, deal with it, return. See decision 20 in `roadmap_npc.md`.
+**Verbs are bought abilities used at in-world devices.** There is no throwing. The player buys abilities, each with a few uses per heist, and uses them by reaching a device in the level: a router, the breaker, a desk phone. The tone is cartoony and relatable: disable the internet at the router, and the customers march over to complain to the clerk. NPCs answer each ability with a short errand: walk somewhere, react, deal with it, return. See decision 20 in `roadmap_npc.md`.
 
-- Disable the internet at the router, so shoppers go and complain to the manager
+- Disable the internet at the router, so customers go and complain to the clerk
 - Trip a breaker to darken a zone; staff come to reset it
 - Open a door: a new route for you, evidence for them, and a slammed door when a guard finds it
 
@@ -265,7 +265,7 @@ Ability ideas kept so far. The common thread is everyday, relatable annoyance pl
 | Call the guard's mum | Desk phone              | The guard walks to the phone and is stuck in the call, facing the wall                       | "Yes mum… no mum… I _am_ eating vegetables" |
 | Page the guard       | Store PA microphone     | "Security to the loading dock, your car is being towed" sends the guard to the far end       | Pats pockets for keys, then jogs off        |
 | Leak the group chat  | Router (staff Wi-Fi)    | The guard stops and stares at his phone, head down; his vision cone shrinks while he scrolls | Gasps, types furiously, scrolls back up     |
-| Clog the toilet      | Staff restroom          | The clerk or manager runs over with a plunger and stays to fix it                            | Plunger raised like a sword                 |
+| Clog the toilet      | Staff restroom          | The clerk runs over with a plunger and stays to fix it                            | Plunger raised like a sword                 |
 | Car alarm            | Key fob on a parked car | Staff and shoppers turn to the window and face away from the shop floor                      | Everyone pressed against the glass          |
 
 - Tamper with a camera so it shows an empty aisle
@@ -287,9 +287,9 @@ When an NPC's suspicion crosses the threshold, a decision tree resolves what the
 
 #### Civilians witness first
 
-Civilians are in the store for their own reasons: customers shop, the tired clerk works the register, the manager runs the place. They are not watching for thieves, so their main role is as **witnesses**: a civilian who can see you is remembering you, even while completely calm.
+Civilians are in the store for their own reasons: customers shop and the tired clerk works the register. They are not watching for thieves, so their main role is as **witnesses**: a civilian who can see you is remembering you, even while completely calm.
 
-Their suspicion rises only on clearly criminal acts: picking a lock (as fast as a guard would notice it), taking loot, smashing glass, a visible tool, or tampering with a device such as a router or a desk phone. Ordinary oddness barely registers: sprinting past a customer takes several seconds of full view before they even look up, and customers ignore an open door. Roles still differ: the tired clerk, almost fixed at the register, shuts an open door as a chore without a second thought, while the manager, halfway between a customer and a guard, investigates it. Civilians have no vision cones; their suspicion indicator is the signal. See decision 22 in `roadmap_npc.md`.
+Their suspicion rises only on clearly criminal acts: picking a lock (as fast as a guard would notice it), taking loot, smashing glass, a visible tool, or tampering with a device such as a router or a desk phone. Ordinary oddness barely registers: sprinting past a customer takes several seconds of full view before they even look up, and customers ignore an open door. Roles still differ: the tired clerk, almost fixed at the register, shuts an open door as a chore without a second thought. Civilians have no vision cones; their suspicion indicator is the signal. See decision 22 in `roadmap_npc.md`.
 
 #### Inputs
 
@@ -297,10 +297,9 @@ Personality alone reads as random because the player cannot see it. Branch prima
 
 1. **Severity of what was witnessed** — the tree root. Seeing someone move oddly is not the same as seeing someone with a crowbar in a display case.
 2. **Role** — an employee has a duty and a manager; a customer has nothing to gain. Uniform makes this visible.
-3. **Do they think you saw them?** Being noticed noticing pushes hard toward fear or compliance.
-4. **Social proof** — is anyone else already panicking? This is where contagion enters the tree rather than sitting beside it.
-5. **Distance to the player** — the closer the threat, the more likely fear wins over reaching for a phone. Civilians never flee, so distance to an exit does not matter.
-6. **Personality traits** as tiebreaker, not driver. Two axes suffice: self-preservation versus civic duty.
+3. **Do they think you saw them?** Being noticed noticing pushes hard toward fear.
+4. **Distance to the player** — the closer the threat, the more likely fear wins over reaching for a phone. Civilians never flee, so distance to an exit does not matter.
+5. **Personality traits** as tiebreaker, not driver. Two axes suffice: self-preservation versus civic duty.
 
 #### Outcomes, and the evidence each produces
 
@@ -308,19 +307,17 @@ Reactions must differ in what they feed the witness model, so the reaction syste
 
 | Reaction           | Evidence produced                                                                                                                                                                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Comply             | Long, calm, high-quality observation. The most dangerous outcome for the player.                                                                                                                                                      |
-| Discreet call      | Starts a police timer. Phone is visible, so it is interruptible.                                                                                                                                                                      |
-| Scared             | Freezes in place, covers their face and looks at the floor, shaking. Sees nothing while scared, so no new evidence; calms down after a while and goes back to what they were doing. Spreads panic. Never runs: civilians do not flee. |
+| Discreet call      | Starts a police call that fails the job. The lean toward it shows while they decide, so getting out of sight in time stops it.                                                                                                                                                                    |
+| Scared             | Freezes in place, covers their face and looks at the floor, shaking. Sees nothing while scared, so no new evidence; calms down after a while and goes back to what they were doing. Never runs: civilians do not flee. Panic stays with them: it does not spread to others. |
 | Avoid / walk away  | Almost nothing.                                                                                                                                                                                                                       |
-| Pretend not to see | Keeps working, keeps observing secretly.                                                                                                                                                                                              |
 | Film the player    | Camera-quality visual evidence. Must be stopped.                                                                                                                                                                                      |
 | Confront           | Rare. A physical obstacle.                                                                                                                                                                                                            |
 
-**The resulting inversion: calm witnesses are the dangerous ones.** Scaring a civilian stops them watching for a while but spreads panic to the people around them. Keeping them calm is quiet but gives them a long clean look at you. A real strategic decision rather than a preference.
+**The resulting inversion: calm witnesses are the dangerous ones.** Scaring a civilian stops them watching for a while. Keeping them calm is quiet but gives them a long clean look at you. A real strategic decision rather than a preference.
 
 #### The decision window
 
-**The single most important mechanic in this section.** Do not resolve the tree instantly. Show a few seconds of visible deliberation, with an indicator above the NPC showing which way they are leaning. During that window the player can act: intimidate to force compliance, break line of sight, retreat, cover the loot, knock the phone away.
+**The single most important mechanic in this section.** Do not resolve the tree instantly. Show a few seconds of visible deliberation, with an indicator above the NPC showing which way they are leaning. During that window the player can act by getting out of sight: the window drains while the civilian cannot see them. There is no verb that stops a call once it is under way.
 
 This turns being seen from binary failure into a playable moment, which is exactly what the loop needs without shooting. It also makes the tree legible, because the player watches the decision happen.
 
@@ -333,8 +330,6 @@ The fidgety one, the one already on their phone, the bored employee, the one wea
 #### Implementation notes
 
 - Tree for coarse branching, weighted score at the leaves, then **sample softly** rather than taking the top result. Pure determinism becomes a lookup table; pure randomness feels unfair.
-- **Panic contagion** as a value spreading to nearby NPCs with distance falloff and a cap, re-evaluating their tree at a threshold. Cap cascade depth or one trigger empties the building.
-- Panic generates noise, which feeds guard perception. The path from one frightened civilian to an alerted guard should be traceable and visible.
 - Author trees as ScriptableObjects so archetypes are data rather than code.
 
 ---

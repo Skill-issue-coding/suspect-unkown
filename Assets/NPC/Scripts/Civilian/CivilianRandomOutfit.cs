@@ -17,9 +17,6 @@ public class CivilianRandomOutfit : MonoBehaviour
     [SerializeField, Tooltip("Outfits an employee can wear. Should read as staff")]
     private GameObject[] employeeOutfits;
 
-    [SerializeField, Tooltip("Outfits a manager can wear")]
-    private GameObject[] managerOutfits;
-
     private CivilianBehaviour civilian;
 
     private void Awake()
@@ -53,7 +50,6 @@ public class CivilianRandomOutfit : MonoBehaviour
 
         HideAll(customerOutfits);
         HideAll(employeeOutfits);
-        HideAll(managerOutfits);
 
         GameObject chosen = pool[UnityEngine.Random.Range(0, pool.Length)];
         if (chosen != null)
@@ -64,7 +60,6 @@ public class CivilianRandomOutfit : MonoBehaviour
     {
         CivilianRole.Customer => customerOutfits,
         CivilianRole.Employee => employeeOutfits,
-        CivilianRole.Manager => managerOutfits,
         _ => throw new ArgumentOutOfRangeException(nameof(role))
     };
 

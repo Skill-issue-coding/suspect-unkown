@@ -13,7 +13,7 @@ Covers the systems side of the split in `roadmap.md`. Integration seams with the
 Every observer in a location runs on the same perception pipeline. They differ only in their data and in what they do with what they see:
 
 - A **guard** patrols, notices, investigates a last-known position, pursues, and reads behaviour that civilians miss.
-- A **civilian** roams, notices, visibly deliberates, then calls, gets scared, films, walks away, or pretends not to have seen — and the player can interrupt the deliberation.
+- A **civilian** roams, notices, visibly deliberates, then calls, gets scared or walks away — and the player can escape the deliberation by getting out of sight before it ends.
 - A **clerk** is a civilian with worse eyes and worse memory.
 - A **camera** is an observer without a body: perfect retention, visual features only, fixed arc. It raises no alarm itself; a guard watching its feed does.
 - Every one of them produces **witness evidence** that feeds the police profile.
@@ -138,7 +138,7 @@ A calm civilian who stares for ten seconds has low suspicion and excellent evide
 
 The 1.5–3 second deliberation from concept 6.8 is `CivilianActivity.Deliberating`, with a pending reaction and a visible timer on `CivilianBehaviour`. It is not a coroutine hidden inside the tree evaluation. The player has to be able to see it and interrupt it, so the rest of the game has to be able to read it.
 
-The exception that proves the rule: `PretendingNotToSee` must look like `Working` from outside while it keeps feeding the witness. It is the one reaction whose indicator should lie.
+A reaction that hides itself (pretending not to see, looking like `Working` while still feeding the witness) was planned as the exception and dropped on 2026-10-19: every reaction now shows its icon (thrift shop C6b).
 
 ### 10. Noise travels through the NavMesh
 
@@ -254,7 +254,7 @@ An **anomaly** is a world object in a state that only the player causes: an open
 - NPCs check every raised anomaly on their perception tick, cheap to expensive like the player rays: the cone, then one linecast to the anomaly's point. Noticing one raises an event; it does not go on the `Observation`, which is about the player (decision 14).
 - **Noticing and suspicion are separate.** Every NPC notices raised anomalies; how suspicious one makes it is the archetype's kind weight. A weight of 0 means "notices, but is not suspicious": the tired clerk sees an open door and shuts it as a chore without growing suspicious. Do not skip weight-0 kinds in the sight check; the list of raised anomalies is almost always empty, so checking all of them costs nothing.
 - **Suspicion:** noticing sets a floor of `anomalySuspicion × kind weight`, per archetype, and makes the anomaly the stimulus and the guard's last-known position. Like sound, an anomaly alone never pushes past Investigating (decision 6).
-- **What an NPC does about an anomaly is its role's business** (decision 1). Open doors: the guard slams them; the manager investigates and shuts them; the tired clerk shuts them as a chore; customers ignore them.
+- **What an NPC does about an anomaly is its role's business** (decision 1). Open doors: the guard slams them; the tired clerk shuts them as a chore; customers ignore them.
 - **Resolution is an errand** (decision 20): one NPC of the right role claims the anomaly, walks to it, plays a reaction, and fixes it through `Resolve()`. A claim works like a POI claim (decision 15), so two NPCs never fix the same thing.
 - **Witnesses:** being seen _causing_ an anomaly is conduct. For doors that is the `Lockpicking` flag (decision 19), which raises suspicion in whoever sees it. The pick itself goes to the job log for adaptive security, not to the witness model (decision 23). An `OpeningDoor` flag for doors without a lock waits until a level needs one.
 
@@ -285,10 +285,10 @@ There is no physical throwing. Every verb is a **bought ability** with a limited
 - `Ability` (Core) is a ScriptableObject holding data only: name, uses per heist, description. The remaining uses are runtime state on the player (`PlayerAbilities`), never on the asset (decision 1). The shop (Phase 7) decides which abilities the player owns.
 - `Device` (Core) is the world object. It names the `Ability` it needs and exposes `Activate()`. It never looks up the player: the player side checks a charge, spends it, and calls `Activate()`, so dependencies stay Player → Core.
 - Activating a device raises an event. NPC role behaviours subscribe and respond.
-- **Responses are errands:** a claimed target, a point to walk to, a reaction clip, a duration, then back to normal. Slamming a door, resetting the breaker, complaining to the manager about the internet, and answering a prank call are all the same mechanism with different data. This is the one shared piece; there is no general scripting system, and each ability is its own small, named effect.
+- **Responses are errands:** a claimed target, a point to walk to, a reaction clip, a duration, then back to normal. Slamming a door, resetting the breaker, complaining to the clerk about the internet, and answering a prank call are all the same mechanism with different data. This is the one shared piece; there is no general scripting system, and each ability is its own small, named effect.
 - Until the interaction system exists, devices are triggered with `[ContextMenu]`, calling the same `Activate()` the interaction will call.
 
-Abilities that act on civilians (disable the internet, so shoppers go and complain to the manager) need civilians and arrive in M6. M5 proves the system with an ability that acts on the guard.
+Abilities that act on civilians (disable the internet, so customers go and complain to the clerk) need civilians and arrive in M6. M5 proves the system with an ability that acts on the guard.
 
 ### 21. The vision cone is drawn as a light
 
@@ -308,13 +308,13 @@ The vision cone is a player-facing gameplay element, not a debug view: a glowing
 
 ### 22. Civilians witness; they rarely alarm
 
-Civilians are in the store for their own reasons: customers shop, the tired clerk works the register, the manager runs the place. They are not watching for thieves. Their importance to the player is **what they remember**, not how alarmed they get.
+Civilians are in the store for their own reasons: customers shop and the tired clerk works the register. They are not watching for thieves. Their importance to the player is **what they remember**, not how alarmed they get.
 
 - **Perception runs all the time and feeds the witness.** A calm civilian who can see the player is collecting evidence. This is concept 6.8's inversion, "calm witnesses are the dangerous ones", and it depends on decision 7 keeping evidence and suspicion apart.
 - **Suspicion only rises on clearly criminal acts,** and only the decision window at Alerted turns it into a reaction (call, get scared, walk away…). Civilians never flee (changed 2026-10-19): a scared civilian freezes, covers their face and sees nothing until they calm down. Criminal acts, each added as a conduct flag together with what produces it: lockpicking (M5), taking loot, smashing glass, a visible tool, and using a device that is not a door (a router, a car alarm, a desk phone). A mask would be suspicious if masks are ever added.
 - **Ordinary oddness barely registers.** Sprinting in front of a customer takes about 5 seconds of full view to make them Curious. Open doors do not make customers suspicious at all.
 - **One rise rate for everyone.** Every archetype uses the guard's rise rate of 0.5, so a conduct weight means the same thing for every observer (weight × 0.5 is suspicion per second at full visibility). That is how lockpicking is exactly as fast for a civilian as for a guard, and it keeps the numbers explainable for the report. Civilians still notice less in practice, because they see less far and fade faster with distance.
-- **Roles differ in data and in what they do** (decisions 1 and 18): customers ignore open doors; the tired clerk, almost fixed at the register, shuts them as a chore without suspicion; the manager, a middle step between a civilian and a guard, investigates and shuts them.
+- **Roles differ in data and in what they do** (decisions 1 and 18): customers ignore open doors; the tired clerk, almost fixed at the register, shuts them as a chore without suspicion. (A manager who investigated them was dropped on 2026-10-19.)
 - **At home, the same clerk is the opposite of calm** (`Assets/apartment-level.md`). The apartment interior is a `Staff` zone, and the `ApartmentClerk` archetype weighs `InStaffArea` heavily, so a stranger seen inside is alarming on its own. Still the shared rise rate; only the weights differ. Their role behaviour, `ResidentBehaviour`, runs a sleep rhythm in an armchair, an occasional snack run to the kitchen along the NavMesh, and a fixed reaction: a decision window that fills while they can see the player, then a police call that fails the job.
 - **The alert ladder means less for civilians:** Curious is a glance while carrying on; Investigating is stopping to look; Alerted opens the decision window.
 - **No vision cones** (decision 21). The suspicion indicator is enough.
@@ -406,8 +406,6 @@ Assets/
 | `SecurityGuard.asset`                  | Observer skill 1.0, long retention, behaviour features visible             | vision block | M1        |
 | `Civilian.asset`                       | Observer skill 0.6, no behaviour reading                                   | vision block | M1+       |
 | `TiredClerk.asset`                     | Observer skill 0.4, fast memory decay, obvious visual features only        | vision block | M1+       |
-| `CivilianRole.Manager.asset`           | Calm, notices more than a customer: the dangerous witness from concept 6.8 | vision block | M6        |
-| `CivilianRole.DistractedShopper.asset` | Phone out, tiny cone: filler that makes a room readable                    | vision block | M6        |
 | `SecurityCamera.asset`                 | Visual features only, no memory decay                                      | vision block | M8        |
 
 Create these from `Assets > Create > Suspect Unknown > NPC Archetype`. Each asset gains values as its milestone adds a block to `NpcArchetype`. Observer skill values are from concept 6.2 and arrive with the M7 witness block.
@@ -419,8 +417,6 @@ Vision block starting values. Region weights are head / upper body / hands / low
 | SecurityGuard     | 18            | 110 | 1.7              | 0.6           | 10        | 1.0 / 1.0 / 0.8 / 0.8 / 0.6 |
 | Civilian          | 12            | 120 | 1.65             | 0.5           | 5         | 1.0 / 0.8 / 0.3 / 0.2 / 0   |
 | TiredClerk        | 8             | 80  | 1.6              | 0.4           | 4         | 1.0 / 0.5 / 0 / 0 / 0       |
-| Manager           | 14            | 110 | 1.7              | 0.55          | 8         | 1.0 / 1.0 / 0.6 / 0.4 / 0.2 |
-| DistractedShopper | 6             | 60  | 1.6              | 0.3           | 3         | 1.0 / 0.4 / 0 / 0 / 0       |
 | SecurityCamera    | 20            | 70  | 0 (root at lens) | 0.8           | 10        | 1.0 / 1.0 / 0.6 / 0.6 / 0.3 |
 
 The guard's hand weight is high because tool use is conduct guards read. The camera's feet weight is low because a ceiling camera sees headwear well and footwear badly. Lower tick rates for civilians make them slower to notice and cheaper to run.
@@ -432,8 +428,6 @@ Suspicion block values. Conduct weights are sprinting / in staff area; `lockpick
 | SecurityGuard     | 0.6 / 0.8  | 0.5    | 0.1    | 2.0    | 0.2     | 0.5           | 0.9     | 0.05       |
 | Civilian          | 0.1 / 0.1  | 0.5    | 0.2    | 1.0    | 0.25    | 0.55          | 0.9     | 0.05       |
 | TiredClerk        | 0.1 / 0.25 | 0.5    | 0.3    | 0.5    | 0.3     | 0.6           | 0.9     | 0.05       |
-| Manager           | 0.3 / 0.6  | 0.5    | 0.15   | 1.5    | 0.2     | 0.5           | 0.9     | 0.08       |
-| DistractedShopper | 0.1 / 0.1  | 0.5    | 0.4    | 0.5    | 0.3     | 0.6           | 0.95    | 0.03       |
 | SecurityCamera    | 0.5 / 0.8  | unused | unused | unused | unused  | unused        | unused  | unused     |
 
 Anomaly block values (decision 18). The floor a noticed open door sets is `anomalySuspicion × openDoor`; weight 0 means the NPC still notices the door but is not suspicious of it.
@@ -441,26 +435,22 @@ Anomaly block values (decision 18). The floor a noticed open door sets is `anoma
 | Archetype         | anomalySuspicion | openDoor | Floor | What it does about an open door   |
 | ----------------- | ---------------- | -------- | ----- | --------------------------------- |
 | SecurityGuard     | 0.6              | 1.0      | 0.6   | Investigates, slams it            |
-| Manager           | 0.55             | 1.0      | 0.55  | Investigates, shuts it            |
 | TiredClerk        | 0.4              | 0        | 0     | Shuts it as a chore               |
 | Civilian          | 0.3              | 0        | 0     | Ignores it                        |
-| DistractedShopper | 0.2              | 0        | 0     | Ignores it                        |
 | SecurityCamera    | 0.6              | 1.0      | 0.6   | What the monitor guard reads (M8) |
 
-Civilians barely react to running (about 5 seconds of sprinting right in front of a customer before they are Curious) and react to lockpicking exactly as fast as a guard at the same visibility. The clerk is staff, so a stranger in the back room stands out a little. The manager sits between a civilian and a guard. The camera has no `NpcSuspicion` (decision 11), so only its conduct weights matter: they define what the guard at the monitor reads through the feed. Its other suspicion values copy the guard's so the asset stays valid.
+Civilians barely react to running (about 5 seconds of sprinting right in front of a customer before they are Curious) and react to lockpicking exactly as fast as a guard at the same visibility. The clerk is staff, so a stranger in the back room stands out a little. The camera has no `NpcSuspicion` (decision 11), so only its conduct weights matter: they define what the guard at the monitor reads through the feed. Its other suspicion values copy the guard's so the asset stays valid.
 
 Hearing and light block values, as tuned in M4. Sensitivity multiplies how far a sound carries to this NPC (decision 10); hearing suspicion is the floor a sound at full loudness and alarm 1 sets. Dark factor is `fLight` in full darkness (decision 17). The last two columns use the formula in the M4 notes: a sprint is radius 9, alarm 0.3; a "crash" is a reference loud sound of radius 12 and alarm 1, such as a noisy ability effect or panic (M6). Nothing publishes one yet.
 
 | Archetype         | Sensitivity | Hearing suspicion | Dark factor | Sprint: Curious within | Crash: Curious / Investigating within |
 | ----------------- | ----------- | ----------------- | ----------- | ---------------------- | ------------------------------------- |
 | SecurityGuard     | 3.0         | 0.7               | 0.3         | 1.3 m                  | 25.7 m / 10.3 m                       |
-| Manager           | 2.0         | 0.6               | 0.3         | never                  | 16 m / 4 m                            |
 | Civilian          | 1.5         | 0.5               | 0.25        | never                  | 9 m / never                           |
 | TiredClerk        | 0.6         | 0.4               | 0.2         | never                  | 1.8 m / never                         |
-| DistractedShopper | 0.4         | 0.4               | 0.2         | never                  | 1.2 m / never                         |
 | SecurityCamera    | 0           | 0                 | 0.15        | never                  | never                                 |
 
-Only the guard reacts to footsteps; for everyone else the sound that counts is a crash, and civilians do not investigate (their reaction is the M6 tree). Every hearing suspicion is below that archetype's `alertedAt`, so a sound alone never alerts. The shopper is on their phone, so sound barely reaches them. The camera hears nothing (decision 2); its zeros keep the asset valid, and its low dark factor makes the breaker a strong counter to cameras.
+Only the guard reacts to footsteps; for everyone else the sound that counts is a crash, and civilians do not investigate (their reaction is the M6 tree). Every hearing suspicion is below that archetype's `alertedAt`, so a sound alone never alerts. The camera hears nothing (decision 2); its zeros keep the asset valid, and its low dark factor makes the breaker a strong counter to cameras.
 
 ### NPC/Scripts/Data/
 
@@ -501,11 +491,11 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 
 | File                      | Type             | Purpose                                                                                                                                                                       | Status                 | Milestone |
 | ------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- | --------- |
-| `CivilianBehaviour.cs`    | MonoBehaviour    | Idle routine and carrying out the outcome (Scared, Avoiding); `Activity` also reports the window's Deliberating and Calling; raises `ActivityChanged`                         | working (C6 check pending) | M6, Thrift shop C6 |
+| `CivilianBehaviour.cs`    | MonoBehaviour    | Idle routine and carrying out the outcome (Scared, Avoiding); `Activity` also reports the window's Deliberating and Calling; raises `ActivityChanged`                         | working                | M6, Thrift shop C6 |
 | `CivilianRandomOutfit.cs` | MonoBehaviour    | Picks a random outfit for the civilian's role at spawn; cosmetic only                                                                                                         | working                | M6        |
 | `CivilianSpot.cs`         | MonoBehaviour    | A place where civilians of one role browse or work, with its `CivilianStation` (the dwell clip); static registry and claims; no pick weights                                 | working                | M6        |
 | `CivilianStation.cs`      | enum             | Shelf, Rack, Table, Shoes, Register, Bin, Restock, Tidy: the dwell clip at a spot. Order is the Dwell tree's threshold                                                         | working                | Thrift shop C5 |
-| `CivilianActivity.cs`     | enum             | Roaming, Working, Deliberating, the reactions (Calling, Scared, Avoiding), PretendingNotToSee; `Dozing` planned for the resident. `Fleeing` removed and `Frozen` renamed `Scared` (2026-10-19) | declared               | M6        |
+| `CivilianActivity.cs`     | enum             | Roaming, Working, Deliberating, the reactions (Calling, Scared, Avoiding), `Dozing` for the resident. `PretendingNotToSee` is not built (2026-10-19) and leaves the enum. `Fleeing` removed and `Frozen` renamed `Scared` (2026-10-19) | declared               | M6        |
 | `ReactionInput.cs`        | enum             | What a `ReactionBranch` tests: Severity, PlayerDistance. Saved by number in branch assets, so new inputs go at the end                                                         | working                | Thrift shop C6 |
 | `ReactionContext.cs`      | struct           | The tree's inputs, gathered once when the window opens; severity is the archetype's abnormality for the conduct seen                                                          | working                | Thrift shop C6 |
 | `ResidentBehaviour.cs`    | MonoBehaviour    | The clerk at home: sleep rhythm in the armchair driving the view scale, the snack run to the kitchen; reads `NpcDecisionWindow` for the police call (`Assets/apartment-level.md`) | —                      | Apartment |
@@ -513,10 +503,9 @@ Only the guard reacts to footsteps; for everyone else the sound that counts is a
 | `NpcWindowReporter.cs`    | MonoBehaviour    | Reports the open window to `JobAlert` for the HUD ring (replaces `ResidentWindowReporter`)                                                                                    | working                | Thrift shop C1 |
 | `CivilianSpawner.cs`      | MonoBehaviour    | Spawns a level's civilians once at load: per group a random count at random free points, role and archetype applied after `Instantiate`; debug seed, gizmos and spot warnings  | working                | Thrift shop C2 |
 | `CivilianSpawnGroup.cs`   | Serializable     | One spawn group: prefab, role, archetype, count range and points                                                                                                              | working                | Thrift shop C2 |
-| `CivilianRole.cs`         | enum             | Customer, Employee, Manager                                                                                                                                                   | declared               | M6        |
-| `ReactionTree.cs`         | ScriptableObject | Root of a civilian's reaction tree, referenced by the archetype; walks to a leaf and samples it (`TrySample`)                                                                 | working (C6 check pending) | Thrift shop C6 |
-| `ReactionNode.cs`         | ScriptableObject | Abstract node: `ReactionBranch` tests one input against a threshold, `ReactionLeaf` samples weighted outcomes (`ReactionWeight`) in proportion                               | working (C6 check pending) | Thrift shop C6 |
-| `PanicContagion.cs`       | MonoBehaviour    | Spreads panic with distance falloff and a depth cap                                                                                                                           | stub                   | M6        |
+| `CivilianRole.cs`         | enum             | Customer, Employee (Manager dropped 2026-10-19)                                                                                                                                             | declared               | M6        |
+| `ReactionTree.cs`         | ScriptableObject | Root of a civilian's reaction tree, referenced by the archetype; walks to a leaf and samples it (`TrySample`)                                                                 | working                | Thrift shop C6 |
+| `ReactionNode.cs`         | ScriptableObject | Abstract node: `ReactionBranch` tests one input against a threshold, `ReactionLeaf` samples weighted outcomes (`ReactionWeight`) in proportion                               | working                | Thrift shop C6 |
 
 ### NPC/Scripts/UI/
 
@@ -770,8 +759,8 @@ Redesigned 2026-10-05 (decisions 18–21): there is no physical throwing and no 
    - [ ] **Call the guard's mum** (desk phone). The guard walks to the phone and is stuck in the call, facing the wall. Guard only.
    - [ ] **Page the guard** (store PA microphone). "Security to the loading dock, your car is being towed" sends the guard to the far end. Guard only.
    - [ ] **Leak the group chat** (router, staff Wi-Fi). The guard stops and stares at his phone, head down, and his cone shrinks while he scrolls. Guard only. Needs one extra errand field: a perception modifier while busy, applied to the archetype's view distance and angle and shown by the cone (decision 21).
-   - [ ] **Clog the toilet** (staff restroom). The clerk or manager runs over with a plunger and stays to fix it. Needs staff NPCs, so it lands with M6.
-   - [ ] **Car alarm** (key fob on a parked car). Staff and shoppers turn to the window and face away from the shop floor. Changes facing, not position. Needs civilians, so it lands with M6.
+   - [ ] **Clog the toilet** (staff restroom). The clerk runs over with a plunger and stays to fix it. Needs staff NPCs, so it lands with M6.
+   - [ ] **Car alarm** (key fob on a parked car). Staff and customers turn to the window and face away from the shop floor. Changes facing, not position. Needs civilians, so it lands with M6.
 
 5. [ ] **Pursuit across vaults.** Guards follow over counters via `NavMeshLink`, first with built-in traversal, then with a vault clip in the guard's animator builder (decision 16). An opened door also opens a pursuit route (decision 19).
 6. [ ] **Near-miss pass.** Suspicion decays, investigation and errands are interruptible, the player always has a recovery move, and Curious lasts long enough to react to.
@@ -788,17 +777,17 @@ Civilians follow decision 22: they witness all the time and alarm only on crimin
 
 1. [x] **A civilian that exists.** Body rotation moves out of `GuardBehaviour` into a shared `NpcFacing`. `CivilianSpot` marks where civilians browse or work (not POIs: those are security coverage for Phase 8). `CivilianBehaviour` runs the idle routine: pick a free spot for the role, walk there, stay, repeat. The tired clerk has one register spot with a long dwell. Until the decision window exists, Curious means a glance while carrying on and Investigating or above means stopping to look. The prefab has the shared perception components and no vision cone. Customers get a random outfit for their role (`CivilianRandomOutfit`), so staff read as staff. Passed on the test bench.
 2. [ ] **Witness slice.** `NpcWitness` accumulates exposure per NPC from each `Observation`: time seen, weighted by observation quality. A debug readout per civilian. M7 builds the full model on top. Built on 2026-10-09 (`NpcWitness` on guards and civilians, readout line in `NpcPerceptionDebug`); the play-mode check is still to run.
-3. [ ] **Door chores.** The tired clerk shuts open doors without suspicion; the manager investigates and shuts them. Same claim and `Resolve()` as the guard (decision 18, `Assets/doors-and-lockpicking.md`).
+3. [ ] **Door chores.** The tired clerk shuts open doors without suspicion. Same claim and `Resolve()` as the guard (decision 18, `Assets/doors-and-lockpicking.md`).
 
 Then the reactions:
 
 - `ReactionTree` and `ReactionNode` as ScriptableObjects, with `ReactionNode` split into branch and leaf subclasses, so archetypes are data rather than code.
-- Tree inputs from concept 6.8, in priority order: **severity** (from the conduct reading in decision 6; the criminal acts in decision 22), role, whether they think the player saw them, social proof, distance to the player and to an exit, and personality only as a tiebreaker.
+- Tree inputs from concept 6.8, in priority order: **severity** (from the conduct reading in decision 6; the criminal acts in decision 22), role, whether they think the player saw them, distance to the player, and personality only as a tiebreaker. (Social proof went with contagion and distance to an exit with fleeing, both 2026-10-19.)
 - Coarse branching in the tree, weighted scores at the leaves, then sample softly instead of taking the top result.
 - The decision window as the `Deliberating` state: a pending reaction, a timer, an indicator showing which way the civilian is leaning, and body language (reaching for a phone, backing away, freezing) as the primary signal.
-- Three outcomes first — call, scared, walk away — and one player counter-action during the window. `PretendingNotToSee` and the rest follow.
-- `PanicContagion` with distance falloff and a capped cascade depth. Panic publishes a `NoiseEvent`, so the path from one frightened civilian to an alerted guard is traceable.
-- Two civilian archetypes whose personality reads from their idle behaviour.
+- Three outcomes — call, scared, walk away. The player's counter-action is the window itself: get out of sight before it fills (decided 2026-10-19). There is no verb that stops a call, and pretending not to see is not built.
+- Panic is individual (decided 2026-10-19): no contagion between civilians and no panic noise for guards.
+- Two or three customer personalities that read from their idle behaviour, and the clerk's own tree.
 
 **Done when:** a player can look at a room and correctly guess which civilian is the dangerous one.
 
@@ -813,7 +802,7 @@ First built in the apartment level as Track W (`Assets/apartment-level.md` 3.6),
 - No Behaviour or Method slot: what the player does goes to the job log and adaptive security (decision 23).
 - One `ConfusionMatrix` for colors, shared by every slot (a color is mistaken the same way on any garment); a wrong style is any other style, since styles have no similar neighbours. Below a quality threshold the value taken in is sometimes a mistake, so a red jacket gets described as purple. The chance of a mistake is capped so the truth stays the most likely recall: a poor witness is vague, not consistently wrong.
 - `WitnessReport` at job end, with the log-odds merge across witnesses.
-- Reactions feed evidence differently: a civilian who pretends not to see keeps a long, clean look; a scared one covers their face and gathers nothing while scared.
+- Reactions feed evidence differently: a calm witness who never reaches Alerted keeps a long, clean look; a scared one covers their face and gathers nothing while scared.
 - A hook for a player-side confidence multiplier (concept 7.4 Face: "witnesses observe you at reduced confidence"). No skill logic here.
 - Unit tests for the merge using the Unity Test Framework. It is pure logic and painful to debug through gameplay.
 
@@ -863,7 +852,6 @@ First built in the apartment level as Track W (`Assets/apartment-level.md` 3.6),
 | Suspicion and evidence merged into one number                             | Decision 7. Two accumulators, or calm witnesses stop being dangerous.                                                                                                                                       |
 | A dependency cycle once assembly definitions exist                        | Decision 4. Shared types go in Core; Core references nothing.                                                                                                                                               |
 | The decision window buried inside tree evaluation                         | Decision 9. `Deliberating` is a real, readable state.                                                                                                                                                       |
-| Panic contagion empties the building                                      | Cap the cascade depth                                                                                                                                                                                       |
 | Cameras need guard code                                                   | Perception has leaked into the guard. The M8 done-when catches it.                                                                                                                                          |
 | Curious is too short, so there is no tension                              | The Phase 3 gate check: lengthen it before doing anything else                                                                                                                                              |
 | An array in `Observation` shared between copies                           | Decision 14. Debug detail stays on `NpcPerception`.                                                                                                                                                         |
@@ -887,7 +875,6 @@ First built in the apartment level as Track W (`Assets/apartment-level.md` 3.6),
 - **Which conduct counts as abnormal, and where.** The first set of conduct flags and their weights per archetype and zone type.
 - **Does `NpcStance` exist?** Only if civilians crouch or hide as part of a reaction.
 - **Decision window length.** Likely 1.5–3 seconds, probably different per reaction. A playtest question.
-- **Social proof.** Is the contagion broadcast enough for a civilian to know someone else is panicking, or do NPCs need to perceive each other?
 - ~~**Reading conduct through a feed.**~~ Answered by decision 6: yes for suspicion. The camera's own conduct weights define what the monitor guard reads. Behaviour never becomes witness evidence for any observer (decision 23).
 - ~~**Cameras and light.**~~ Answered by decision 17: yes. Cameras use `NpcPerception`, so `f_light` applies to them automatically, and the breaker counters them too. The camera archetype's `darkVisibilityFactor` sets how much.
 - **Baked lights in builds.** Not yet verified in this Unity version: does a Baked light keep its `Light` component and parameters in a player build? `GameplayLight` assumes it does.
@@ -993,3 +980,7 @@ First built in the apartment level as Track W (`Assets/apartment-level.md` 3.6),
 - **2026-10-19** — C6b step 3 settled after playtesting: the call-only ring that filled over the call's 1.5 s appeared too late to act on, so the ring is back to showing a window leaning toward a call (orange, filling with the window) and the call itself (full, red, pulsing). Every lean on the indicator is orange; only the call is red. `NpcDecisionWindow.CallProgress` is removed (nothing reads it).
 - **2026-10-19** — Thrift shop C6b step 5 done and checked: `ReactionToast` on `JobHud.prefab` under the status tag. Added from playtesting: `CIVILIAN ABOUT TO CALL` (orange) when a window leaning toward a call opens and `CIVILIAN LOST SIGHT` when it drains without one (`JobReaction.AboutToCall`, `LostSight`), so the toast warns while the player can still act, not only once the call is under way.
 - **2026-10-19** — Thrift shop C6b step 2d: every indicator symbol is an icon from the one sprite asset (`ReactionIcons`, now seven icons): eye when curious; flashlight and handcuffs for guards; a staring eye for civilians from investigating up, orange even when Alerted outside the window, which settles the drained-window known issue above.
+- **2026-10-19** — The reaction toast announces guards as well: `GuardReactionReporter` (NPC, on `Guard.prefab`) maps `GuardBehaviour.ActivityChanged` onto new `JobReaction` values (GuardCurious, GuardInvestigating, GuardChasing, GuardLostYou, GuardGaveUp). `ReactionToast` colors lines by stake: red for a call or a chase, orange for the warnings, off-white for the rest.
+- **2026-10-19** — Civilian scope cut. The `Manager` and `DistractedShopper` archetypes are deleted (nothing in the game needs them), so the manager's door chore, tree and open question go, and the archetype tuning tables lose their rows. The clerk gets a reaction tree of their own (C9). Pretend not to see is not built, and the player's counter-action during a decision window is getting out of sight in time, with no verb that stops a call (C7 settled). Panic is individual: no contagion and no panic noise (C8 dropped), and social proof leaves the tree inputs. Code still to follow: `CivilianRole.Manager` (and the outfit list that reads it), `CivilianActivity.PretendingNotToSee` and the `PanicContagion` stub.
+- **2026-10-19** — Baseline reaction trees set up for the C6 check: `CivilianTree` (customers) and `StoreClerk_Distance` (the clerk, part of C9), both splitting odd behaviour from crime on severity 0.8, then on distance (4 m for customers, 3 m for the clerk's crimes). Values and odds in `Assets/thriftshop-level.md` under C6. Thresholds then settled off every producible severity: customers 0.8 (sprinting and the staff area are odd behaviour), the clerk 0.78 (sprinting is odd, the staff area is crime).
+- **2026-10-19** — Thrift shop C6 and C6b done and checked. The scope-cut code clean-up is done: `CivilianRole.Manager` and its outfit list, `CivilianActivity.PretendingNotToSee` and the `PanicContagion` stub are gone. Next: T2b (guards pass through doors).

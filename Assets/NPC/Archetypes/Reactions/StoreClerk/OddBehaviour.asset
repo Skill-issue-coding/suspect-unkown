@@ -9,7 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4fc901e1eca94554a025c6ae741ea8b, type: 3}
-  m_Name: CustomerReactions
-  m_EditorClassIdentifier: Assembly-CSharp::ReactionTree
-  root: {fileID: 11400000, guid: 3feb34f402e986c47801afde06c6f3e1, type: 2}
+  m_Script: {fileID: 11500000, guid: 15b5a7f86d8be7446a68d607a78f4a39, type: 3}
+  m_Name: OddBehaviour
+  m_EditorClassIdentifier: Assembly-CSharp::ReactionLeaf
+  weights:
+  - outcome: 5
+    weight: 3
+  - outcome: 4
+    weight: 1

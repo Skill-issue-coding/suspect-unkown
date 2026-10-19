@@ -91,6 +91,7 @@ MonoBehaviour:
     inStaffArea: 0.6
     lockpicking: 1
     stealing: 1
+    glasscutting: 1
   riseRate: 0.6
   decayRate: 0.025
   decayDelay: 3
@@ -105,4 +106,4 @@ MonoBehaviour:
     legs: 0.7
     feet: 0.4
   memoryHalfLife: 70
-  reactionTree: {fileID: 11400000, guid: c837447dd9fff8f48892414fe496a847, type: 2}
+  reactionTree: {fileID: 11400000, guid: fbed033a3a205e548be06a5acb9bbc3a, type: 2}

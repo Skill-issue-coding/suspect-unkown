@@ -527,6 +527,11 @@ MonoBehaviour:
   edgeMargin: 60
   arrowFadeSpeed: 6
   onScreenInset: 0.02
+  deliberatingColor: {r: 1, g: 0.55, b: 0, a: 1}
+  callingColor: {r: 1, g: 0, b: 0, a: 1}
+  callingPulseRate: 4
+  scaredColor: {r: 0.65, g: 0.75, b: 1, a: 1}
+  avoidingColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!1 &819685089077814339
 GameObject:
   m_ObjectHideFlags: 0
@@ -1568,7 +1573,7 @@ MonoBehaviour:
     bottomLeft: {r: 1, g: 1, b: 1, a: 1}
     bottomRight: {r: 1, g: 1, b: 1, a: 1}
   m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
+  m_spriteAsset: {fileID: 11400000, guid: 54774307c1f44b94caec43c50c24e35f, type: 2}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
   m_TextStyleHashCode: -1183493901
@@ -2290,6 +2295,7 @@ GameObject:
   - component: {fileID: 8786211797238540667}
   - component: {fileID: 7929661741115065216}
   - component: {fileID: 6652728458607151797}
+  - component: {fileID: -7865312120789787377}
   m_Layer: 15
   m_Name: Guard
   m_TagString: NPC
@@ -2538,6 +2544,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc3810c5da02a6c448e92746e93214ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcAlertReporter
+--- !u!114 &-7865312120789787377
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6720325424012129814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ad6fc4c0fc06ee42b291ce0d02af133, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GuardReactionReporter
 --- !u!1 &7060616932561885397
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4f8999d85dbe4cb49b66f07fe346e062, type: 3}
-  m_Name: Customer_Distance
+  m_Name: Crime
   m_EditorClassIdentifier: Assembly-CSharp::ReactionBranch
   input: 1
   threshold: 4
-  below: {fileID: 11400000, guid: afce7c75880f76a4e84f0d45819ba0ac, type: 2}
-  above: {fileID: 11400000, guid: 2cc5e502bc657384e9e5734e9157f853, type: 2}
+  below: {fileID: 11400000, guid: 95a94de85ef77c1448a4dc28b6dbc7d8, type: 2}
+  above: {fileID: 11400000, guid: 40d7c96c0ba0b6a4082e71b9391121c7, type: 2}

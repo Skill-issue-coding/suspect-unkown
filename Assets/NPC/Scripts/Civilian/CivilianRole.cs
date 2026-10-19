@@ -3,5 +3,4 @@ public enum CivilianRole
 {
     Customer,
     Employee,
-    Manager
 }

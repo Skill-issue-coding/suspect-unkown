@@ -2061,7 +2061,6 @@ MonoBehaviour:
   employeeOutfits:
   - {fileID: 2143828427648269870}
   - {fileID: 7920009572186555951}
-  managerOutfits:
   - {fileID: 1062667485680595406}
 --- !u!114 &8896140562330364355
 MonoBehaviour:

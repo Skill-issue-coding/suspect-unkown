@@ -2,12 +2,13 @@ using PrimeTween;
 using TMPro;
 using UnityEngine;
 
-// Announces what the job's civilians just did, under the status tag: "CIVILIAN SCARED" fades in, holds and
+// Announces what the job's civilians and guards just did, under the status tag: "CIVILIAN SCARED" fades in, holds and
 // fades out, like the pickup toast. Hears JobAlert.Reacted, so it knows no NPC (dependencies point NPC to
 // Core). The same reaction while the line is still showing counts up ("2 CIVILIANS SCARED"); another one
 // replaces it. "CIVILIAN ABOUT TO CALL" is the orange warning while the player can still get out of sight,
-// "CIVILIAN LOST SIGHT" says they did; the police call is red, stays up and overrides everything until the
-// job ends. A copy of PickupToast's fade on purpose: extract a shared toast only when a third one appears
+// "CIVILIAN LOST SIGHT" says they did; guards announce noticing, investigating, chasing ("GUARD CHASING
+// YOU" in red), losing the player and giving up; the police call is red, stays up and overrides everything
+// until the job ends. A copy of PickupToast's fade on purpose: extract a shared toast only when a third one appears
 public class ReactionToast : MonoBehaviour
 {
     [SerializeField, Tooltip("Fades the toast in and out")]
@@ -22,13 +23,13 @@ public class ReactionToast : MonoBehaviour
     [SerializeField, Tooltip("Seconds the toast stays fully shown")]
     private float holdSeconds = 2f;
 
-    [SerializeField, Tooltip("Text color for a reaction, and for the lost-sight line")]
+    [SerializeField, Tooltip("Text color for the lines that are no threat yet or any more: scared, calmed down, lost sight, a guard curious, losing you or giving up")]
     private Color reactionColor = new Color(0.93f, 0.91f, 0.86f, 1f);
 
-    [SerializeField, Tooltip("Text color for the warning that a civilian is about to call, as the HUD ring")]
+    [SerializeField, Tooltip("Text color for the warnings the player can still act on: a civilian about to call, a guard investigating")]
     private Color warningColor = new Color(1f, 0.5f, 0.2f, 1f);
 
-    [SerializeField, Tooltip("Text color once a call is under way")]
+    [SerializeField, Tooltip("Text color while the job is at stake: a call under way, a guard chasing")]
     private Color callColor = new Color(1f, 0.3f, 0.27f, 1f);
 
     private Sequence show;
@@ -63,7 +64,7 @@ public class ReactionToast : MonoBehaviour
         callShown = reaction == JobReaction.Calling;
 
         label.text = Text(reaction, count);
-        label.color = callShown ? callColor : reaction == JobReaction.AboutToCall ? warningColor : reactionColor;
+        label.color = ColorFor(reaction);
 
         show.Stop();
         show = callShown
@@ -74,14 +75,32 @@ public class ReactionToast : MonoBehaviour
                 .Chain(Tween.Alpha(group, 0f, fadeDuration, Ease.InQuad));
     }
 
+    // Red for the two moments the job is at stake (a call, a chase), orange for the warnings that can still
+    // be acted on, off-white for the rest
+    private Color ColorFor(JobReaction reaction) => reaction switch
+    {
+        JobReaction.Calling or JobReaction.GuardChasing => callColor,
+        JobReaction.AboutToCall or JobReaction.GuardInvestigating => warningColor,
+        _ => reactionColor,
+    };
+
     private static string Text(JobReaction reaction, int count) => reaction switch
     {
-        JobReaction.Scared => count == 1 ? "CIVILIAN SCARED" : $"{count} CIVILIANS SCARED",
-        JobReaction.CalmedDown => count == 1 ? "CIVILIAN CALMED DOWN" : $"{count} CIVILIANS CALMED DOWN",
-        JobReaction.Avoiding => count == 1 ? "CIVILIAN WALKING AWAY" : $"{count} CIVILIANS WALKING AWAY",
+        JobReaction.Scared => Civilians(count, "SCARED"),
+        JobReaction.CalmedDown => Civilians(count, "CALMED DOWN"),
+        JobReaction.Avoiding => Civilians(count, "WALKING AWAY"),
         JobReaction.Calling => "POLICE CALL IN PROGRESS",
-        JobReaction.AboutToCall => count == 1 ? "CIVILIAN ABOUT TO CALL" : $"{count} CIVILIANS ABOUT TO CALL",
-        JobReaction.LostSight => count == 1 ? "CIVILIAN LOST SIGHT" : $"{count} CIVILIANS LOST SIGHT",
+        JobReaction.AboutToCall => Civilians(count, "ABOUT TO CALL"),
+        JobReaction.LostSight => Civilians(count, "LOST SIGHT"),
+        JobReaction.GuardCurious => Guards(count, "CURIOUS"),
+        JobReaction.GuardInvestigating => Guards(count, "INVESTIGATING"),
+        JobReaction.GuardChasing => Guards(count, "CHASING YOU"),
+        JobReaction.GuardLostYou => Guards(count, "LOST YOU"),
+        JobReaction.GuardGaveUp => Guards(count, "GAVE UP"),
         _ => "",
     };
+
+    private static string Civilians(int count, string what) => count == 1 ? $"CIVILIAN {what}" : $"{count} CIVILIANS {what}";
+
+    private static string Guards(int count, string what) => count == 1 ? $"GUARD {what}" : $"{count} GUARDS {what}";
 }
