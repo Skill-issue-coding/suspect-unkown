@@ -86,6 +86,10 @@ public class NpcArchetype : ScriptableObject
     [SerializeField, Min(0f), Tooltip("Seconds for remembered evidence to halve. 0 never forgets (a camera's recording). Clerk ~90, civilian ~120, guard ~300")]
     private float memoryHalfLife = 120f;
 
+    [Header("Reactions")]
+    [SerializeField, Tooltip("What a civilian does when its decision window fills. Empty: it always calls the police (the apartment resident)")]
+    private ReactionTree reactionTree;
+
     public float ViewDistance => viewDistance;
     public float FovDegrees => fovDegrees;
     public float EyeHeight => eyeHeight;
@@ -107,6 +111,7 @@ public class NpcArchetype : ScriptableObject
     public float MemoryHalfLife => memoryHalfLife;
     public float FeatureVisibility(FeatureSlot slot) => featureVisibility.Get(slot);
     public float AnomalyWeight(AnomalyKind kind) => anomalyWeights.Get(kind);
+    public ReactionTree ReactionTree => reactionTree;
 
     // Light level 0 is darkness, 1 full light. Shadow lowers visibility but never to zero:
     // a figure in the dark is harder to see, not invisible.

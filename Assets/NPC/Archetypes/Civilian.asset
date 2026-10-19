@@ -87,13 +87,13 @@ MonoBehaviour:
   anomalyWeights:
     openDoor: 0
   conductWeights:
-    sprinting: 0.25
-    inStaffArea: 0.4
+    sprinting: 0.75
+    inStaffArea: 0.6
     lockpicking: 1
     stealing: 1
-  riseRate: 0.4
-  decayRate: 0.2
-  decayDelay: 1
+  riseRate: 0.6
+  decayRate: 0.025
+  decayDelay: 3
   curiousAt: 0.25
   investigatingAt: 0.55
   alertedAt: 0.9
@@ -104,4 +104,5 @@ MonoBehaviour:
     chest: 1
     legs: 0.7
     feet: 0.4
-  memoryHalfLife: 120
+  memoryHalfLife: 70
+  reactionTree: {fileID: 11400000, guid: c837447dd9fff8f48892414fe496a847, type: 2}

@@ -398,7 +398,7 @@ GameObject:
   - component: {fileID: 6427516456994103221}
   - component: {fileID: 1850746697128293008}
   - component: {fileID: 8898408765514671757}
-  m_Layer: 15
+  m_Layer: 5
   m_Name: SuspicionIndicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1495,7 +1495,7 @@ GameObject:
   - component: {fileID: 1893445706486000342}
   - component: {fileID: 8533023324321370385}
   - component: {fileID: 5066711073301839974}
-  m_Layer: 15
+  m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1630,7 +1630,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7808469898732362760}
-  m_Layer: 15
+  m_Layer: 5
   m_Name: ArrowPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2525,6 +2525,7 @@ MonoBehaviour:
   sightingGap: 0.5
   colorConfusion: {fileID: 11400000, guid: 2ecd182514cef9e418e6b188a36d968a, type: 2}
   clearLook: 0.35
+  worstWrongChance: 0.5
 --- !u!114 &6652728458607151797
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2643,7 +2644,7 @@ GameObject:
   - component: {fileID: 8083906996167637252}
   - component: {fileID: 1203987820737815953}
   - component: {fileID: 5668994531009336693}
-  m_Layer: 15
+  m_Layer: 5
   m_Name: Fill
   m_TagString: Untagged
   m_Icon: {fileID: 0}

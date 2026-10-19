@@ -129,6 +129,10 @@ PrefabInstance:
       propertyPath: archetype
       value: 
       objectReference: {fileID: 11400000, guid: ebc81325f11c4c544b8a223126b70fab, type: 2}
+    - target: {fileID: 729227976571061195, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 922280801458338377, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -281,9 +285,21 @@ PrefabInstance:
       propertyPath: 'employeeOutfits.Array.data[1]'
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 4403218634038927323, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4509243036094280278, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
+      propertyPath: m_Layer
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 6720325424012129814, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
       propertyPath: m_Name
       value: ApartmentClerk
+      objectReference: {fileID: 0}
+    - target: {fileID: 7469816718146457371, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
+      propertyPath: m_Layer
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8812113050130535251, guid: 39f0e4f50e72a5e41aecbd047b99238b, type: 3}
       propertyPath: readoutRect.x

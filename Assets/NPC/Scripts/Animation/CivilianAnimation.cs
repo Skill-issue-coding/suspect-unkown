@@ -1,9 +1,9 @@
 using UnityEngine;
 
 // Shows CivilianBehaviour on the civilian animator: standing at a spot plays that spot's station clip on
-// the base layer, and deliberating or calling brings the phone out on the upper-body layer. Speed comes
-// from NpcAnimator. Decides nothing. Not on the apartment clerk, whose ResidentAnimation drives its own
-// controller
+// the base layer, the reactions (deliberating, scared, avoiding) play on the base layer from Activity, and
+// the call brings the phone out on the upper-body layer. Speed comes from NpcAnimator. Decides nothing.
+// Not on the apartment clerk, whose ResidentAnimation drives its own controller
 [RequireComponent(typeof(CivilianBehaviour), typeof(NpcDecisionWindow))]
 public class CivilianAnimation : MonoBehaviour
 {
@@ -46,10 +46,13 @@ public class CivilianAnimation : MonoBehaviour
         animator.SetBool(CivilianAnimatorParams.DwellingId, dwelling);
         if (dwelling) animator.SetFloat(CivilianAnimatorParams.StationId, (float)civilian.Station);
 
+        // Deliberating and Calling drive the shared Phone layer's states; Activity drives the base layer
         animator.SetBool(NpcAnimatorParams.DeliberatingId, window.IsDeliberating);
         animator.SetBool(NpcAnimatorParams.CallingId, window.IsCalling);
+        animator.SetInteger(CivilianAnimatorParams.ActivityId, (int)civilian.Activity);
 
-        float target = window.IsDeliberating || window.IsCalling ? 1f : 0f;
+        // While deliberating, React_Deliberating on the base layer owns the arms; the phone only comes out for the call
+        float target = window.IsCalling ? 1f : 0f;
         if (phoneLayer >= 0 && phoneWeight != target)
         {
             phoneWeight = Mathf.MoveTowards(phoneWeight, target, Time.deltaTime / phoneFadeSeconds);

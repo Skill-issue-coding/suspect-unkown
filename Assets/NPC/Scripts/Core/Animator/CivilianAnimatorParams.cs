@@ -12,6 +12,11 @@ public static class CivilianAnimatorParams
     // True while standing at a spot: the base layer leaves the walk for the Dwell tree
     public const string Dwelling = "Dwelling";
 
+    // CivilianBehaviour.Activity as an int: Deliberating, Scared and Avoiding have base-layer states that
+    // match its value. Relies on CivilianActivity's declaration order; a rebuild picks up a reorder
+    public const string Activity = "Activity";
+
     public static readonly int StationId = Animator.StringToHash(Station);
     public static readonly int DwellingId = Animator.StringToHash(Dwelling);
+    public static readonly int ActivityId = Animator.StringToHash(Activity);
 }

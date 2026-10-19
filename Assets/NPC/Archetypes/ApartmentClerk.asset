@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1f479f0caeb42399171ea0310394d8, type: 3}
   m_Name: ApartmentClerk
   m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
-  viewDistance: 18
+  viewDistance: 10
   fovDegrees: 110
   eyeHeight: 1.65
   distanceFalloff:
@@ -81,7 +81,7 @@ MonoBehaviour:
     lowerBody: 1
     feet: 1
   tickRate: 10
-  hearingSensitivity: 12
+  hearingSensitivity: 8
   hearingSuspicion: 0.85
   anomalySuspicion: 0.6
   anomalyWeights:
@@ -104,4 +104,5 @@ MonoBehaviour:
     chest: 1
     legs: 0.6
     feet: 0.3
-  memoryHalfLife: 90
+  memoryHalfLife: 60
+  reactionTree: {fileID: 0}

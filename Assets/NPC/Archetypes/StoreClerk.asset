@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1f479f0caeb42399171ea0310394d8, type: 3}
   m_Name: StoreClerk
   m_EditorClassIdentifier: Assembly-CSharp::NpcArchetype
-  viewDistance: 12
+  viewDistance: 10
   fovDegrees: 100
   eyeHeight: 1.65
   distanceFalloff:
@@ -27,6 +27,15 @@ MonoBehaviour:
       weightedMode: 0
       inWeight: 0
       outWeight: 0
+    - serializedVersion: 3
+      time: 0.5
+      value: 0.7
+      inSlope: -1.1525781
+      outSlope: -1.1525781
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.4106958
+      outWeight: 0.22513092
     - serializedVersion: 3
       time: 1
       value: 0
@@ -53,13 +62,13 @@ MonoBehaviour:
       outWeight: 0
     - serializedVersion: 3
       time: 0.5
-      value: 0.6
-      inSlope: -1.4999934
-      outSlope: -1.4999934
+      value: 1
+      inSlope: 0.012364169
+      outSlope: 0.012364169
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
-      outWeight: 0.33333334
+      outWeight: 0.58115184
     - serializedVersion: 3
       time: 1
       value: 0.1
@@ -87,13 +96,13 @@ MonoBehaviour:
   anomalyWeights:
     openDoor: 0.6
   conductWeights:
-    sprinting: 0.3
-    inStaffArea: 0.5
+    sprinting: 0.75
+    inStaffArea: 0.8
     lockpicking: 1
     stealing: 1
-  riseRate: 0.35
-  decayRate: 0.2
-  decayDelay: 1
+  riseRate: 0.6
+  decayRate: 0.025
+  decayDelay: 4
   curiousAt: 0.25
   investigatingAt: 0.55
   alertedAt: 0.9
@@ -104,4 +113,5 @@ MonoBehaviour:
     chest: 1
     legs: 0.7
     feet: 0.4
-  memoryHalfLife: 120
+  memoryHalfLife: 70
+  reactionTree: {fileID: 11400000, guid: c837447dd9fff8f48892414fe496a847, type: 2}

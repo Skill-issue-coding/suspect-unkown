@@ -6,9 +6,10 @@ using UnityEngine;
 // Rebuilds the civilians' animator from code via Tools > Suspect Unknown > NPC > Civilian > Rebuild
 // Locomotion. Applies NPC.fbx's clip import settings first, then builds the base layer: Standing (a Speed
 // tree, idle and walk) while moving between spots, and Dwell (a Station tree, one clip per CivilianStation)
-// while standing at one, toggled by Dwelling. On top, the shared Phone layer (AnimatorBuildUtility) takes
-// the phone out while the decision window is open. All clips are in NPC.fbx, each take prefixed with the
-// armature's name
+// while standing at one, toggled by Dwelling. The reactions (Deliberating, Scared, Avoiding) are entered
+// from any state while Activity matches and hand back to Standing. On top, the shared Phone layer
+// (AnimatorBuildUtility) is faded in by CivilianAnimation for the call only. All clips are in NPC.fbx, each
+// take prefixed with the armature's name
 public static class CivilianLocomotionBuilder
 {
     private const string ControllerPath = "Assets/NPC/Animators/CivilianAnimator.controller";
@@ -27,6 +28,10 @@ public static class CivilianLocomotionBuilder
 
         AnimationClip idle = Clip("NPC_Idle"), walk = Clip("NPC_Walk");
 
+        // The reactions. The avoid walk keeps NPC_Walk's legs, so it fits WalkSpeed without a speed tree
+        AnimationClip deliberating = Clip("React_Deliberating"), scared = Clip("React_Scared"),
+            avoiding = Clip("React_AvoidWalk");
+
         // In CivilianStation order: index n is threshold n in the Dwell tree, so a wrong order plays the
         // wrong clip at a spot with no error
         AnimationClip[] dwell =
@@ -38,7 +43,8 @@ public static class CivilianLocomotionBuilder
         // The clerk's phone clips, retargeted through the Humanoid avatar: every civilian reaches the same way
         AnimationClip reach = Clip("Clerk_PhoneReach"), call = Clip("Clerk_PhoneCall");
 
-        if (!idle || !walk || !reach || !call || System.Array.Exists(dwell, clip => !clip))
+        if (!idle || !walk || !reach || !call || !deliberating || !scared || !avoiding
+            || System.Array.Exists(dwell, clip => !clip))
         {
             Debug.LogError($"{LogPrefix} Missing clips in {CivilianClipImport.FbxPath}. Aborting.");
             return;
@@ -46,7 +52,7 @@ public static class CivilianLocomotionBuilder
 
         AnimatorController controller = PrepareController();
         AddParameters(controller);
-        BuildBaseLayer(controller, idle, walk, dwell);
+        BuildBaseLayer(controller, idle, walk, dwell, deliberating, scared, avoiding);
         AnimatorBuildUtility.AddPhoneLayer(controller, reach, call);
 
         AssetDatabase.SaveAssets();
@@ -76,12 +82,13 @@ public static class CivilianLocomotionBuilder
         controller.AddParameter(CivilianAnimatorParams.Dwelling, AnimatorControllerParameterType.Bool);
         controller.AddParameter(NpcAnimatorParams.Deliberating, AnimatorControllerParameterType.Bool);
         controller.AddParameter(NpcAnimatorParams.Calling, AnimatorControllerParameterType.Bool);
+        controller.AddParameter(CivilianAnimatorParams.Activity, AnimatorControllerParameterType.Int);
     }
 
     // Walking between spots, then the spot's clip while standing at it. Dwelling toggles between the two;
     // Station only changes while walking, so the Dwell tree never visibly blends two clips
     private static void BuildBaseLayer(AnimatorController controller, AnimationClip idle, AnimationClip walk,
-        AnimationClip[] dwell)
+        AnimationClip[] dwell, AnimationClip deliberating, AnimationClip scared, AnimationClip avoiding)
     {
         AnimatorStateMachine root = controller.layers[0].stateMachine;
 
@@ -91,6 +98,10 @@ public static class CivilianLocomotionBuilder
 
         AnimatorBuildUtility.AddToggleTransitions(root, standing, dwelling, CivilianAnimatorParams.Dwelling,
             fromAnyState: false);
+
+        AddActivityState(root, standing, deliberating, CivilianActivity.Deliberating);
+        AddActivityState(root, standing, scared, CivilianActivity.Scared);
+        AddActivityState(root, standing, avoiding, CivilianActivity.Avoiding);
     }
 
     // Standing still at 0 m/s, the walk at its own speed. A civilian that stops stops its legs
@@ -109,6 +120,22 @@ public static class CivilianLocomotionBuilder
         for (int i = 0; i < clipsByStation.Length; i++)
             tree.AddChild(clipsByStation[i], i);
         return tree;
+    }
+
+    // Entered from any state while Activity equals the value, back to Standing when it changes. Any State
+    // transitions are checked first, so one reaction hands straight over to the next
+    private static void AddActivityState(AnimatorStateMachine root, AnimatorState standing, AnimationClip clip,
+        CivilianActivity activity)
+    {
+        AnimatorState state = AnimatorBuildUtility.AddState(root, activity.ToString(), clip);
+
+        AnimatorStateTransition enter = root.AddAnyStateTransition(state);
+        enter.AddCondition(AnimatorConditionMode.Equals, (int)activity, CivilianAnimatorParams.Activity);
+        enter.canTransitionToSelf = false;
+        AnimatorBuildUtility.Configure(enter, 0.25f, hasExitTime: false);
+
+        AnimatorBuildUtility.AddTransition(state, standing, 0.3f,
+            (AnimatorConditionMode.NotEqual, (int)activity, CivilianAnimatorParams.Activity));
     }
 
     private static AnimationClip Clip(string name)

@@ -1555,7 +1555,7 @@ MonoBehaviour:
     m_Bits: 1024
   tickRate: 10
   ambientLevel: 0.1
-  fullLightIntensity: 1
+  fullLightIntensity: 3
 --- !u!114 &8681365460147532909
 MonoBehaviour:
   m_ObjectHideFlags: 0

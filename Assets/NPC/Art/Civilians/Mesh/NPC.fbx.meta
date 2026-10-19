@@ -23,7 +23,7 @@ ModelImporter:
     removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
-    animationImportWarnings: "\nClip 'Armature|Clerk_PhoneCall' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Clerk_SitDown' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Clerk_SitStir' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Clerk_StandUp' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Customer_BrowseShelf' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Customer_ClothesRack' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Customer_InspectTable' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Customer_LookShoes' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Employee_BinDump' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Employee_Register' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Employee_Restock' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Employee_TidyShelf' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|React_Freeze' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|React_Startled' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n"
+    animationImportWarnings: "\nClip 'Armature|Clerk_PhoneCall' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Clerk_SitDown' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Clerk_SitStir' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Clerk_StandUp' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Customer_BrowseShelf' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Customer_ClothesRack' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Customer_InspectTable' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Customer_LookShoes' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Employee_BinDump' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Employee_Register' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Employee_Restock' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|Employee_TidyShelf' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|React_Deliberating' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\nClip 'Armature|React_Startled' has import animation warnings that might lower retargeting quality:\nNote: Activate translation DOF on avatar to improve retargeting quality.\n\t'Finger_01' is inbetween humanoid transforms and has rotation animation that will be discarded.\n\t'Finger_01.001' is inbetween humanoid transforms and has rotation animation that will be discarded.\n"
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -675,6 +675,35 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
+      name: Armature|React_AvoidWalk
+      takeName: Armature|React_AvoidWalk
+      internalID: -7829901797794334644
+      firstFrame: 0
+      lastFrame: 28
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 1
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000u
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
       name: Armature|React_BackAway
       takeName: Armature|React_BackAway
       internalID: -3730721888079226126
@@ -704,9 +733,9 @@ ModelImporter:
       maskSource: {instanceID: 0}
       additiveReferencePoseFrame: 0
     - serializedVersion: 16
-      name: Armature|React_Freeze
-      takeName: Armature|React_Freeze
-      internalID: -2502316217366754962
+      name: Armature|React_Deliberating
+      takeName: Armature|React_Deliberating
+      internalID: 321221062011826556
       firstFrame: 0
       lastFrame: 60
       wrapMode: 0
@@ -717,13 +746,42 @@ ModelImporter:
       hasAdditiveReferencePose: 0
       loopTime: 0
       loopBlend: 0
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
+      keepOriginalPositionY: 0
       keepOriginalPositionXZ: 0
-      heightFromFeet: 0
+      heightFromFeet: 1
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000u
+      curves: []
+      events: []
+      transformMask: []
+      maskType: 3
+      maskSource: {instanceID: 0}
+      additiveReferencePoseFrame: 0
+    - serializedVersion: 16
+      name: Armature|React_Scared
+      takeName: Armature|React_Scared
+      internalID: 6885498524419496047
+      firstFrame: 0
+      lastFrame: 60
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      hasAdditiveReferencePose: 0
+      loopTime: 1
+      loopBlend: 1
+      loopBlendOrientation: 1
+      loopBlendPositionY: 1
+      loopBlendPositionXZ: 1
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 0
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 1
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000u
       curves: []

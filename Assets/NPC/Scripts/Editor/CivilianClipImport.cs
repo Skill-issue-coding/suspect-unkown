@@ -7,8 +7,8 @@ using UnityEngine;
 // cycle would slide. Applied by CivilianLocomotionBuilder.Rebuild before it reads the clips, so one menu
 // click is enough, and a no-op when the settings are already right (no reimport). The clip ranges are read
 // fresh from the FBX each time, so a re-export with new lengths needs nothing else. Only the clips the
-// graph uses get settings; the rest (the clerk's set, the reactions, the run) keep their defaults until
-// something plays them
+// graph uses get settings; the rest (the clerk's set, React_BackAway, React_Startled, the run) keep their
+// defaults until something plays them
 public static class CivilianClipImport
 {
     public const string FbxPath = "Assets/NPC/Art/Civilians/Mesh/NPC.fbx";
@@ -16,15 +16,21 @@ public static class CivilianClipImport
     // The FBX prefixes every clip with its armature's name
     private const string ClipPrefix = "Armature|";
 
-    // Every clip the graph plays loops: the legs, the dwell clips (a civilian stays 6 to 35 s at a spot,
-    // longer than any clip) and the two phone poses, which hold until the window closes
+    // Clips that loop: the legs, the dwell clips (a civilian stays 6 to 35 s at a spot, longer than any
+    // clip), the two phone poses, which hold until the window closes, and the two reactions that last
+    // longer than their clip (the 8 to 10 s scare, the walk away)
     private static readonly string[] Cycles =
     {
         "NPC_Idle", "NPC_Walk",
         "Customer_BrowseShelf", "Customer_ClothesRack", "Customer_InspectTable", "Customer_LookShoes",
         "Employee_Register", "Employee_BinDump", "Employee_Restock", "Employee_TidyShelf",
         "Clerk_PhoneReach", "Clerk_PhoneCall",
+        "React_Scared", "React_AvoidWalk",
     };
+
+    // Played once and held on the last frame while the state lasts: the decision window can run longer
+    // than the clip, and a loop would snap the pose back to its start
+    private static readonly string[] Holds = { "React_Deliberating" };
 
     public static void Apply()
     {
@@ -42,7 +48,8 @@ public static class CivilianClipImport
         foreach (ModelImporterClipAnimation clip in clips)
         {
             string name = clip.name.StartsWith(ClipPrefix) ? clip.name.Substring(ClipPrefix.Length) : clip.name;
-            if (Cycles.Contains(name)) SetLooping(clip);
+            if (Cycles.Contains(name)) Bake(clip, loop: true);
+            else if (Holds.Contains(name)) Bake(clip, loop: false);
         }
 
         if (Same(importer.clipAnimations, clips)) return;
@@ -53,11 +60,12 @@ public static class CivilianClipImport
     }
 
     // Rotation, height and position are all baked into the pose, because the NavMeshAgent moves the
-    // character and NpcFacing turns it: the clips must not move it too (CLAUDE.md, Animation)
-    private static void SetLooping(ModelImporterClipAnimation clip)
+    // character and NpcFacing turns it: the clips must not move it too (CLAUDE.md, Animation). Loop or
+    // hold is the only difference between the two lists
+    private static void Bake(ModelImporterClipAnimation clip, bool loop)
     {
-        clip.loopTime = true;
-        clip.loopPose = true;
+        clip.loopTime = loop;
+        clip.loopPose = loop;
         clip.lockRootRotation = true;
         clip.lockRootHeightY = true;
         clip.lockRootPositionXZ = true;

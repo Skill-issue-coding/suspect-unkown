@@ -297,26 +297,26 @@ Personality alone reads as random because the player cannot see it. Branch prima
 
 1. **Severity of what was witnessed** — the tree root. Seeing someone move oddly is not the same as seeing someone with a crowbar in a display case.
 2. **Role** — an employee has a duty and a manager; a customer has nothing to gain. Uniform makes this visible.
-3. **Do they think you saw them?** Being noticed noticing pushes hard toward flight or compliance.
+3. **Do they think you saw them?** Being noticed noticing pushes hard toward fear or compliance.
 4. **Social proof** — is anyone else already panicking? This is where contagion enters the tree rather than sitting beside it.
-5. **Distance to the player, and distance to an exit** — nobody flees past the threat.
+5. **Distance to the player** — the closer the threat, the more likely fear wins over reaching for a phone. Civilians never flee, so distance to an exit does not matter.
 6. **Personality traits** as tiebreaker, not driver. Two axes suffice: self-preservation versus civic duty.
 
 #### Outcomes, and the evidence each produces
 
 Reactions must differ in what they feed the witness model, so the reaction system connects to 6.2 instead of running parallel to it.
 
-| Reaction           | Evidence produced                                                                |
-| ------------------ | -------------------------------------------------------------------------------- |
-| Freeze / comply    | Long, calm, high-quality observation. The most dangerous outcome for the player. |
-| Discreet call      | Starts a police timer. Phone is visible, so it is interruptible.                 |
-| Panic flee         | Poor, error-prone description. Loud. Spreads.                                    |
-| Avoid / walk away  | Almost nothing.                                                                  |
-| Pretend not to see | Keeps working, keeps observing secretly.                                         |
-| Film the player    | Camera-quality visual evidence. Must be stopped.                                 |
-| Confront           | Rare. A physical obstacle.                                                       |
+| Reaction           | Evidence produced                                                                                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Comply             | Long, calm, high-quality observation. The most dangerous outcome for the player.                                                                                                                                                      |
+| Discreet call      | Starts a police timer. Phone is visible, so it is interruptible.                                                                                                                                                                      |
+| Scared             | Freezes in place, covers their face and looks at the floor, shaking. Sees nothing while scared, so no new evidence; calms down after a while and goes back to what they were doing. Spreads panic. Never runs: civilians do not flee. |
+| Avoid / walk away  | Almost nothing.                                                                                                                                                                                                                       |
+| Pretend not to see | Keeps working, keeps observing secretly.                                                                                                                                                                                              |
+| Film the player    | Camera-quality visual evidence. Must be stopped.                                                                                                                                                                                      |
+| Confront           | Rare. A physical obstacle.                                                                                                                                                                                                            |
 
-**The resulting inversion: calm witnesses are the dangerous ones.** Scaring a civilian degrades their description but adds noise and alarm. Keeping them calm is quiet but gives them a long clean look at you. A real strategic decision rather than a preference.
+**The resulting inversion: calm witnesses are the dangerous ones.** Scaring a civilian stops them watching for a while but spreads panic to the people around them. Keeping them calm is quiet but gives them a long clean look at you. A real strategic decision rather than a preference.
 
 #### The decision window
 
@@ -324,7 +324,7 @@ Reactions must differ in what they feed the witness model, so the reaction syste
 
 This turns being seen from binary failure into a playable moment, which is exactly what the loop needs without shooting. It also makes the tree legible, because the player watches the decision happen.
 
-In 3D this is much stronger than it would be in 2D: body language carries it. A civilian reaching for a phone, backing away, or freezing is readable from animation alone, so the indicator becomes reinforcement rather than the whole signal.
+In 3D this is much stronger than it would be in 2D: body language carries it. A civilian reaching for a phone, backing away, or cowering with their face covered is readable from animation alone, so the indicator becomes reinforcement rather than the whole signal.
 
 #### Telegraph personality before it matters
 
