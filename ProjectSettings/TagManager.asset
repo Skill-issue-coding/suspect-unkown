@@ -23,7 +23,7 @@ TagManager:
   - Occluder
   - Camera
   - MainCameraOnly
-  - Oasis_TerrainBake
+  - Door
   - Player
   - NPC
   - Volume

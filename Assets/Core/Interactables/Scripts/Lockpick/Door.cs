@@ -43,6 +43,7 @@ public class Door : MonoBehaviour
     // Degrees, inside the pick's swing (LockpickModel clamps it to ±135). Random per door, fixed for
     // the heist, so a slip teaches the player something
     public float SweetSpot { get; private set; }
+    public float SwingSeconds => swingDuration;
 
     private Anomaly anomaly;
     private NavMeshObstacle obstacle;
@@ -50,11 +51,18 @@ public class Door : MonoBehaviour
     private Quaternion closedRotation;
     private Tween swing;
 
+    // World bounds of the reach triggers, taken in Awake while the door is shut and the triggers are on:
+    // a disabled collider reports empty bounds, and an open door's reaches are off
+    private Bounds[] reachBounds;
+
     private void Awake()
     {
         anomaly = GetComponent<Anomaly>();
         obstacle = GetComponent<NavMeshObstacle>();
         reaches = GetComponentsInChildren<Interactable>(true);
+        reachBounds = new Bounds[reaches.Length];
+        for (int i = 0; i < reaches.Length; i++)
+            reachBounds[i] = reaches[i].GetComponent<Collider>().bounds;
 
         // RequireComponent only adds components when Door itself is added, not to existing objects
         if (anomaly == null || obstacle == null)
@@ -79,11 +87,8 @@ public class Door : MonoBehaviour
     {
         if (!enabled || IsOpen) return;
 
-        IsOpen = true;
+        OpenForPassage();
         IsLocked = false;
-        obstacle.enabled = false;
-        SetReachable(false);
-        Swing(openAngle, swingDuration);
         anomaly.Raise();
     }
 
@@ -111,6 +116,18 @@ public class Door : MonoBehaviour
         anomaly.Clear();
     }
 
+    // For a guard passing through opens without raising the anomaly and leaves the lock as it was, since guards carry keys.
+    [ContextMenu("OpenForPassage")]
+    public void OpenForPassage()
+    {
+        if (!enabled || IsOpen) return;
+
+        IsOpen = true;
+        obstacle.enabled = false;
+        SetReachable(false);
+        Swing(openAngle, swingDuration);
+    }
+
     // The reach triggers exist only while the door is shut: an open door offers nothing to use
     private void SetReachable(bool reachable)
     {
@@ -136,6 +153,18 @@ public class Door : MonoBehaviour
         box.shape = NavMeshObstacleShape.Box;
         box.carving = true;
         box.carveOnlyStationary = true;
+    }
+
+    // Whether a position stands in either reach. Height is ignored: the NPC's position is at its feet,
+    // which can sit on the box's bottom edge
+    public bool InReach(Vector3 position)
+    {
+        foreach (Bounds bounds in reachBounds)
+        {
+            Vector3 flat = new Vector3(position.x, bounds.center.y, position.z);
+            if (bounds.Contains(flat)) return true;
+        }
+        return false;
     }
 
     // The doorway as NPCs see it: red while it blocks, green while it is a route

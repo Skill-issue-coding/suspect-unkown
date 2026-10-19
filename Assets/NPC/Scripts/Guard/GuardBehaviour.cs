@@ -104,6 +104,13 @@ public class GuardBehaviour : MonoBehaviour
 
     private bool LostSight => Time.time - lastSeenTime > lostSightGrace;
 
+    // Crossing a door's NavMeshLink the door this guard opened, whether it will close it once
+    // clear of the reach, and when the door has swung far enough to walk through
+    private Door passageDoor;
+    private bool closeBehind;
+    private bool crossing;
+    private float passageReadyTime;
+
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
@@ -112,6 +119,7 @@ public class GuardBehaviour : MonoBehaviour
         // Guards start in Patrolling without an activity change, so its speed is set here once;
         // SetActivity sets it on every later return to patrol.
         agent.speed = patrolSpeed;
+        agent.autoTraverseOffMeshLink = false;
 
         suspicion = GetComponent<NpcSuspicion>();
         perception = GetComponent<NpcPerception>();
@@ -151,6 +159,13 @@ public class GuardBehaviour : MonoBehaviour
         TrackPlayer();
         SetActivity(ActivityFor(suspicion.State));
 
+        if (agent.isOnOffMeshLink)
+        {
+            CrossLink();
+            return;
+        }
+        CloseBehindWhenClear();
+
         switch (Activity)
         {
             case GuardActivity.Patrolling: UpdatePatrol(); break;
@@ -160,6 +175,56 @@ public class GuardBehaviour : MonoBehaviour
         }
 
         UpdateHead();
+    }
+
+    // The agent waits at a link's start while autoTraverseOffMeshLink is off; this walks it across. A link on a
+    // Door opens it first: a patrolling or investigating guard waits for the swing, a chasing one does not
+    private void CrossLink()
+    {
+        OffMeshLinkData link = agent.currentOffMeshLinkData;
+
+        if (!crossing)
+        {
+            crossing = true;
+            passageReadyTime = Time.time;
+
+            Door door = link.owner is Component owner && owner != null ? owner.GetComponentInParent<Door>() : null;
+            if (door != null && !door.IsOpen)
+            {
+                door.OpenForPassage();
+                passageDoor = door;
+                closeBehind = Activity != GuardActivity.Pursuing;
+                if (closeBehind) passageReadyTime += door.SwingSeconds;
+            }
+        }
+
+        facing.LookDirection(link.endPos - link.startPos);
+        if (Time.time < passageReadyTime) return;
+
+        transform.position = Vector3.MoveTowards(transform.position, link.endPos, agent.speed * Time.deltaTime);
+        if ((transform.position - link.endPos).sqrMagnitude < 0.0025f)
+        {
+            agent.CompleteOffMeshLink();
+            crossing = false;
+        }
+    }
+
+    // Shuts only a door this guard opened, once it is out of both reaches. A chase cancels it: the door stays
+    // open, and is no anomaly, since only the player's open door is evidence
+    private void CloseBehindWhenClear()
+    {
+        if (passageDoor == null) return;
+
+        if (!closeBehind || Activity == GuardActivity.Pursuing)
+        {
+            passageDoor = null;
+            return;
+        }
+
+        if (passageDoor.InReach(transform.position)) return;
+
+        passageDoor.Close();
+        passageDoor = null;
     }
 
     private static GuardActivity ActivityFor(NpcAlertState state) => state switch

@@ -3,7 +3,8 @@ using UnityEngine;
 using UnityEngine.AI;
 
 // Decides whether a published sound reached this NPC, measuring distance along the NavMesh so sound
-// travels around corners and through open doors, never through walls (decision 10). Cheap straight-line
+// travels around corners and through open doors, never through walls or closed doors (decision 10): the
+// path leaves out the Door area, the NavMeshLinks guards cross closed doors by. Cheap straight-line
 // rejection first; a path is only calculated for sounds that could be in range.
 [RequireComponent(typeof(NpcPerception))]
 public class NpcHearing : MonoBehaviour
@@ -20,6 +21,11 @@ public class NpcHearing : MonoBehaviour
 
     private NpcPerception perception;
     private NavMeshPath path;
+
+    // Sound travels the NavMesh but not across door links, so a closed door blocks it (decision 10); an open
+    // door is plain floor and lets it through
+    private int areaMask = NavMesh.AllAreas;
+
     private readonly Vector3[] corners = new Vector3[MaxCorners];
 
 #if UNITY_EDITOR
@@ -52,6 +58,11 @@ public class NpcHearing : MonoBehaviour
     {
         perception = GetComponent<NpcPerception>();
         path = new NavMeshPath();
+
+        // 1 << door is the area's bit; & ~ clears it, leaving every area but Door
+        int door = NavMesh.GetAreaFromName("Door");
+        if (door < 0) Debug.LogWarning($"{name}: no NavMesh area 'Door'; sound will pass through closed doors", this);
+        else areaMask = NavMesh.AllAreas & ~(1 << door);
     }
 
     private void OnEnable() => NoiseBus.Published += OnNoise;
@@ -69,14 +80,14 @@ public class NpcHearing : MonoBehaviour
         Vector3 listener = transform.position;
         if ((noise.Position - listener).sqrMagnitude > reach * reach) return;
 
-        if (!NavMesh.SamplePosition(noise.Position, out NavMeshHit hit, SampleDistance, NavMesh.AllAreas))
+        if (!NavMesh.SamplePosition(noise.Position, out NavMeshHit hit, SampleDistance, areaMask))
         {
 #if UNITY_EDITOR
             Record(Verdict.OffNavMesh, noise, reach, 0f, 0);
 #endif
             return;
         }
-        if (!NavMesh.CalculatePath(listener, hit.position, NavMesh.AllAreas, path)
+        if (!NavMesh.CalculatePath(listener, hit.position, areaMask, path)
             || path.status != NavMeshPathStatus.PathComplete)
         {
 #if UNITY_EDITOR
