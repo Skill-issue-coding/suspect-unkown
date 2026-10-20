@@ -1312,6 +1312,8 @@ GameObject:
   - component: {fileID: -1327982410260966809}
   - component: {fileID: 7596070796813075446}
   - component: {fileID: 6880438211409201768}
+  - component: {fileID: 8829665198697198782}
+  - component: {fileID: 3580678349697786402}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -1675,8 +1677,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLockpicking
   tuning: {fileID: 11400000, guid: 9eddadc2fae627343b962ab73e045ce6, type: 2}
-  view: {fileID: 0}
-  successHold: 0.45
 --- !u!114 &-9086269151619823552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1690,8 +1690,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDoorInteraction
   tuning: {fileID: 11400000, guid: 2283f0033beda6343864383734ddc2a3, type: 2}
-  view: {fileID: 0}
-  successHold: 0.45
 --- !u!114 &5916406596137029354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1743,6 +1741,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f46426571b9c0a46bc1e36854d32dfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
+--- !u!114 &8829665198697198782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e53facaa6b97b5140bc2bd2c15152da8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMinigame
+  successHold: 0.45
+--- !u!114 &3580678349697786402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61881fd0bd7bf984f86e99c4e5259d36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSafeCracking
+  tuning: {fileID: 11400000, guid: c7d1d213cb8f010429d339f06df9adbc, type: 2}
 --- !u!1 &1386813031399317714
 GameObject:
   m_ObjectHideFlags: 0

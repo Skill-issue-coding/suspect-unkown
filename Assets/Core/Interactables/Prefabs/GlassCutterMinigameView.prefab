@@ -457,7 +457,7 @@ RectTransform:
   m_GameObject: {fileID: 5516013612130047880}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.3333299, y: 1.3333299, z: 1.3333299}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5001803729159223324}
@@ -465,7 +465,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 1180, y: 805}
-  m_SizeDelta: {x: 4000, y: 1500}
+  m_SizeDelta: {x: 1920, y: 1080}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &26447149910013278
 CanvasRenderer:
@@ -546,7 +546,7 @@ GameObject:
   - component: {fileID: 2525846162617236269}
   - component: {fileID: 8790997825255310053}
   m_Layer: 21
-  m_Name: LockpickRimLight
+  m_Name: GlassCutterRimLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -561,7 +561,7 @@ Transform:
   m_GameObject: {fileID: 6931994434402819936}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1018.2741, y: -537.4628, z: 1.5093002}
+  m_LocalPosition: {x: 2.1100643, y: 1.6614584, z: 0.8408232}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -739,7 +739,7 @@ GameObject:
   - component: {fileID: 4274406297382441728}
   - component: {fileID: 4094691063329682870}
   m_Layer: 21
-  m_Name: LockpickKeyLight
+  m_Name: GlassCutterKeyLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -753,8 +753,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7528686565412127425}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.3123097, y: 0.37681943, z: -0.13663928, w: 0.8612778}
-  m_LocalPosition: {x: -1020.0774, y: -536.84296, z: 0.005375147}
+  m_LocalRotation: {x: 0.31413066, y: 0.37800735, z: -0.13809632, w: 0.8598615}
+  m_LocalPosition: {x: -0.28991956, y: 2.4881186, z: -1.1591768}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -773,7 +773,7 @@ Light:
   m_Color: {r: 1, g: 0.86, b: 0.68, a: 1}
   m_Intensity: 4
   m_Range: 5.2737017
-  m_SpotAngle: 45
+  m_SpotAngle: 55
   m_InnerSpotAngle: 25
   m_CookieSize2D: {x: 0.5, y: 0.5}
   m_Shadows:
@@ -993,6 +993,7 @@ GameObject:
   - component: {fileID: 5001803729159223324}
   - component: {fileID: 8669309818968696699}
   - component: {fileID: 2721253322079226694}
+  - component: {fileID: 2829763407036716172}
   m_Layer: 21
   m_Name: GlassCutterMinigameView
   m_TagString: Untagged
@@ -1139,7 +1140,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a375a418dc9e6614880c13e87ae142f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlassCutterMinigame
-  cutterRoot: {fileID: 7881397977423288098}
   cutterMesh: {fileID: 4109682385117225703}
   cutterTip: {fileID: 5871964049638088991}
   conePivot: {fileID: 3190082467837046164}
@@ -1153,12 +1153,28 @@ MonoBehaviour:
   warningColor: {r: 1, g: 0.48, b: 0.32, a: 0.75}
   circleSegments: 128
   lineWidth: 0.02
-  dotTiling: 30
+  guideColor: {r: 1, g: 1, b: 1, a: 0.35}
+  cutColor: {r: 1, g: 1, b: 1, a: 0.95}
   lineZOffset: -0.005
-  blurVolume: {fileID: 0}
-  blurDuration: 0.25
-  cutterCamera: {fileID: 7475281756998771085}
+  cutLineRenderer: {fileID: 0}
   screenRect: {fileID: 3597712994398772250}
+  hud: {fileID: 0}
+--- !u!114 &2829763407036716172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8666632560557073463}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28443560454abee498d37285c749192b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MinigameScreen
+  screenCamera: {fileID: 7475281756998771085}
   pushInFov: 6
   pushInSharpness: 8
+  punchRoot: {fileID: 7881397977423288098}
   completePunch: 0.08
+  blurVolume: {fileID: 0}
+  blurDuration: 0.25

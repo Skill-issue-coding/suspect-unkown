@@ -1,17 +1,15 @@
 using PrimeTween;
 using UnityEngine;
-using UnityEngine.Rendering;
 
-// The glass cutter minigame's screen: the 3D cutter and glass, the camera that films them into a
-// RenderTexture, the dotted guide ring, progressive cut groove, and background blur. Reads a GlassCutterModel
-// and decides nothing. PlayerGlassCutting calls Begin and End, and asks TryGetAim where the pointer is on the glass.
+// The glass cutter minigame's own drawing: the 3D cutter and glass, the dotted guide ring, the progressive
+// cut groove, and the aim cone. The camera, blur, push-in and completion punch are the MinigameScreen
+// beside it. Reads a GlassCutterModel and decides nothing. PlayerGlassCutting calls Begin and End, and
+// asks TryGetAim where the pointer is on the glass.
 [RequireComponent(typeof(LineRenderer))]
+[RequireComponent(typeof(MinigameScreen))]
 public class GlassCutterView : MonoBehaviour
 {
     [Header("Hierarchy")]
-    [SerializeField, Tooltip("The parent object holding the minigame meshes, used for the completion scale punch")]
-    private Transform cutterRoot;
-
     [SerializeField, Tooltip("Rotated by the cut angle. Pivot must sit on the center suction cup")]
     private Transform cutterMesh;
 
@@ -66,35 +64,20 @@ public class GlassCutterView : MonoBehaviour
     [SerializeField, Tooltip("Optional separate LineRenderer for the solid cut groove. Auto-created on child 'CutLine' if empty")]
     private LineRenderer cutLineRenderer;
 
-    [Header("Background Blur")]
-    [SerializeField, Tooltip("Global Volume with Depth of Field, weight 0. Kept outside this object so it can fade out after the view hides")]
-    private Volume blurVolume;
-
-    [SerializeField, Tooltip("Seconds to blur in or out")]
-    private float blurDuration = 0.25f;
-
     [Header("Presentation")]
-    [SerializeField, Tooltip("Camera that films the glass cutter into a RenderTexture; its field of view narrows as the cut progresses")]
-    private Camera cutterCamera;
-
     [SerializeField, Tooltip("The RawImage rect that shows the camera's RenderTexture. The pointer is mapped through it, because the camera does not fill the screen")]
     private RectTransform screenRect;
 
-    [SerializeField, Tooltip("Degrees the field of view narrows at a full 360 cut")]
-    private float pushInFov = 6f;
-
-    [SerializeField, Tooltip("How quickly the camera follows the cut progress. Higher is snappier")]
-    private float pushInSharpness = 8f;
-
-    [SerializeField, Tooltip("Scale punch on the cutter root when the circle finishes")]
-    private float completePunch = 0.08f;
+    [Header("HUD")]
+    [SerializeField, Tooltip("The glass cutter HUD beside this view in Minigames.prefab. Kept outside this object so it can fade out after the view hides")]
+    private GlassCutterHud hud;
 
     private GlassCutterModel currentModel;
     private LineRenderer lineRenderer;
+    private Camera cutterCamera;
     private Camera uiCamera;
     private Material coneMaterial;
     private Color coneColor;
-    private Tween blurFade;
     private SpriteRenderer coneSpriteRenderer;
 
     // Materials and textures created procedurally for cleanup
@@ -109,7 +92,6 @@ public class GlassCutterView : MonoBehaviour
 
     private Vector3 aimDirection;
     private float cutterRadius;
-    private float baseFov;
     private float strainTimer;
     private bool cutClockwise;
     private bool celebrated;
@@ -121,6 +103,7 @@ public class GlassCutterView : MonoBehaviour
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
+        cutterCamera = GetComponent<MinigameScreen>().Camera;
 
         if (cutterMesh == null || cutterTip == null || conePivot == null || coneVisual == null
             || cutterCamera == null || screenRect == null)
@@ -138,7 +121,6 @@ public class GlassCutterView : MonoBehaviour
         initialCutterRotation = cutterMesh.localRotation;
         initialConeRotation = coneVisual.localRotation;
         initialConePosition = coneVisual.localPosition;
-        baseFov = cutterCamera.fieldOfView;
         aimDirection = conePivot.up;
 
         if (coneRenderer is SpriteRenderer sr)
@@ -172,7 +154,6 @@ public class GlassCutterView : MonoBehaviour
         cutterMesh.localRotation = initialCutterRotation;
         coneVisual.localRotation = initialConeRotation;
         coneVisual.localPosition = initialConePosition;
-        cutterCamera.fieldOfView = baseFov;
 
         Vector3 localCenter = transform.InverseTransformPoint(cutterMesh.position);
         Vector3 startTipLocal = transform.InverseTransformPoint(cutterTip.position);
@@ -197,15 +178,15 @@ public class GlassCutterView : MonoBehaviour
             cutLineRenderer.enabled = false;
         }
 
-        FadeBlur(1f);
         currentModel.Misaligned += OnMisaligned;
+        if (hud != null) hud.Show(model);
     }
 
     public void End()
     {
         if (currentModel == null) return;
 
-        FadeBlur(0f);
+        if (hud != null) hud.Hide();
         currentModel.Misaligned -= OnMisaligned;
         currentModel = null;
 
@@ -289,19 +270,11 @@ public class GlassCutterView : MonoBehaviour
         // Progressive cut groove line
         UpdateCutLine();
 
-        // Smooths only what is displayed: the camera eases toward the progress, the model stays exact.
-        // Exponential smoothing, so the feel does not depend on frame rate
-        float targetFov = baseFov - pushInFov * currentModel.Progress;
-        float blend = 1f - Mathf.Exp(-pushInSharpness * Time.deltaTime);
-        cutterCamera.fieldOfView = Mathf.Lerp(cutterCamera.fieldOfView, targetFov, blend);
-
         if (!celebrated && currentModel.IsComplete)
         {
             celebrated = true;
             lineRenderer.enabled = false;
             SetConeColor(alignedColor);
-            if (cutterRoot != null)
-                Tween.PunchScale(cutterRoot, Vector3.one * completePunch, duration: 0.35f, frequency: 6);
         }
     }
 
@@ -349,15 +322,6 @@ public class GlassCutterView : MonoBehaviour
             coneSpriteRenderer.color = color;
         else if (coneMaterial != null)
             coneMaterial.color = color;
-    }
-
-    private void FadeBlur(float to)
-    {
-        if (blurVolume == null) return;
-
-        blurFade.Stop();
-        blurFade = Tween.Custom(blurVolume, blurVolume.weight, to, blurDuration,
-            (volume, weight) => volume.weight = weight, Ease.OutQuad);
     }
 
     private void SetupDottedCircle()

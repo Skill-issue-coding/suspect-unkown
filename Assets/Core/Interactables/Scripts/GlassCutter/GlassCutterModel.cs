@@ -4,7 +4,7 @@ using UnityEngine;
 // The glass cutter's rules, with no scene objects: the cut advances only while tension is held and the
 // aim follows the dotted line, and straining out of line is reported once. PlayerGlassCutting feeds it
 // input each frame; GlassCutterView only reads it
-public class GlassCutterModel
+public class GlassCutterModel : IMinigameModel
 {
     private const float FullCircle = 360f;
 
@@ -13,6 +13,9 @@ public class GlassCutterModel
     public bool IsComplete => CutAngle >= FullCircle;
     public bool IsAligned { get; private set; }
     public bool IsStraining { get; private set; }
+
+    // Read by the HUD to show what the player is doing: whether tension is held this tick
+    public bool HasTension { get; private set; }
 
     // Raised on the tick the player starts holding tension out of line, not every tick after
     public event Action Misaligned;
@@ -27,6 +30,7 @@ public class GlassCutterModel
     public void Tick(float deltaTime, bool aligned, bool tension)
     {
         IsAligned = aligned;
+        HasTension = tension;
 
         if (IsComplete)
         {

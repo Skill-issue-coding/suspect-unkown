@@ -1,9 +1,10 @@
 using UnityEngine;
 using PrimeTween;
-using UnityEngine.Rendering;
 
-// The lockpicking minigame's screen: the 3D lock and pick, the camera that films them, the HUD, and the
-// background blur. Reads a LockpickModel and decides nothing. PlayerLockpicking calls Begin and End
+// The lockpicking minigame's own drawing: the 3D lock and pick, the bind shake, the slip rattle, and the
+// HUD. The camera, blur, push-in and open punch are the MinigameScreen beside it. Reads a LockpickModel
+// and decides nothing. PlayerLockpicking calls Begin and End
+[RequireComponent(typeof(MinigameScreen))]
 public class LockpickView : MonoBehaviour
 {
     [Header("Hierarchy")]
@@ -20,30 +21,9 @@ public class LockpickView : MonoBehaviour
     [SerializeField] private float cylinderMaxTurnAngle = 90f;
     [SerializeField, Tooltip("Degrees the pick shakes at most while the lock binds")] private float maxShakeAngle = 4f;
 
-    [Header("Background Blur")]
-    [SerializeField, Tooltip("Global Volume with Depth of Field, weight 0. Kept outside this object so it can fade out after the view hides")]
-    private Volume blurVolume;
-
-    [SerializeField, Tooltip("Seconds to blur in or out")]
-    private float blurDuration = 0.25f;
-
-    [Header("Presentation")]
-    [SerializeField, Tooltip("Camera that films the lock; its field of view narrows as the lock turns")]
-    private Camera lockCamera;
-
-    [SerializeField, Tooltip("Degrees the field of view narrows at a full turn")]
-    private float pushInFov = 8f;
-
-    [SerializeField, Tooltip("How quickly the camera follows the turn. Higher is snappier")]
-    private float pushInSharpness = 8f;
-
-    [SerializeField, Tooltip("Scale punch on the lock when it opens")]
-    private float openPunch = 0.08f;
-
-    private Tween blurFade;
+    [Header("HUD")]
+    [SerializeField, Tooltip("The lockpick HUD beside this view in Minigames.prefab. Kept outside this object so it can fade out after the view hides")]
     private LockpickHud hud;
-    private float baseFov;
-    private bool celebrated;
 
     private LockpickModel currentModel;
     private float bindingTimer;
@@ -56,25 +36,17 @@ public class LockpickView : MonoBehaviour
     {
         if (pickMesh != null) initialPickRotation = pickMesh.localRotation;
         if (cylinderMesh != null) initialCylinderRotation = cylinderMesh.localRotation;
-        if (lockCamera != null) baseFov = lockCamera.fieldOfView;
     }
 
     public void Begin(LockpickModel model, int lockLevel)
     {
-        // The HUD lives in the scene's PlayerHud and registers itself; fetched here, on first use,
-        // so the order of the two objects' Awake calls does not matter
-        if (hud == null) hud = LockpickHud.Current;
-
         if (currentModel != null)
         {
             currentModel.Slipped -= OnSlipped;
         }
 
         currentModel = model;
-        FadeBlur(1f);
         bindingTimer = 0f;
-        celebrated = false;
-        if (lockCamera != null) lockCamera.fieldOfView = baseFov;
         if (hud != null) hud.Show(model, lockLevel);
 
         if (currentModel != null)
@@ -87,7 +59,6 @@ public class LockpickView : MonoBehaviour
     {
         if (currentModel == null) return;
 
-        FadeBlur(0f);
         if (hud != null) hud.Hide();
         currentModel.Slipped -= OnSlipped;
         currentModel = null;
@@ -119,30 +90,6 @@ public class LockpickView : MonoBehaviour
 
         pickMesh.localRotation = initialPickRotation * Quaternion.AngleAxis(pickAngle + pickShake, pickRotationAxis);
         cylinderMesh.localRotation = initialCylinderRotation * Quaternion.AngleAxis(cylinderAngle, cylinderRotationAxis);
-
-        // Smooths only what is displayed: the camera eases toward the turn, the model stays exact.
-        // Exponential smoothing, so the feel does not depend on frame rate
-        if (lockCamera != null)
-        {
-            float targetFov = baseFov - pushInFov * currentModel.LockTurn;
-            float blend = 1f - Mathf.Exp(-pushInSharpness * Time.deltaTime);
-            lockCamera.fieldOfView = Mathf.Lerp(lockCamera.fieldOfView, targetFov, blend);
-        }
-
-        if (!celebrated && currentModel.IsOpen)
-        {
-            celebrated = true;
-            if (lockRoot != null) Tween.PunchScale(lockRoot, Vector3.one * openPunch, duration: 0.35f, frequency: 6);
-        }
-    }
-
-    private void FadeBlur(float to)
-    {
-        if (blurVolume == null) return;
-
-        blurFade.Stop();
-        blurFade = Tween.Custom(blurVolume, blurVolume.weight, to, blurDuration,
-            (volume, weight) => volume.weight = weight, Ease.OutQuad);
     }
 
     private void OnSlipped()

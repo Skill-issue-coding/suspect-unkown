@@ -1,12 +1,18 @@
 using System;
 using UnityEngine; // Needed for Mathf
 
-public class LockpickModel
+// The lock's rules, with no scene objects. PlayerLockpicking feeds it input each frame; LockpickView and
+// LockpickHud only read it
+public class LockpickModel : IMinigameModel
 {
     public float PickAngle { get; private set; }
     public float LockTurn { get; private set; }  // 0 = rest, 1 = open
     public bool IsBinding { get; private set; }
     public bool IsOpen => LockTurn >= 1f;
+
+    // The shared minigame view of the lock, kept explicit so lock code still says LockTurn and IsOpen
+    float IMinigameModel.Progress => LockTurn;
+    bool IMinigameModel.IsComplete => IsOpen;
 
     // Read by the HUD to show what the player can do right now: whether tension is applied this tick,
     // whether a slip lockout is running, and how close a binding lock is to slipping (0 to 1)

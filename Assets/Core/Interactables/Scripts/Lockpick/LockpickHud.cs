@@ -6,14 +6,10 @@ using UnityEngine.UI;
 // The lockpicking minigame's 2D layer: control hints, a status line and a turn meter, all read from the
 // LockpickModel. It teaches without interrupting: the hint for what the player can do right now lights
 // up, the status line names the lock's state, and a tip appears only after repeated slips. Draws only;
-// the model decides. An overlay canvas of its own inside the scene's PlayerHud prefab; LockpickView finds
-// it through Current, so the two need no reference to each other
+// the model decides. An overlay canvas of its own inside Minigames.prefab, beside the LockpickView that
+// shows and hides it
 public class LockpickHud : MonoBehaviour
 {
-    // The scene's lockpicking HUD. Set in Awake and cleared on destroy, so a reloaded scene never keeps
-    // the old one
-    public static LockpickHud Current { get; private set; }
-
     [Header("Parts")]
     [SerializeField, Tooltip("Fades the whole HUD")]
     private CanvasGroup group;
@@ -87,8 +83,6 @@ public class LockpickHud : MonoBehaviour
 
     private void Awake()
     {
-        Current = this;
-
         if (group == null || moveHint == null || turnHint == null || status == null || meterFill == null || levelLabel == null)
         {
             Debug.LogWarning($"{name} is missing parts; assign them in LockpickHud.prefab", this);
@@ -102,7 +96,6 @@ public class LockpickHud : MonoBehaviour
     private void OnDestroy()
     {
         Detach();
-        if (Current == this) Current = null;
     }
 
     public void Show(LockpickModel lockModel, int lockLevel)

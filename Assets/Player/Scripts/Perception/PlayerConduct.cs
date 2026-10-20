@@ -7,17 +7,16 @@ using UnityEngine;
 // CharacterController: adding a Rigidbody to the player would make all 17 bone 
 // triggers fire zone events too. A zone disabled while the player is inside never 
 // sends OnTriggerExit; zones are static level geometry, so that is accepted.
-// Lockpicking comes from PlayerLockpicking, Stealing from PlayerInteraction.
+// Minigame conduct (Lockpicking, GlassCutting) comes from PlayerMinigame, Stealing from PlayerInteraction.
 [RequireComponent(typeof(PlayerMotor))]
 public class PlayerConduct : MonoBehaviour
 {
     private readonly Dictionary<Zone, int> zoneCounts = new();
 
     private PlayerMotor motor;
-    private PlayerLockpicking lockpicking;
+    private PlayerMinigame minigame;
     private PlayerInteraction interaction;
     private bool isStealing;
-    private PlayerGlassCutting glasscutting;
     public ConductFlags Current
     {
         get
@@ -25,9 +24,8 @@ public class PlayerConduct : MonoBehaviour
             ConductFlags flags = ConductFlags.None;
             if (motor.IsSprinting) flags |= ConductFlags.Sprinting;
             if (IsInStaffArea()) flags |= ConductFlags.InStaffArea;
-            if (lockpicking != null && lockpicking.IsPicking) flags |= ConductFlags.Lockpicking;
+            if (minigame != null) flags |= minigame.Conduct;
             if (isStealing) flags |= ConductFlags.Stealing;
-            if (glasscutting != null && glasscutting.IsCutting) flags |= ConductFlags.GlassCutting;
             return flags;
         }
     }
@@ -93,9 +91,8 @@ public class PlayerConduct : MonoBehaviour
     private void Awake()
     {
         motor = GetComponent<PlayerMotor>();
-        lockpicking = GetComponent<PlayerLockpicking>();
+        minigame = GetComponent<PlayerMinigame>();
         interaction = GetComponent<PlayerInteraction>();
-        glasscutting = GetComponent<PlayerGlassCutting>();
     }
 
 }

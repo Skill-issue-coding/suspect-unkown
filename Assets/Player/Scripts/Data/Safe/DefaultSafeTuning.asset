@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 842ae36ac1006414189ecdf786888763, type: 3}
+  m_Name: DefaultSafeTuning
+  m_EditorClassIdentifier: Assembly-CSharp::SafeTuning
+  levels:
+  - numbers: 3
+    sweetSpot: 9
+    margin: 36
+    testSpeed: 1.6
+    slipTime: 0.9
+  - numbers: 3
+    sweetSpot: 6
+    margin: 27
+    testSpeed: 1.3
+    slipTime: 0.7
+  - numbers: 3
+    sweetSpot: 4
+    margin: 18
+    testSpeed: 1.1
+    slipTime: 0.5
+  dialSpeed: 0.3
+  returnSpeed: 3
+  slipLockout: 0.4

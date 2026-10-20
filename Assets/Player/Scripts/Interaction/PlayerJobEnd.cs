@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Takes the player's controls away the moment the job ends, caught or escaped: cancels a lockpick in
+// Takes the player's controls away the moment the job ends, caught or escaped: ends a minigame in
 // progress, frees the cursor, stops movement, and stops all gameplay input so nothing new can start.
 // The newspaper's buttons still work: UI clicks go through the EventSystem, not PlayerInput
 [RequireComponent(typeof(PlayerInput), typeof(PlayerInputs), typeof(PlayerMotor))]
@@ -10,16 +10,14 @@ public class PlayerJobEnd : MonoBehaviour
     private PlayerInput playerInput;
     private PlayerInputs inputs;
     private PlayerMotor motor;
-    private PlayerLockpicking lockpicking;
-    private PlayerGlassCutting glassCutting;
+    private PlayerMinigame minigame;
 
     private void Awake()
     {
         playerInput = GetComponent<PlayerInput>();
         inputs = GetComponent<PlayerInputs>();
         motor = GetComponent<PlayerMotor>();
-        lockpicking = GetComponent<PlayerLockpicking>();
-        glassCutting = GetComponent<PlayerGlassCutting>();
+        minigame = GetComponent<PlayerMinigame>();
     }
 
     private void OnEnable()
@@ -38,8 +36,7 @@ public class PlayerJobEnd : MonoBehaviour
 
     private void End()
     {
-        if (lockpicking != null) lockpicking.Cancel();
-        if (glassCutting != null) glassCutting.End();
+        if (minigame != null) minigame.End();
 
         motor.IsMovementSuspended = true;
         inputs.MoveInput(Vector2.zero);

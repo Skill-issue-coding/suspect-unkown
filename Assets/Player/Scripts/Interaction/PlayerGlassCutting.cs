@@ -1,112 +1,92 @@
 using UnityEngine;
 
-// Runs one glass-cutting session at a pane: feeds the pointer and tension to the GlassCutterModel, shows
-// the view, holds the player still with the cursor free, and tells the glass when the circle is cut.
-// GlassCutterInteraction starts it; the model decides, the view draws
+// Glass cutting as a minigame: feeds the pointer and tension to a GlassCutterModel, and tells the glass
+// when the circle is cut. PlayerMinigame runs the session around it; GlassCutterInteraction starts it;
+// the model decides, the view draws
 [RequireComponent(typeof(PlayerInputs))]
-[RequireComponent(typeof(PlayerMotor))]
-public class PlayerGlassCutting : MonoBehaviour
+[RequireComponent(typeof(PlayerMinigame))]
+public class PlayerGlassCutting : MonoBehaviour, IMinigame
 {
     [SerializeField, Tooltip("Cut speed and aim tolerance")]
     private GlassCutterTuning tuning;
 
-    [SerializeField, Tooltip("The minigame's scene instance, not the prefab asset; shown while cutting")]
+    private PlayerInputs input;
+    private PlayerMinigame minigame;
     private GlassCutterView view;
-
-    [SerializeField, Tooltip("Seconds the finished cut stays on screen before the view closes")]
-    private float successHold = 0.45f;
-
-    private PlayerMotor playerMotor;
-    private PlayerInteraction interaction;
-    private PlayerInputs _input;
+    private MinigameScreen screen;
 
     private GlassCutterModel model;
     private GlassCutterInteraction targetGlass;
-    private float finishTimer;
-    private bool isCutting;
-    private bool cursorWasLocked;
-    public bool IsCutting => isCutting;
+
+    public MinigameScreen Screen => screen;
+    public IMinigameModel Model => model;
+
+    // Free cursor: the cone follows the pointer
+    public bool LocksCursor => false;
+    public ConductFlags Conduct => ConductFlags.GlassCutting;
 
     private void Awake()
     {
-        _input = GetComponent<PlayerInputs>();
-        playerMotor = GetComponent<PlayerMotor>();
-        interaction = GetComponent<PlayerInteraction>();
+        input = GetComponent<PlayerInputs>();
+        minigame = GetComponent<PlayerMinigame>();
 
-        if (tuning == null || view == null)
+        if (tuning == null)
         {
-            Debug.LogWarning($"{name} needs a GlassCutterTuning and a GlassCutterView", this);
+            Debug.LogWarning($"{name} needs a GlassCutterTuning", this);
             enabled = false;
         }
     }
 
     public void Begin(GlassCutterInteraction glass)
     {
-        if (!enabled || isCutting || glass == null) return;
+        if (!enabled || glass == null || minigame.IsPlaying || !FindView()) return;
 
         targetGlass = glass;
-        isCutting = true;
         model = new GlassCutterModel(tuning.CutSpeed);
 
-        view.gameObject.SetActive(true);
+        if (!minigame.Begin(this))
+        {
+            model = null;
+            targetGlass = null;
+            return;
+        }
+
         view.Begin(model, tuning.CutClockwise);
-
-        if (interaction != null) interaction.IsBusy = true;
-
-        playerMotor.IsMovementSuspended = true;
-
-        // Free cursor: the cone follows the pointer
-        cursorWasLocked = _input.cursorLocked;
-        _input.SetCursorLocked(false);
-
-        finishTimer = 0f;
-        _input.tension = false;
-        _input.cancel = false;
     }
 
-    public void End()
+    public void Tick(float deltaTime)
     {
-        if (!isCutting) return;
+        bool aimed = view.TryGetAim(input.aim, tuning.MinAimDistance, out float angleToTangent);
+        model.Tick(deltaTime, aimed && angleToTangent <= tuning.AlignmentTolerance, input.tension);
+    }
 
-        isCutting = false;
+    public void Complete() => targetGlass.OnCut();
+
+    public void Stop()
+    {
+        view.End();
         model = null;
         targetGlass = null;
-        view.End();
-        view.gameObject.SetActive(false);
-
-        playerMotor.IsMovementSuspended = false;
-        _input.SetCursorLocked(cursorWasLocked);
-
-        if (interaction != null) interaction.IsBusy = false;
     }
 
-    private void Update()
+    // The view lives in the scene's MinigameRig; found on first use, so the order of the two objects'
+    // Awake calls does not matter
+    private bool FindView()
     {
-        if (!isCutting) return;
+        if (view != null) return true;
 
-        if (_input.cancel)
+        if (MinigameRig.Current != null)
+            view = MinigameRig.Current.GetComponentInChildren<GlassCutterView>(true);
+
+        if (view == null)
         {
-            _input.cancel = false; // Consume the input so it doesn't fire twice
-            End();
-            return;
+            Debug.LogWarning($"{name} found no GlassCutterView in the scene's MinigameRig", this);
+            enabled = false;
+            return false;
         }
 
-        // The circle is cut and the pane already gone: hold the view a moment so the player sees it
-        if (finishTimer > 0f)
-        {
-            finishTimer -= Time.deltaTime;
-            if (finishTimer <= 0f) End();
-            return;
-        }
-
-        bool aimed = view.TryGetAim(_input.aim, tuning.MinAimDistance, out float angleToTangent);
-        model.Tick(Time.deltaTime, aimed && angleToTangent <= tuning.AlignmentTolerance, _input.tension);
-
-        if (model.IsComplete)
-        {
-            targetGlass.OnCut();
-            if (successHold > 0f) finishTimer = successHold;
-            else End();
-        }
+        // GlassCutterView requires a MinigameScreen beside it
+        screen = view.GetComponent<MinigameScreen>();
+        return true;
     }
 }

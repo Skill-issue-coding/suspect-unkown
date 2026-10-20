@@ -76,7 +76,7 @@ Errands use the existing `CivilianSpot` mechanism. Spots have no weights (decide
 
 The safe in the office holds the bonus money: one to three money stacks (bag items, `LootCarry.Bag`), rolled at load like the rest of the bonus loot.
 
-- **Opening it** is a lockpick at lock level 1 (the same minigame as doors), so being seen opening it is `Lockpicking` conduct. Each stack is then taken with a hold, like any loot.
+- **Opening it** is a combination dial (changed 2026-10-20 from the door lockpick): turn the dial either way until it catches, which it does only on the next number of the combination (the dial jumps, the handle kicks, the readout turns green), and hold tension to test it. The turning direction does not matter (changed the same day: the right-left-right rule and the wider catch zone made the hint too vague). A test at the number sets it; near it the test binds and, held too long, slips. Numbers already set stay set if the player backs off, so leaving when a guard comes costs only the number in progress. Being seen at it is `Lockpicking` conduct. Each stack is then taken with a hold, like any loot.
 - **An open safe is an anomaly,** a new `AnomalyKind.SafeOpen`. A guard who notices it:
   1. investigates it (the anomaly becomes the stimulus and last-known position, decision 18),
   2. has their **baseline suspicion raised for the rest of the job** to just under `curiousAt`, so they keep patrolling but any further stimulus tips them into Curious quickly,
@@ -287,7 +287,7 @@ _Check:_ the guard patrols, visits the office most, catches the player standing 
 **G2. Slamming doors** (M5 step 2.4). The guard claims an open door's anomaly, walks over, plays the confused beat, and calls `Resolve()`; the door slams. A pursuing guard ignores open doors and runs through.
 _Check:_ pick the right side door and leave it open: the guard comes, looks confused and slams it. Two guards never go for the same door. Chased through an open door, the guard follows without slamming it.
 
-**G3. The safe.** `Safe` (Core) with a lock level, the lockpick minigame, money stacks inside, and an `Anomaly` of the new kind `SafeOpen`. The guard investigates it, raises their baseline to just under `curiousAt`, and closes the safe as an errand. The office POI drains 1.5 times faster once the safe has been opened.
+**G3. The safe.** The minigame is built (2026-10-20): `Safe` (Core) with a lock level and a combination rolled per heist, `SafeInteraction`, `PlayerSafeCracking` (an `IMinigame`, on `Player.prefab`), `SafeModel`, `SafeView` and `SafeHud`, `SafeTuning` (`DefaultSafeTuning`), and `SafeMinigameView.prefab` with `SafeHud.prefab` in `Minigames.prefab`, on render layer 18 (`SafeCracking`). The dial has 20 numbers (cut from 40 the same day: 9° between numbers was too fine to aim for) printed by `SafeView`'s Rebuild Dial Face; the handle turns −90° about its local Y on opening (+90° turns it up into the dial). Still to do: money stacks inside, and an `Anomaly` of the new kind `SafeOpen`. The guard investigates it, raises their baseline to just under `curiousAt`, and closes the safe as an errand. The office POI drains 1.5 times faster once the safe has been opened.
 _Check:_ open the safe and hide: the guard comes, closes it, and from then on reaches Curious from a glance that would not have made them Curious before. The office POI's drain readout is 1.5 times its base rate.
 
 ### Track C — civilians
