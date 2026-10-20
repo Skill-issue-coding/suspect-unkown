@@ -7,7 +7,7 @@ using UnityEngine;
 // Authoring it in code rather than by hand keeps the blend thresholds, damping and transition
 // settings reviewable in git, and makes a bad experiment one menu click away from being undone.
 //
-// Every clip but the jump comes from Player.fbx. The graph has two stances, each with an idle, a walking
+// Every clip comes from Player.fbx. The graph has two stances, each with an idle, a walking
 // tier (and a sprint tier standing) and turn-in-place; and one idle break per stance, a random variant
 // that PlayerAnimator fires after the player has stood still for a while.
 public static class PlayerLocomotionBuilder
@@ -35,9 +35,6 @@ public static class PlayerLocomotionBuilder
     }
 
     private const string ControllerPath = "Assets/Player/Art/PlayerAnimationController.controller";
-
-    // Player.fbx has no jump. This is the one Mixamo clip left; replace it here when a real one exists.
-    private const string JumpClipPath = "Assets/Player/Art/Animations/Running/running_jump.fbx";
 
     // PlayerAim reads the length of whichever state carries this tag, and paces the body's
     // rotation to it. Renaming the tag here means renaming TurnTag there.
@@ -89,7 +86,7 @@ public static class PlayerLocomotionBuilder
         AnimationClip turnRight = LoadClip("Player_Turn_Right_Stand");
         AnimationClip crouchTurnLeft = LoadClip("Player_Turn_Left_Crouch");
         AnimationClip crouchTurnRight = LoadClip("Player_Turn_Right_Crouch");
-        AnimationClip jump = LoadJumpClip();
+        AnimationClip jump = LoadClip("Player_Jump_New");
 
         // Anything missing aborts: a state with no clip would hold the rig frozen mid-pose
         bool complete = standIdle != null && crouchIdle != null && walk.IsComplete && run.IsComplete
@@ -471,16 +468,6 @@ public static class PlayerLocomotionBuilder
             .FirstOrDefault(c => !c.name.StartsWith("__preview__") && c.name.EndsWith("|" + shortName));
 
         if (clip == null) Debug.LogWarning($"[PlayerLocomotionBuilder] No clip {shortName} in {PlayerClipImport.FbxPath}");
-        return clip;
-    }
-
-    private static AnimationClip LoadJumpClip()
-    {
-        AnimationClip clip = AssetDatabase.LoadAllAssetsAtPath(JumpClipPath)
-            .OfType<AnimationClip>()
-            .FirstOrDefault(c => !c.name.StartsWith("__preview__"));
-
-        if (clip == null) Debug.LogWarning($"[PlayerLocomotionBuilder] No clip in {JumpClipPath}");
         return clip;
     }
 }

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEditor.Animations;
 using UnityEngine;
 
-// Building blocks for code-built animator controllers: loading and measuring clips, creating trees,
+// Building blocks for code-built animator controllers: measuring clips, creating trees,
 // states and transitions, and resetting a controller in place. Nothing here knows about a specific
 // character; the builders decide the graph.
 public static class AnimatorBuildUtility
@@ -15,19 +15,6 @@ public static class AnimatorBuildUtility
     // Below this, a measured speed is treated as "no root motion" rather than a very slow clip
     private const float MinMeasurableSpeed = 0.05f;
     private const float MinMeasurableTurnRate = 1f;
-
-    public static AnimationClip LoadClip(string root, string fileName)
-    {
-        string path = $"{root}/{fileName}";
-
-        // An imported FBX holds its clip as a sub-asset, alongside a hidden __preview__ copy.
-        AnimationClip clip = AssetDatabase.LoadAllAssetsAtPath(path)
-            .OfType<AnimationClip>()
-            .FirstOrDefault(c => !c.name.StartsWith("__preview__"));
-
-        if (clip == null) Debug.LogWarning($"{LogPrefix} No clip at {path}");
-        return clip;
-    }
 
     // averageSpeed is the clip's root motion in metres per second. A Humanoid clip exported with
     // "In Place" unchecked has it; an in-place clip reads zero and gets the fallback
@@ -43,10 +30,11 @@ public static class AnimatorBuildUtility
     }
 
     // Degrees per second the clip turns on its own. Only readable when Root Transform Rotation is not
-    // baked; a baked clip reads zero and gets the fallback.
+    // baked; a baked clip reads zero and gets the fallback. averageAngularSpeed is in radians per second,
+    // whatever its name suggests, and NpcAnimator sets TurnRate in degrees per second, so convert.
     public static float MeasureTurnRate(AnimationClip clip, float fallback)
     {
-        float rate = Mathf.Abs(clip.averageAngularSpeed);
+        float rate = Mathf.Abs(clip.averageAngularSpeed) * Mathf.Rad2Deg;
         if (rate >= MinMeasurableTurnRate) return rate;
 
         Debug.LogWarning($"{LogPrefix} {clip.name} has no root rotation; using {fallback}°/s. " +

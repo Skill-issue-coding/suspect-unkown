@@ -39,6 +39,11 @@ public static class PlayerClipImport
         "Player_Turn_Left_Crouch", "Player_Turn_Right_Crouch",
     };
 
+    // Plays once. The clip keeps the hips at standing height in the air, because PlayerMotor supplies the
+    // whole rise; its height is based on Original so the tucked legs lift the feet instead of the body
+    // sinking to keep them on the floor (CLAUDE.md, Animation)
+    private const string Jump = "Player_Jump_New";
+
     public static void Apply()
     {
         ModelImporter importer = AssetImporter.GetAtPath(FbxPath) as ModelImporter;
@@ -59,6 +64,7 @@ public static class PlayerClipImport
             if (Cycles.Contains(name)) Set(clip, loop: true, bakeRotation: true);
             else if (Breaks.Contains(name)) Set(clip, loop: false, bakeRotation: true);
             else if (Turns.Contains(name)) Set(clip, loop: false, bakeRotation: false);
+            else if (name == Jump) Set(clip, loop: false, bakeRotation: true, heightFromFeet: false);
         }
 
         if (Same(importer.clipAnimations, clips)) return;
@@ -69,17 +75,17 @@ public static class PlayerClipImport
     }
 
     // Position Y and XZ are always baked into the pose, because PlayerMotor moves the character and
-    // the clips must not move it too
-    private static void Set(ModelImporterClipAnimation clip, bool loop, bool bakeRotation)
+    // the clips must not move it too. Height comes from the feet unless the clip leaves the ground
+    private static void Set(ModelImporterClipAnimation clip, bool loop, bool bakeRotation, bool heightFromFeet = true)
     {
         clip.loopTime = loop;
         clip.loopPose = loop;
         clip.lockRootRotation = bakeRotation;
         clip.lockRootHeightY = true;
         clip.lockRootPositionXZ = true;
-        clip.heightFromFeet = true;
+        clip.heightFromFeet = heightFromFeet;
         clip.keepOriginalOrientation = false;
-        clip.keepOriginalPositionY = false;
+        clip.keepOriginalPositionY = !heightFromFeet;
         clip.keepOriginalPositionXZ = false;
     }
 

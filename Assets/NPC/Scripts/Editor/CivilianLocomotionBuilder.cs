@@ -8,12 +8,11 @@ using UnityEngine;
 // tree, idle and walk) while moving between spots, and Dwell (a Station tree, one clip per CivilianStation)
 // while standing at one, toggled by Dwelling. The reactions (Deliberating, Scared, Avoiding) are entered
 // from any state while Activity matches and hand back to Standing. On top, the shared Phone layer
-// (AnimatorBuildUtility) is faded in by CivilianAnimation for the call only. All clips are in NPC.fbx, each
-// take prefixed with the armature's name
+// (AnimatorBuildUtility) is faded in by CivilianAnimation for the call only. All clips are in NPC.fbx,
+// loaded through NpcClipImport
 public static class CivilianLocomotionBuilder
 {
     private const string ControllerPath = "Assets/NPC/Animators/CivilianAnimator.controller";
-    private const string ClipPrefix = "Armature|";
     private const string LogPrefix = "[CivilianLocomotionBuilder]";
 
     // The walk is animated in place for about this speed; CivilianBehaviour's walk speed should match it,
@@ -24,7 +23,7 @@ public static class CivilianLocomotionBuilder
     public static void Rebuild()
     {
         // Settings before reading: a clip read before the reimport is the old one
-        CivilianClipImport.Apply();
+        NpcClipImport.Apply();
 
         AnimationClip idle = Clip("NPC_Idle"), walk = Clip("NPC_Walk");
 
@@ -46,7 +45,7 @@ public static class CivilianLocomotionBuilder
         if (!idle || !walk || !reach || !call || !deliberating || !scared || !avoiding
             || System.Array.Exists(dwell, clip => !clip))
         {
-            Debug.LogError($"{LogPrefix} Missing clips in {CivilianClipImport.FbxPath}. Aborting.");
+            Debug.LogError($"{LogPrefix} Missing clips in {NpcClipImport.FbxPath}. Aborting.");
             return;
         }
 
@@ -138,11 +137,5 @@ public static class CivilianLocomotionBuilder
             (AnimatorConditionMode.NotEqual, (int)activity, CivilianAnimatorParams.Activity));
     }
 
-    private static AnimationClip Clip(string name)
-    {
-        foreach (Object asset in AssetDatabase.LoadAllAssetsAtPath(CivilianClipImport.FbxPath))
-            if (asset is AnimationClip clip && clip.name == ClipPrefix + name) return clip;
-        Debug.LogWarning($"{LogPrefix} No clip {name} in {CivilianClipImport.FbxPath}");
-        return null;
-    }
+    private static AnimationClip Clip(string name) => NpcClipImport.Load(name);
 }

@@ -17,6 +17,9 @@ public static class GuardLocomotionBuilder
     [MenuItem(MenuPaths.GuardRebuildLocomotion, false, MenuPaths.NpcPriority)]
     public static void Rebuild()
     {
+        // Settings before reading: a clip read before the reimport is the old one
+        NpcClipImport.Apply();
+
         GuardClips clips = GuardClips.Load();
         if (!clips.HasRequired)
         {
