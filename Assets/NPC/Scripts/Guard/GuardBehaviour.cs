@@ -62,8 +62,11 @@ public class GuardBehaviour : MonoBehaviour
     private float glanceDuration = 1.5f;
 
     [Header("Errands")]
-    [SerializeField, Tooltip("Seconds the guard stands confused at an open door before slamming it")]
+    [SerializeField, Tooltip("Seconds from arriving at an open door or safe to it shutting. Match the impact in Guard_DoorSlam")]
     private float confusedDuration = 1.5f;
+
+    [SerializeField, Range(0.005f, 0.1f), Tooltip("How far below the point where Curious calms back to Idle an open safe leaves the guard's suspicion for the rest of the job")]
+    private float onEdgeMargin = 0.01f;
 
     [Header("Debug")]
     [SerializeField] private bool debug = true;
@@ -113,6 +116,17 @@ public class GuardBehaviour : MonoBehaviour
     private bool LostSight => Time.time - lastSeenTime > lostSightGrace;
 
     public bool IsResolving => errand != null && arrived && Activity == GuardActivity.Investigating;
+
+    // Just under where Curious drops back to Idle, not under curiousAt itself: between the two, a guard who
+    // once reached Curious could never calm down again
+    private float OnEdgeBaseline
+    {
+        get
+        {
+            NpcArchetype archetype = perception.Archetype;
+            return archetype.Threshold(NpcAlertState.Curious) - archetype.Hysteresis - onEdgeMargin;
+        }
+    }
 
     private void Awake()
     {
@@ -525,6 +539,11 @@ public class GuardBehaviour : MonoBehaviour
     // ignores doors (decision 19), and a door another guard has claimed only raises suspicion (NpcSuspicion)
     private void OnNoticed(Anomaly anomaly)
     {
+        // Seeing the safe open puts this guard on edge for the job, even mid-chase or if another guard
+        // has the errand
+        if (anomaly.Kind == AnomalyKind.SafeOpen)
+            suspicion.RaiseBaseline(OnEdgeBaseline);
+
         if (!LostSight || Activity == GuardActivity.Pursuing) return;
         if (errand != null || !anomaly.TryClaim(this)) return;
 

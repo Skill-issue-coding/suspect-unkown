@@ -2,5 +2,6 @@
 // A kind is added only together with the thing that raises it
 public enum AnomalyKind
 {
-    OpenDoor
+    OpenDoor,
+    SafeOpen
 }

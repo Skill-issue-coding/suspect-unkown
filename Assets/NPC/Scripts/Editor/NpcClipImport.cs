@@ -8,7 +8,7 @@ using UnityEngine;
 // GuardLocomotionBuilder before they read the clips, so one menu click is enough, and a no-op when the
 // settings are already right (no reimport). The clip ranges are read fresh from the FBX each time, so a
 // re-export with new lengths or new takes needs nothing else. Only the clips a graph uses get settings; the
-// rest (the clerk's set, React_BackAway, React_Startled, NPC_Run, Guard_DoorSlam) keep their defaults until
+// rest (the clerk's set, React_BackAway, React_Startled, NPC_Run) keep their defaults until
 // something plays them
 public static class NpcClipImport
 {
@@ -32,8 +32,10 @@ public static class NpcClipImport
     };
 
     // Played once: held on the last frame while the state lasts (the decision window can run longer than
-    // the clip, and a loop would snap the pose back to its start), or left near the end (the give-ups)
-    private static readonly string[] Holds = { "React_Deliberating", "Guard_GiveUp_1", "Guard_GiveUp_2" };
+    // the clip, and a loop would snap the pose back to its start), or left near the end (the give-ups and
+    // the guard's slam)
+    private static readonly string[] Holds =
+        { "React_Deliberating", "Guard_GiveUp_1", "Guard_GiveUp_2", "Guard_DoorSlam" };
 
     // The guard's gaits loop with Position XZ unbaked, so GuardClips can measure each gait's speed from its
     // root motion. Harmless at runtime: the guard's Animator applies no root motion

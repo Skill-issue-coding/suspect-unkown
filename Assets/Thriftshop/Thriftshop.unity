@@ -15864,6 +15864,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1270010469}
   - component: {fileID: 1270010470}
+  - component: {fileID: 1270010471}
   m_Layer: 0
   m_Name: Adaptive1
   m_TagString: Untagged
@@ -15903,6 +15904,20 @@ MonoBehaviour:
   baseDecayRate: 0.01
   dwellTime: 10
   initialCoverage: 0.5
+--- !u!114 &1270010471
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1270010468}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0f755d144e261417a92a792e2f59322e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PoiSafeAlarm
+  safe: {fileID: 5624436561709742263}
+  alarmFactor: 1.5
 --- !u!1001 &1270074494
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20154,7 +20169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PointOfInterest
   radius: 2.85
   fillRate: 0.1
-  baseDecayRate: 0.15
+  baseDecayRate: 0.005
   dwellTime: 15
   initialCoverage: 0.5
 --- !u!1001 &1538778001
@@ -30045,6 +30060,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 768621486}
     m_Modifications:
+    - target: {fileID: 3871528271968016, guid: 7829df83e74e68f41b69e43201e1f72b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2341533328511206685, guid: 7829df83e74e68f41b69e43201e1f72b, type: 3}
       propertyPath: m_Name
       value: Safe
@@ -30094,6 +30113,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7829df83e74e68f41b69e43201e1f72b, type: 3}
+--- !u!114 &5624436561709742263 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2080952319394986878, guid: 7829df83e74e68f41b69e43201e1f72b, type: 3}
+  m_PrefabInstance: {fileID: 5624436561709742262}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c14241f5672a0f344ad1e21b108643f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Safe
 --- !u!23 &5691195536480901513
 MeshRenderer:
   m_ObjectHideFlags: 0

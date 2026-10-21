@@ -7,6 +7,11 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     [SerializeField, Tooltip("Optional mesh/object disabled when the glass is fully cut")]
     private GameObject glassPane;
 
+    [SerializeField, Tooltip("Component to enable after GlassCutting is done")]
+    private Interactable enableOnDone;
+
+    private void Awake() { if (enableOnDone != null) enableOnDone.SetReachable(false); }
+
     // Glass cutting is currently not blocked by level/skills
     public bool IsBlockedFor(GameObject interactor) => false;
 
@@ -28,5 +33,8 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
 
         if (glassPane != null)
             glassPane.SetActive(false);
+
+        if (enableOnDone != null)
+            enableOnDone.SetReachable(true);
     }
 }

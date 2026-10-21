@@ -151,7 +151,9 @@ public class NpcPerceptionDebug : MonoBehaviour
 
         if (suspicion != null)
         {
-            GUILayout.Label($"suspicion   {suspicion.Suspicion:F2}");
+            GUILayout.Label(suspicion.Baseline > 0f
+                ? $"suspicion   {suspicion.Suspicion:F2} (base {suspicion.Baseline:F2})"
+                : $"suspicion   {suspicion.Suspicion:F2}");
             GUILayout.Label($"state       {suspicion.State}");
         }
 
