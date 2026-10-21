@@ -19,6 +19,11 @@ public class PlayerNoise : MonoBehaviour
     [Header("Steps")]
     [SerializeField, Tooltip("Metres moved between footsteps.")] private float _strideLength = 0.75f;
 
+    [Header("Skills")]
+    [SerializeField, Range(0.1f, 1f), Tooltip("Multiplier applied to footstep radius when Soft Steps is unlocked.")]
+    private float _softStepsMultiplier = 0.7f;
+
+    private PlayerSkills _skills;
     private PlayerStance _stance;
     private PlayerMotor _motor;
     private float _distanceSinceStep;
@@ -27,6 +32,7 @@ public class PlayerNoise : MonoBehaviour
     {
         _stance = GetComponent<PlayerStance>();
         _motor = GetComponent<PlayerMotor>();
+        _skills = GetComponent<PlayerSkills>();
     }
 
     private void Update()
@@ -47,8 +53,10 @@ public class PlayerNoise : MonoBehaviour
         bool sprinting = !crouching && _motor.IsSprinting;
 
         float radius = crouching ? _crouchRadius : sprinting ? _sprintRadius : _walkRadius;
-        float alarm = sprinting ? _sprintAlarm : 0f;
+        if (_skills != null && _skills.HasSoftSteps)
+            radius *= _softStepsMultiplier;
 
+        float alarm = sprinting ? _sprintAlarm : 0f;
         NoiseBus.Publish(new NoiseEvent(transform.position, radius, alarm));
     }
 }

@@ -17,7 +17,7 @@ public class Wallet : MonoBehaviour
     [SerializeField] private int skillPoints = 0;
     [Tooltip("Fraction of dirty money the fence pays out")]
     [Range(0f, 1f)]
-    [SerializeField] private float fenceRate = 0.7f;
+    [SerializeField] private float fenceRate = 0.65f;
 
     public ProgressSave save;
 
@@ -39,6 +39,7 @@ public class Wallet : MonoBehaviour
         clean = save.money;
         dirty = save.dirtyMoney;
         skillPoints = save.skillPoints;
+        fenceRate = save.Has(ProgressUnlock.Skill_Negotiator) ? 0.85f : 0.65f;
         Changed?.Invoke();
     }
 
@@ -62,7 +63,9 @@ public class Wallet : MonoBehaviour
         if (unlock == ProgressUnlock.None) return;
         if (save == null) save = ProgressStore.Load();
         save.Apply(unlock);
+        fenceRate = save.Has(ProgressUnlock.Skill_Negotiator) ? 0.85f : 0.65f;
         SavetoDisk();
+        Changed?.Invoke();
     }
 
     // Invariant culture on purpose: a Swedish locale groups thousands with a no-break space,

@@ -12,6 +12,7 @@ public class FeatureBelief
     [SerializeField] private float[] scores;    // index is value - 1: value 0 is Unknown and teaches nothing
     [SerializeField] private bool learned;
 
+    public static float ConfidenceMultiplier = 1.0f;
     public bool Learned => learned;
 
     public void AddEvidence(int value, float weight)
@@ -67,7 +68,7 @@ public class FeatureBelief
         for (int i = 0; i < scores.Length; i++) total += Mathf.Exp(scores[i] - scores[best]);
 
         value = best + 1;
-        confidence = 1f / total;
+        confidence = (1f / total) * ConfidenceMultiplier;
         return true;
     }
 
@@ -91,7 +92,7 @@ public class FeatureBelief
         for (int i = 0; i < scores.Length; i++)
         {
             if (scores[i] < minScore) continue;
-            float conf = Mathf.Exp(scores[i] - scores[best]) / total;
+            float conf = Mathf.Exp(scores[i] - scores[best]) / total * ConfidenceMultiplier;
             results.Add((i + 1, conf));
         }
 
