@@ -3,7 +3,9 @@ using UnityEngine;
 
 // A combination safe in the world. It knows nothing about the player: it holds its lock level, a
 // combination rolled once per heist, how many of its numbers have been set so far (so a player who backs
-// off keeps them), and swings its door open when asked. PlayerSafeCracking reads and writes these
+// off keeps them), and swings its door open when asked. PlayerSafeCracking reads and writes these.
+// It holds a story item and rolled money stacks, reachable only while open, so a closed safe hides what
+// is left. Once the save holds the story item's unlock, the story item is gone and more stacks may be live
 [RequireComponent(typeof(Interactable), typeof(Anomaly))]
 public class Safe : MonoBehaviour
 {
@@ -30,8 +32,24 @@ public class Safe : MonoBehaviour
     [SerializeField, Tooltip("Interact outline object, disables when the safe is done")]
     private GameObject interactOutline;
 
-    [SerializeField, Tooltip("Component to enable after GlassCutting is done")]
-    private Interactable enableOnDone;
+    [Header("Contents")]
+    [SerializeField, Tooltip("Always inside, reachable only while the safe is open (the story item)")]
+    private Interactable[] fixedContents;
+
+    [SerializeField, Tooltip("Money stacks inside. The first Min to Max of them are live this heist, the rest switched off")]
+    private Interactable[] moneyStacks;
+
+    [SerializeField, Min(0), Tooltip("Fewest live money stacks")]
+    private int minStacks = 1;
+
+    [SerializeField, Min(0), Tooltip("Most live money stacks while the story item is still to be stolen")]
+    private int maxStacks = 1;
+
+    [SerializeField, Min(0), Tooltip("Most live money stacks once the story item's unlock is saved")]
+    private int maxStacksReplay = 2;
+
+    [SerializeField, Tooltip("The unlock the story item gives. Once the save holds it, the story item is gone and Max Stacks Replay applies. None: always the first-run contents")]
+    private ProgressUnlock storyUnlock = ProgressUnlock.None;
 
     public int LockLevel => lockLevel;
     public bool IsOpen { get; private set; }
@@ -60,15 +78,50 @@ public class Safe : MonoBehaviour
 
         if (door != null) closedRotation = door.localRotation;
 
-        if (enableOnDone != null)
-        {
-            enableOnDone.enabled = false;
-            enableOnDone.SetReachable(false);
-        }
+        // A story item already stolen would give nothing a second time, so a replay pays in stacks instead.
+        // The None check matters: ProgressSave.Has(None) is always true
+        bool replay = storyUnlock != ProgressUnlock.None && ProgressStore.Load().Has(storyUnlock);
+        if (replay)
+            foreach (Interactable item in fixedContents)
+                if (item != null) item.gameObject.SetActive(false);
+
+        int max = replay ? maxStacksReplay : maxStacks;
+        int live = Random.Range(minStacks, Mathf.Min(max, moneyStacks.Length) + 1);
+        for (int i = live; i < moneyStacks.Length; i++)
+            if (moneyStacks[i] != null) moneyStacks[i].gameObject.SetActive(false);
+
+        SetContentsReachable(false);
+    }
+
+    private void OnValidate()
+    {
+        if (maxStacks < minStacks) maxStacks = minStacks;
+        if (maxStacksReplay < minStacks) maxStacksReplay = minStacks;
+        if (moneyStacks == null) return;
+
+        int most = Mathf.Max(maxStacks, maxStacksReplay);
+        if (most > moneyStacks.Length)
+            Debug.LogWarning($"{name}: Max Stacks {most} is more than the {moneyStacks.Length} stacks inside", this);
     }
 
     private void OnEnable() => anomaly.Resolved += Close;
     private void OnDisable() => anomaly.Resolved -= Close;
+
+    private void SetContentsReachable(bool reachable)
+    {
+        SetReachable(fixedContents, reachable);
+        SetReachable(moneyStacks, reachable);
+    }
+
+    private static void SetReachable(Interactable[] contents, bool reachable)
+    {
+        foreach (Interactable item in contents)
+        {
+            if (item == null) continue;
+            item.enabled = reachable;
+            item.SetReachable(reachable);
+        }
+    }
 
     // Rolled on first use and fixed for the heist, so numbers set in one try still hold in the next
     public int[] CombinationFor(int length, int dialNumbers)
@@ -98,11 +151,7 @@ public class Safe : MonoBehaviour
         if (interactOutline != null)
             interactOutline.SetActive(false);
 
-        if (enableOnDone != null)
-        {
-            enableOnDone.enabled = true;
-            enableOnDone.SetReachable(true);
-        }
+        SetContentsReachable(true);
 
         IsOpen = true;
         IsCracked = true;
@@ -129,11 +178,7 @@ public class Safe : MonoBehaviour
         if (interactOutline != null)
             interactOutline.SetActive(true);
 
-        if (enableOnDone != null)
-        {
-            enableOnDone.enabled = false;
-            enableOnDone.SetReachable(false);
-        }
+        SetContentsReachable(false);
 
         if (door == null) return;
         swing.Stop();

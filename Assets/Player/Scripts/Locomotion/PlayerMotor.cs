@@ -66,9 +66,13 @@ public class PlayerMotor : MonoBehaviour
 
     private void Update()
     {
-        if (IsMovementSuspended) 
+        if (IsMovementSuspended)
         {
-            return; 
+            // Held still. Without this the last gait's velocity and sprint flag stay frozen, so the
+            // animator keeps running and NPCs keep reading a sprint through the whole minigame.
+            _horizontalVelocity = Vector3.zero;
+            IsSprinting = false;
+            return;
         }
         
         UpdateHorizontal();

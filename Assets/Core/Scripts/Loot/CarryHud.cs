@@ -1,12 +1,10 @@
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
 // The carry panel's contents: the cash in the pockets as a running total, and the bag's slots as a tree
 // under the Bag heading, one item per slot, "Empty" until filled. The bag holds two items in every job,
-// so the slots are fixed lines in the prefab and the panel never changes size. Hears LootPickup.Taken,
-// and changes only then. The bag only fills for now; once the van empties it (A7), the list moves into a
-// carry model that both the van and this HUD read, and that model also refuses a third bag item
+// so the slots are fixed lines in the prefab and the panel never changes size. The pocket total hears
+// LootPickup.Taken; the slots read LootBag, the one owner of what is in the bag, on LootBag.Changed
 public class CarryHud : MonoBehaviour
 {
     [SerializeField, Tooltip("Shows the pocket total")]
@@ -18,7 +16,6 @@ public class CarryHud : MonoBehaviour
     [SerializeField, Tooltip("Text of a slot with nothing in it")]
     private string emptyText = "Empty";
 
-    private readonly List<LootItem> bagItems = new();
     private int pocket;
 
     private void Awake()
@@ -30,10 +27,19 @@ public class CarryHud : MonoBehaviour
         }
     }
 
-    private void OnEnable() => LootPickup.Taken += OnTaken;
+    private void OnEnable()
+    {
+        LootPickup.Taken += OnTaken;
+        LootBag.Changed += ShowBag;
+    }
 
-    private void OnDisable() => LootPickup.Taken -= OnTaken;
+    private void OnDisable()
+    {
+        LootPickup.Taken -= OnTaken;
+        LootBag.Changed -= ShowBag;
+    }
 
+    // After every OnEnable, so the level's LootBag is Active by now
     private void Start()
     {
         ShowPocket();
@@ -43,25 +49,20 @@ public class CarryHud : MonoBehaviour
     private void OnTaken(LootPickup pickup)
     {
         LootItem item = pickup.Item;
-        if (item.CarriedIn == LootCarry.Pocket)
-        {
-            pocket += item.Value;
-            ShowPocket();
-            return;
-        }
+        if (item.CarriedIn != LootCarry.Pocket) return;
 
-        bagItems.Add(item);
-        // Nothing stops a third bag item yet; the carry model will. Until then the HUD says so
-        if (bagItems.Count > slotLabels.Length)
-            Debug.LogWarning($"{name}: {item.DisplayName} taken with the bag already full", this);
-        ShowBag();
+        pocket += item.Value;
+        ShowPocket();
     }
 
     private void ShowPocket() => pocketLabel.text = $"${pocket}";
 
+    // No bag in the level: every slot shows empty
     private void ShowBag()
     {
+        LootBag bag = LootBag.Active;
+        int count = bag != null ? bag.Count : 0;
         for (int i = 0; i < slotLabels.Length; i++)
-            slotLabels[i].text = i < bagItems.Count ? bagItems[i].DisplayName : emptyText;
+            slotLabels[i].text = i < count ? bag.Item(i).DisplayName : emptyText;
     }
 }

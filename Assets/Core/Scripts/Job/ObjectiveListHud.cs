@@ -75,7 +75,9 @@ public class ObjectiveListHud : MonoBehaviour
         for (int i = 0; i < rows.Length; i++)
         {
             LootItem item = objectives.RequiredItem(i);
-            rows[i].Show(item != null ? item.DisplayName : "?", objectives.IsTaken(i));
+            string label = item != null ? item.DisplayName : "?";
+            if (objectives.StoryItemsOptional) label += " (optional)";
+            rows[i].Show(label, objectives.IsTaken(i));
         }
 
         bool readyToEscape = objectives.IsComplete;

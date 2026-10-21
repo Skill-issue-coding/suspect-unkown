@@ -13789,6 +13789,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: LootDisplay
       objectReference: {fileID: 0}
+    - target: {fileID: 8557090036698868675, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

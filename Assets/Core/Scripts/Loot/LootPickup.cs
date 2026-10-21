@@ -13,7 +13,10 @@ public class LootPickup : MonoBehaviour, IInteractionBehaviour
 
     public LootItem Item => item;
 
-    public bool IsBlockedFor(GameObject interactor) => false;
+    public bool IsBlockedFor(GameObject interactor) =>
+        item.CarriedIn == LootCarry.Bag && LootBag.Active != null && LootBag.Active.IsFull;
+
+    public string BlockedText => "Bag full";
 
     private void Awake()
     {

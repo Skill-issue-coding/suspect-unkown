@@ -14,7 +14,16 @@ public class ProgressSave
     public int skillPoints;
     public JobResult lastJob = new();
     public bool debriefPending;
+    // One entry per completed run, by scene name, so the count per level is how often it appears
     public List<string> completedJobs = new();
+
+    public int TimesCompleted(string job)
+    {
+        int count = 0;
+        foreach (string done in completedJobs)
+            if (done == job) count++;
+        return count;
+    }
 
     // None counts as unlocked, so content that needs nothing (the Apartment) is always open
     public bool Has(ProgressUnlock unlock) => (unlocks & unlock) == unlock;

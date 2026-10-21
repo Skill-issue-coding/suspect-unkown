@@ -1,13 +1,20 @@
 using System;
 using UnityEngine;
 
-// The level's required loot: which items must be taken before the getaway van will leave, and how
-// many are taken so far. Hears every pickup through LootPickup.Taken, so pickups need no reference
-// to it. One per level. A level with nothing required is complete from the start
+// The level's objective loot and when the getaway van will leave. By default every listed item must be
+// taken (the apartment, where a level with nothing listed is complete from the start). With story items
+// optional, the listed items are the story items, and taking any of them or any bag item lets the van
+// leave (the thrift shop, as in Payday). Hears every pickup through LootPickup.Taken, so pickups need no
+// reference to it. One per level
 public class JobObjectives : MonoBehaviour
 {
     [SerializeField, Tooltip("Items that must be taken before the van leaves. List an item twice to require two of it")]
     private LootItem[] required;
+
+    [SerializeField, Tooltip("Off: every listed item must be taken (the apartment). On: listed items are optional story items, and the van leaves once any of them or any bag item is taken")]
+    private bool storyItemsOptional;
+
+    private bool bagItemTaken;
 
     private bool[] taken;
 
@@ -15,7 +22,8 @@ public class JobObjectives : MonoBehaviour
 
     public int Collected { get; private set; }
     public int Required => required.Length;
-    public bool IsComplete => Collected >= Required;
+    public bool IsComplete => storyItemsOptional ? Collected > 0 || bagItemTaken : Collected >= Required;
+    public bool StoryItemsOptional => storyItemsOptional;
 
     // One slot of the required list, for the job card's checklist. Index from 0 to Required - 1
     public LootItem RequiredItem(int index) => required[index];
@@ -39,6 +47,12 @@ public class JobObjectives : MonoBehaviour
             Changed?.Invoke();
             return;
         }
+
+        if (!storyItemsOptional || bagItemTaken || pickup.Item.CarriedIn != LootCarry.Bag) return;
+
+        bagItemTaken = true;
+        Debug.Log("Objectives: a bag item is taken, the van will leave");
+        Changed?.Invoke();
     }
 
     private void OnValidate()

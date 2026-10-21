@@ -51,6 +51,9 @@ public class MapLocation : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField, Tooltip("What the save must hold before this job can be played. None: open from the start")]
     private ProgressUnlock requires = ProgressUnlock.None;
 
+    [SerializeField, Tooltip("Optional. The story item that led here, shown at the OP while selected once the save holds Requires. Empty: nothing (the apartment)")]
+    private StoryItemDisplay storyItem;
+
     [SerializeField, Tooltip("Card line while locked, saying how to unlock it")]
     private string lockedHint = "";
 
@@ -59,6 +62,7 @@ public class MapLocation : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public string DisplayName => displayName;
     public string JobType => jobType;
     public int Difficulty => difficulty;
+    public StoryItemDisplay StoryItem => storyItem;
 
     // The card's security line: the typed text, or "Raised security" in red once the saved runs raise it
     public string SecurityLine(ActionSave actions)

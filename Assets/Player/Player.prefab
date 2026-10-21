@@ -1314,6 +1314,7 @@ GameObject:
   - component: {fileID: 6880438211409201768}
   - component: {fileID: 8829665198697198782}
   - component: {fileID: 3580678349697786402}
+  - component: {fileID: 607464989751407523}
   m_Layer: 14
   m_Name: Player
   m_TagString: Player
@@ -1767,6 +1768,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSafeCracking
   tuning: {fileID: 11400000, guid: c7d1d213cb8f010429d339f06df9adbc, type: 2}
+--- !u!114 &607464989751407523
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281951801932075715}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0f52a25a28956e42bfc60175f8f59a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerVanStash
 --- !u!1 &1386813031399317714
 GameObject:
   m_ObjectHideFlags: 0

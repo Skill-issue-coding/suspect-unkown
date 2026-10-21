@@ -16,4 +16,4 @@ MonoBehaviour:
   takeSeconds: 1.5
   carriedIn: 0
   progressUnlock: 0
-  value: 900
+  value: 200

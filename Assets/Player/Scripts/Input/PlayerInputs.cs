@@ -71,6 +71,13 @@ public class PlayerInputs : MonoBehaviour
         if (value.isPressed) InteractPressed?.Invoke();
     }
 
+    public event Action DropPressed;
+
+    public void OnDrop(InputValue value)
+    {
+        if (value.isPressed) DropPressed?.Invoke();
+    }
+
     public void OnTension(InputValue value) { tension = value.isPressed; }
 
     public void OnCancel(InputValue value) { cancel = value.isPressed; }

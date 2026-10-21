@@ -525,6 +525,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Trusted fence
   description: The fence pays 85% when laundering.
+  unlock: 0
   price: 5000
   currency: 0
   requires: {fileID: 1916352934}
@@ -673,6 +674,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Lockpicks, level 3
   description: 'Opens level 3 locks: safes and vault gates.'
+  unlock: 0
   price: 3000
   currency: 0
   requires: {fileID: 1365531918}
@@ -1001,6 +1003,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Forgettable
   description: Witnesses observe you at reduced confidence
+  unlock: 0
   price: 2
   currency: 1
   requires: {fileID: 1921661196}
@@ -2148,7 +2151,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6
+      value: -10.44
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3109,6 +3112,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: 'Intel: patrol routes'
   description: Reveals where guards spend their time before the job.
+  unlock: 0
   price: 1000
   currency: 0
   requires: {fileID: 0}
@@ -3809,6 +3813,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Pack mule
   description: Full speed with a full bag
+  unlock: 0
   price: 2
   currency: 1
   requires: {fileID: 1863488928}
@@ -7976,6 +7981,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Blend in
   description: Standing still in public calms nearby suspicion
+  unlock: 0
   price: 1
   currency: 1
   requires: {fileID: 0}
@@ -8413,6 +8419,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Car alarm
   description: Staff and shoppers turn to the window and face away from the shop floor.
+  unlock: 0
   price: 650
   currency: 0
   requires: {fileID: 0}
@@ -11399,7 +11406,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 6
+      value: 10.65
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.y
@@ -11984,6 +11991,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Wardrobe storage
   description: Keep more outfits, so burning one hurts less.
+  unlock: 0
   price: 1500
   currency: 0
   requires: {fileID: 0}
@@ -14050,6 +14058,21 @@ MonoBehaviour:
   clean: 2750
   skillPoints: 2
   fenceRate: 0.7
+  save:
+    unlocks: 0
+    money: 0
+    dirtyMoney: 0
+    xp: 0
+    skillPoints: 0
+    lastJob:
+      job: 
+      seconds: 0
+      loot: []
+      peakAlert: 0
+      witness: 0
+      witnessCaption: 
+    debriefPending: 0
+    completedJobs: []
 --- !u!4 &412953601
 Transform:
   m_ObjectHideFlags: 0
@@ -16003,6 +16026,7 @@ MonoBehaviour:
   board: {fileID: 900365489}
   sceneName: Thriftshop
   requires: 2
+  storyItem: {fileID: 845116011}
   lockedHint: Steal the clerk's phone
 --- !u!65 &491247771
 BoxCollider:
@@ -17099,7 +17123,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 518490410}
-  m_LocalRotation: {x: 0.42534962, y: -0.21743788, z: 0.10605153, w: 0.87209606}
+  m_LocalRotation: {x: 0.40786824, y: -0.32940888, z: 0.16066341, w: 0.83625394}
   m_LocalPosition: {x: 0, y: 0, z: 16.09}
   m_LocalScale: {x: 0.034615383, y: 0.034615383, z: 0.034615383}
   m_ConstrainProportionsScale: 0
@@ -17107,7 +17131,7 @@ RectTransform:
   - {fileID: 1549465787}
   - {fileID: 1173403143}
   m_Father: {fileID: 697310859}
-  m_LocalEulerAnglesHint: {x: 52, y: -28, z: 0}
+  m_LocalEulerAnglesHint: {x: 52, y: -43, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -19.699984, y: 9.170428}
@@ -18520,6 +18544,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Quick hands
   description: Faster looting
+  unlock: 0
   price: 1
   currency: 1
   requires: {fileID: 0}
@@ -18659,7 +18684,7 @@ Transform:
   m_GameObject: {fileID: 593101660}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 1, z: -0, w: 0.00000058114523}
-  m_LocalPosition: {x: 3.85, y: 1.05, z: -3}
+  m_LocalPosition: {x: 3.949, y: 1.05, z: -3}
   m_LocalScale: {x: 0.026, y: 0.026, z: 0.026}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -21566,6 +21591,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Smooth talker
   description: Talk down a Curious NPC once per job
+  unlock: 0
   price: 1
   currency: 1
   requires: {fileID: 229009985}
@@ -22648,7 +22674,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -40, y: -20}
+  m_AnchoredPosition: {x: -40, y: 75}
   m_SizeDelta: {x: 560, y: 640}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!225 &705406447
@@ -22720,6 +22746,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Clog the toilet
   description: The clerk or manager runs over with a plunger and stays to fix it.
+  unlock: 0
   price: 500
   currency: 0
   requires: {fileID: 0}
@@ -25295,6 +25322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Identity reset
   description: Wipe the police profile. Expensive, and only once per campaign.
+  unlock: 0
   price: 12500
   currency: 0
   requires: {fileID: 0}
@@ -26283,6 +26311,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Nimble fingers
   description: Faster lockpicking
+  unlock: 0
   price: 1
   currency: 1
   requires: {fileID: 1885189395}
@@ -26806,6 +26835,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Page the guard
   description: '"Security to the loading dock, your car is being towed." Sends the guard to the far end.'
+  unlock: 0
   price: 750
   currency: 0
   requires: {fileID: 0}
@@ -27365,7 +27395,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -6
+      value: -11.04
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.y
@@ -28066,7 +28096,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1326291842}
+    m_TransformParent: {fileID: 1442043093}
     m_Modifications:
     - target: {fileID: 174068, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_Name
@@ -28078,19 +28108,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.39
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.958
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2.947
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9691532
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalRotation.x
@@ -28098,7 +28128,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.24645893
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalRotation.z
@@ -28127,14 +28157,14 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 174068, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 845116013}
+      addedObject: {fileID: 845116011}
   m_SourcePrefab: {fileID: 100100000, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
 --- !u!4 &845116010 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
   m_PrefabInstance: {fileID: 845116009}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &845116013
+--- !u!114 &845116011
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -28143,10 +28173,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 17502162}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49b041f6830be954799dc510a3aa550e, type: 3}
+  m_Script: {fileID: 11500000, guid: 8538d1a98fda5024e8e87e0965ab09d4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ShowWhenUnlocked
-  requires: 2
+  m_EditorClassIdentifier: Assembly-CSharp::StoryItemDisplay
+  popDuration: 0.25
+  shakeStrength: 8
+  shakeDuration: 0.4
 --- !u!1 &854832898
 GameObject:
   m_ObjectHideFlags: 0
@@ -31369,6 +31401,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Call the guard's mum
   description: The guard walks to the phone and is stuck in the call, facing the wall. "Yes mum... no mum..."
+  unlock: 0
   price: 600
   currency: 0
   requires: {fileID: 0}
@@ -32012,6 +32045,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Lockpicks, level 1
   description: Opens level 1 locks. Picks never break.
+  unlock: 0
   price: 0
   currency: 0
   requires: {fileID: 0}
@@ -32862,6 +32896,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Signal jammer
   description: Delays the alarm call when things go wrong.
+  unlock: 0
   price: 2800
   currency: 0
   requires: {fileID: 0}
@@ -33500,6 +33535,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Camera looper
   description: Blinds one camera for a while. Someone at the monitor sees an empty aisle.
+  unlock: 0
   price: 2200
   currency: 0
   requires: {fileID: 0}
@@ -36234,7 +36270,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1079304458}
-  m_LocalRotation: {x: 0.42534962, y: -0.21743788, z: 0.10605153, w: 0.87209606}
+  m_LocalRotation: {x: 0.43555322, y: -0.10174653, z: 0.049625088, w: 0.8930165}
   m_LocalPosition: {x: 0, y: 0, z: 19.999998}
   m_LocalScale: {x: 0.034615383, y: 0.034615383, z: 0.034615383}
   m_ConstrainProportionsScale: 0
@@ -36242,7 +36278,7 @@ RectTransform:
   - {fileID: 346805105}
   - {fileID: 577474602}
   m_Father: {fileID: 697310859}
-  m_LocalEulerAnglesHint: {x: 52, y: -28, z: 0}
+  m_LocalEulerAnglesHint: {x: 52, y: -13, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 33.999996, y: 12.36532}
@@ -40096,6 +40132,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Leak the group chat
   description: The guard stops and stares at his phone. His vision cone shrinks while he scrolls.
+  unlock: 0
   price: 900
   currency: 0
   requires: {fileID: 0}
@@ -42993,7 +43030,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1299218366}
-  m_LocalRotation: {x: 0.42138937, y: -0.24774118, z: 0.12083143, w: 0.86397636}
+  m_LocalRotation: {x: 0.4020127, y: -0.3583931, z: 0.17479996, w: 0.82424825}
   m_LocalPosition: {x: 0, y: 0, z: 12.34}
   m_LocalScale: {x: 0.034615383, y: 0.034615383, z: 0.034615383}
   m_ConstrainProportionsScale: 0
@@ -43001,7 +43038,7 @@ RectTransform:
   - {fileID: 1870402979}
   - {fileID: 1583832183}
   m_Father: {fileID: 697310859}
-  m_LocalEulerAnglesHint: {x: 52, y: -32, z: 0}
+  m_LocalEulerAnglesHint: {x: 52, y: -47, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -36.49, y: 22.549215}
@@ -43176,7 +43213,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -26
+      value: 24.42
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.y
@@ -43184,7 +43221,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 20
+      value: 14.89
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalRotation.w
@@ -44061,7 +44098,6 @@ Transform:
   - {fileID: 2094785794}
   - {fileID: 1602866212}
   - {fileID: 1998423842}
-  - {fileID: 845116010}
   - {fileID: 984524408}
   - {fileID: 1109663489}
   - {fileID: 206698065}
@@ -45507,6 +45543,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Lockpicks, level 2
   description: 'Opens level 2 locks: back offices, display cases.'
+  unlock: 0
   price: 1200
   currency: 0
   requires: {fileID: 977813310}
@@ -46784,6 +46821,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Bigger bag
   description: 'More carry capacity: more value per trip.'
+  unlock: 0
   price: 900
   currency: 0
   requires: {fileID: 0}
@@ -47408,6 +47446,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Appraiser
   description: See values before taking
+  unlock: 0
   price: 1
   currency: 1
   requires: {fileID: 581209263}
@@ -47522,6 +47561,39 @@ RectTransform:
   m_AnchoredPosition: {x: 1020, y: -184}
   m_SizeDelta: {x: 470, y: 100}
   m_Pivot: {x: 0, y: 1}
+--- !u!1 &1442043092
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1442043093}
+  m_Layer: 0
+  m_Name: StoryItems
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1442043093
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442043092}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.24645893, z: -0, w: 0.9691532}
+  m_LocalPosition: {x: 2.42, y: 0.958, z: -2.871}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1819585233681352048}
+  - {fileID: 845116010}
+  m_Father: {fileID: 1683315113}
+  m_LocalEulerAnglesHint: {x: 0, y: 28.536, z: 0}
 --- !u!1 &1444635408
 GameObject:
   m_ObjectHideFlags: 0
@@ -51258,8 +51330,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1561432289}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -5.75, y: 1.55, z: 1.6}
+  m_LocalRotation: {x: 0.05988334, y: 0.92278713, z: -0.34536445, w: 0.16000415}
+  m_LocalPosition: {x: 2.66, y: 3.107, z: -1.212}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -53303,7 +53375,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1634967281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55127,6 +55199,7 @@ Transform:
   - {fileID: 543450653290084847}
   - {fileID: 1326291842}
   - {fileID: 1148606637}
+  - {fileID: 1442043093}
   m_Father: {fileID: 1552175538}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1684558143
@@ -55964,7 +56037,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 22
+      value: 12.52
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.y
@@ -55972,7 +56045,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 28
+      value: 27.6
       objectReference: {fileID: 0}
     - target: {fileID: 419742, guid: ee6af68a3d2c1864ebc6cfc3be82d851, type: 3}
       propertyPath: m_LocalRotation.w
@@ -58097,6 +58170,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Light touch
   description: Partial value from a display without obvious theft
+  unlock: 0
   price: 2
   currency: 1
   requires: {fileID: 1893621392}
@@ -60964,8 +61038,9 @@ MonoBehaviour:
   lockedOutline: {fileID: 2100000, guid: e22091218f314080b4d026e94ef524b1, type: 2}
   board: {fileID: 900365489}
   sceneName: 
-  requires: 0
-  lockedHint: 
+  requires: 8192
+  storyItem: {fileID: 3212440117113394634}
+  lockedHint: Steal the intel from the thrift store
 --- !u!65 &1846509385
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -61310,6 +61385,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Shadow blend
   description: Slower suspicion in shadow
+  unlock: 0
   price: 2
   currency: 1
   requires: {fileID: 797873856}
@@ -61836,6 +61912,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Soft steps
   description: Less noise while moving
+  unlock: 0
   price: 1
   currency: 1
   requires: {fileID: 0}
@@ -62121,6 +62198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Deep pockets
   description: Larger carry capacity
+  unlock: 0
   price: 2
   currency: 1
   requires: {fileID: 1436069799}
@@ -62326,7 +62404,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1898892999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63243,6 +63321,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Better fence contacts
   description: The fence pays 75% instead of 65% when laundering.
+  unlock: 0
   price: 2000
   currency: 0
   requires: {fileID: 0}
@@ -63665,6 +63744,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Staff pass
   description: Pass as staff while in uniform
+  unlock: 0
   price: 2
   currency: 1
   requires: {fileID: 681527530}
@@ -64089,6 +64169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Glass cutter
   description: Silent entry through windows. Limited uses.
+  unlock: 0
   price: 1500
   currency: 0
   requires: {fileID: 0}
@@ -64812,6 +64893,7 @@ MonoBehaviour:
   board: {fileID: 900365489}
   sceneName: Apartment
   requires: 0
+  storyItem: {fileID: 0}
   lockedHint: 
 --- !u!65 &1970547688
 BoxCollider:
@@ -66013,7 +66095,8 @@ MonoBehaviour:
   lockedOutline: {fileID: 2100000, guid: e22091218f314080b4d026e94ef524b1, type: 2}
   board: {fileID: 900365489}
   sceneName: 
-  requires: 0
+  requires: 16384
+  storyItem: {fileID: 0}
   lockedHint: 
 --- !u!65 &1998851490
 BoxCollider:
@@ -69251,7 +69334,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2111304990}
-  m_LocalRotation: {x: 0.42534962, y: -0.21743788, z: 0.10605153, w: 0.87209606}
+  m_LocalRotation: {x: 0.42534968, y: -0.2174379, z: 0.10605154, w: 0.8720961}
   m_LocalPosition: {x: 0, y: 0, z: 15.999995}
   m_LocalScale: {x: 0.034615383, y: 0.034615383, z: 0.034615383}
   m_ConstrainProportionsScale: 0
@@ -69953,6 +70036,25 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &432424416566378861
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1819585233681352048}
+  - component: {fileID: 2804504315454966019}
+  - component: {fileID: 3212440117113394633}
+  - component: {fileID: 3212440117113394634}
+  m_Layer: 0
+  m_Name: JewlryStorePlanScrumbled
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!4 &543450653290084847
 Transform:
   m_ObjectHideFlags: 0
@@ -70252,6 +70354,21 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2880000703427201358}
   m_Mesh: {fileID: -2667152316870098836, guid: 0026aacc863ac384fa52d574474f2284, type: 3}
+--- !u!4 &1819585233681352048
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432424416566378861}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.6868426, y: -0.16806932, z: -0.16806932, w: 0.6868426}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.20999996, y: 0.297, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1442043093}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -27.5}
 --- !u!33 &1836994529160230368
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -70402,6 +70519,14 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3221798562443377268}
   m_Mesh: {fileID: 4400239634377807700, guid: 0026aacc863ac384fa52d574474f2284, type: 3}
+--- !u!33 &2804504315454966019
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432424416566378861}
+  m_Mesh: {fileID: -2553007188018338944, guid: a7027e0564a598b4e9bc1e26e2ca33c8, type: 3}
 --- !u!23 &2839215158863845837
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -70585,6 +70710,70 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
   m_IsActive: 1
+--- !u!23 &3212440117113394633
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432424416566378861}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 36234208408d78f4495789f514349174, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &3212440117113394634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 432424416566378861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8538d1a98fda5024e8e87e0965ab09d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StoryItemDisplay
+  popDuration: 0.25
+  shakeStrength: 8
+  shakeDuration: 0.4
 --- !u!1 &3221798562443377268
 GameObject:
   m_ObjectHideFlags: 0

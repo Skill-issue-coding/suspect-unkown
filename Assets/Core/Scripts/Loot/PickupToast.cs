@@ -2,8 +2,10 @@ using PrimeTween;
 using TMPro;
 using UnityEngine;
 
-// Announces each taken item above the carry panel: "+ LAPTOP" fades in, holds, and fades out. Hears
-// LootPickup.Taken, so it needs no reference to any pickup. A second pickup restarts the sequence
+// The line beside the player (who is always at the centre of the screen) saying what their hands just did:
+// "+ LAPTOP" for a taken item, or why they could not take it ("BAG FULL", in red). Fades in, holds, and
+// fades out. Hears LootPickup.Taken and Interactable.Refused, so it needs no reference to any pickup or
+// to the player. A second line restarts the sequence
 public class PickupToast : MonoBehaviour
 {
     [SerializeField, Tooltip("Fades the toast in and out")]
@@ -18,7 +20,11 @@ public class PickupToast : MonoBehaviour
     [SerializeField, Tooltip("Seconds the toast stays fully shown")]
     private float holdSeconds = 2f;
 
+    [SerializeField, Tooltip("Text color for a refusal (\"BAG FULL\"). A taken item keeps the label's authored color")]
+    private Color refusedColor = new Color(1f, 0.3f, 0.27f, 1f);
+
     private Sequence show;
+    private Color takenColor;
 
     private void Awake()
     {
@@ -29,16 +35,35 @@ public class PickupToast : MonoBehaviour
             return;
         }
 
+        takenColor = label.color;
         group.alpha = 0f;
     }
 
-    private void OnEnable() => LootPickup.Taken += OnTaken;
-
-    private void OnDisable() => LootPickup.Taken -= OnTaken;
-
-    private void OnTaken(LootPickup pickup)
+    private void OnEnable()
     {
-        label.text = $"+ {pickup.Item.DisplayName.ToUpperInvariant()}";
+        LootPickup.Taken += OnTaken;
+        Interactable.Refused += OnRefused;
+    }
+
+    private void OnDisable()
+    {
+        LootPickup.Taken -= OnTaken;
+        Interactable.Refused -= OnRefused;
+    }
+
+    private void OnTaken(LootPickup pickup) => Show($"+ {pickup.Item.DisplayName.ToUpperInvariant()}", takenColor);
+
+    // A blocked interactable with nothing to say (a locked door) leaves its greyed prompt to speak
+    private void OnRefused(Interactable interactable)
+    {
+        string reason = interactable.BlockedText;
+        if (reason != null) Show(reason.ToUpperInvariant(), refusedColor);
+    }
+
+    private void Show(string text, Color color)
+    {
+        label.text = text;
+        label.color = color;
 
         show.Stop();
         show = Sequence.Create()

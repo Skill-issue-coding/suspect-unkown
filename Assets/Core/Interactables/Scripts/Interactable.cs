@@ -31,6 +31,7 @@ public class Interactable : MonoBehaviour
     public InteractOutline Outline => outline;
     public string UseText => useText;
     public float HoldSeconds => holdSeconds;
+    public string BlockedText => behaviour.BlockedText;
 
     public Vector3 PromptPoint =>
         promptTarget != null ? promptTarget.position : transform.TransformPoint(promptOffset);
@@ -38,6 +39,10 @@ public class Interactable : MonoBehaviour
     // Raised by SetReachable(false) and by OnDisable, so the player side drops this interactable
     // from its reach dictionary even when the thing switches itself off (no OnTriggerExit)
     public event Action<Interactable> Withdrawn;
+
+    // Raised when the player tries to use a blocked interactable. Static so the HUD toast hears every
+    // refusal without a reference to the player (Core references nothing)
+    public static event Action<Interactable> Refused;
 
     private Collider trigger;
     private IInteractionBehaviour behaviour;
@@ -69,6 +74,9 @@ public class Interactable : MonoBehaviour
 
     // Called by the player side after a completed press or hold
     public void Use(GameObject interactor) => behaviour.Interact(interactor);
+
+    // Called by the player side when a press lands on a blocked interactable, so the HUD can say why
+    public void Refuse() => Refused?.Invoke(this);
 
     // Enables or disables the reach trigger. Raises Withdrawn when turned off. Safe to call before this
     // Awake has run: an owner (the safe, the glass cutter) switches its loot off from its own Awake, and

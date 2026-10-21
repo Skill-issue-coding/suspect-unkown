@@ -61,6 +61,11 @@ public class MapBoard : MonoBehaviour
         if (previous != null) previous.RefreshOutline();
         if (selected != null) selected.RefreshOutline();
 
+        // The OP shows the item that led to the selected target, once it was stolen. Has, not IsOpen: an
+        // unbuilt job still shows the item that unlocked it
+        if (previous != null && previous.StoryItem != null) previous.StoryItem.Hide();
+        if (selected != null && selected.StoryItem != null && progress.Has(selected.Requires)) selected.StoryItem.Show();
+
         bool show = selected != null;
         card.alpha = show ? 1f : 0f;
         card.interactable = card.blocksRaycasts = show;

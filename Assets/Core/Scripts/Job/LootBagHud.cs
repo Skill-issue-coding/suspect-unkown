@@ -2,14 +2,11 @@ using PrimeTween;
 using UnityEngine;
 using UnityEngine.UI;
 
-// The bag in the job HUD's carry panel: an outline at the start, filling from the bottom as required
-// loot is taken (collected over required). Reacts to JobObjectives.Changed only; the fill eases on
-// display, while the count itself stays exact. Lives on JobHud.prefab's root
+// The bag in the job HUD's carry panel: an outline when empty, filling from the bottom by slots used
+// (count over capacity). Reacts to LootBag.Changed only; the fill eases on display, while the count
+// itself stays exact. Lives on JobHud.prefab's root
 public class LootBagHud : MonoBehaviour
 {
-    [SerializeField, Tooltip("The level's objectives. The HUD shows its Collected over Required")]
-    private JobObjectives objectives;
-
     [SerializeField, Tooltip("The solid bag over the outline. Image Type Filled, Vertical, origin Bottom")]
     private Image fill;
 
@@ -24,36 +21,42 @@ public class LootBagHud : MonoBehaviour
 
     private Tween ease;
     private Tween punch;
-    private float Target => objectives.Required == 0 ? 1f : (float)objectives.Collected / objectives.Required;
+    private int shownCount;
 
     private void Awake()
     {
-        if (objectives == null || fill == null)
+        if (fill == null)
         {
-            Debug.LogWarning($"{name} needs objectives and a fill image", this);
+            Debug.LogWarning($"{name} needs a fill image", this);
             enabled = false;
         }
     }
 
-    // Guarded: disabling in Awake still calls OnDisable, with objectives missing
-    private void OnEnable()
+    private void OnEnable() => LootBag.Changed += OnChanged;
+
+    private void OnDisable() => LootBag.Changed -= OnChanged;
+
+    // After every OnEnable, so the level's LootBag is Active by now
+    private void Start()
     {
-        if (objectives != null) objectives.Changed += OnChanged;
+        shownCount = Count;
+        fill.fillAmount = Target;
     }
 
-    private void OnDisable()
-    {
-        if (objectives != null) objectives.Changed -= OnChanged;
-    }
+    private static int Count => LootBag.Active != null ? LootBag.Active.Count : 0;
 
-    private void Start() => fill.fillAmount = Target;
+    private static float Target => LootBag.Active != null ? (float)LootBag.Active.Count / LootBag.Active.Capacity : 0f;
 
     private void OnChanged()
     {
         ease.Stop();
         ease = Tween.UIFillAmount(fill, Target, easeDuration, Ease.OutCubic);
 
-        if (bag == null) return;
+        // Only an item going in punches; emptying the bag at the van (L4) just drains it
+        bool added = Count > shownCount;
+        shownCount = Count;
+        if (bag == null || !added) return;
+
         // Finish a running punch first, so two quick items cannot leave the bag stuck at a punched scale
         punch.Complete();
         punch = Tween.PunchScale(bag, Vector3.one * punchStrength, duration: 0.3f, frequency: 6);

@@ -6,8 +6,6 @@ using System;
 public enum ProgressUnlock
 {
     None = 0,
-    Shop = 1 << 0,
-    ThriftShop = 1 << 1,
 
     // Gear
     Gear_Lockpick = 1 << 2,
@@ -25,4 +23,10 @@ public enum ProgressUnlock
     Ability_SilentCrouch = 1 << 10,
     Ability_SilentWalk = 1 << 11,
     Ability_SilentRun = 1 << 12,
+
+    // Jobs
+    Shop = 1 << 0,
+    ThriftShop = 1 << 1,
+    JewlryStore = 1 << 13,
+    Bank = 1 << 14,
 }

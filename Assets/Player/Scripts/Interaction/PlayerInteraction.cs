@@ -146,17 +146,23 @@ public class PlayerInteraction : MonoBehaviour
 
         if (shown != null)
         {
-            bool blocked = shown.IsBlockedFor(gameObject);
-            if (shown.Prompt != null) shown.Prompt.Show(transform, shown.PromptPoint, shown.UseText, blocked);
+            if (shown.Prompt != null) shown.Prompt.Show(transform, shown.PromptPoint, shown.UseText, shown.IsBlockedFor(gameObject));
             if (shown.Outline != null) shown.Outline.SetVisible(true);
         }
     }
 
     private void OnInteractPressed()
     {
-        if (IsBusy || shown == null || shown.HoldSeconds > 0f) return;
-        if (shown.IsBlockedFor(gameObject)) return;
+        if (IsBusy || shown == null) return;
 
+        // Checked before the hold test, so a refused hold is announced on the press as well
+        if (shown.IsBlockedFor(gameObject))
+        {
+            shown.Refuse();
+            return;
+        }
+
+        if (shown.HoldSeconds > 0f) return;
         shown.Use(gameObject);
     }
 

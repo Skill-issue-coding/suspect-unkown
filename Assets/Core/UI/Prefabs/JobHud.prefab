@@ -422,6 +422,7 @@ GameObject:
   - component: {fileID: 1465064244775035322}
   - component: {fileID: 3591333893004008451}
   - component: {fileID: 5842674836144021159}
+  - component: {fileID: 590769455933564058}
   m_Layer: 5
   m_Name: JobCard
   m_TagString: Untagged
@@ -492,6 +493,22 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &590769455933564058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 622751379595456427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9035d9120ecf19418bf2ff3ae7dc6fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::JobTitleHud
+  jobLabel: {fileID: 1054177328771030091}
+  addressLabel: {fileID: 6171264559430568879}
+  jobName: Tutorial
+  address: 14 Elm St, Apartment
 --- !u!1 &674487775658247097
 GameObject:
   m_ObjectHideFlags: 0
@@ -1362,8 +1379,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: f76c5714379d4124ba6c1019c04d5335, type: 2}
-  m_sharedMaterial: {fileID: 8013311138831792474, guid: f76c5714379d4124ba6c1019c04d5335, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a36d1aaf2376b8c4cae4eb95f5a4fe04, type: 2}
+  m_sharedMaterial: {fileID: -4564984878045675123, guid: a36d1aaf2376b8c4cae4eb95f5a4fe04, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1447,7 +1464,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2805058915427038281
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1798,7 +1815,6 @@ RectTransform:
   - {fileID: 1805347731068437436}
   - {fileID: 2975848133095126232}
   - {fileID: 8554041258691079023}
-  - {fileID: 3701083632077931825}
   m_Father: {fileID: 6742772369498472440}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -3542,19 +3558,19 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5800107961877767705}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2306557844631620902}
-  m_Father: {fileID: 6240949410801306288}
+  m_Father: {fileID: 6742772369498472440}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 4, y: 7.9999695}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 60, y: 110}
   m_SizeDelta: {x: 360, y: 30}
-  m_Pivot: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0.5}
 --- !u!225 &7359347060596360859
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4234,6 +4250,7 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 3701083632077931825}
   - {fileID: 1465064244775035322}
   - {fileID: 2458582737459671685}
   - {fileID: 1275690014899229402}
@@ -4305,7 +4322,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a852bf8f1d437f42b7a97764edaa092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootBagHud
-  objectives: {fileID: 0}
   fill: {fileID: 6224579045660719377}
   bag: {fileID: 8375384987520474796}
   easeDuration: 0.35
@@ -4343,6 +4359,7 @@ MonoBehaviour:
   label: {fileID: 4085851241440163715}
   fadeDuration: 0.2
   holdSeconds: 2
+  refusedColor: {r: 1, g: 0.3, b: 0.27, a: 1}
 --- !u!114 &6739828055587964007
 MonoBehaviour:
   m_ObjectHideFlags: 0
