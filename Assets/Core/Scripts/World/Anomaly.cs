@@ -25,8 +25,8 @@ public class Anomaly : MonoBehaviour
     public Vector3 SightPoint => transform.TransformPoint(sightOffset);
     public Vector3 ResolvePoint => transform.TransformPoint(resolveOffset);
 
-    // Who is dealing with it, like a POI claim (decision 15). UnityEngine.Object, not GuardBehaviour:
-    // the clerk claims doors too (C4), and Core never sees NPC types
+    // Who is dealing with it, like a POI claim (decision 15). UnityEngine.Object, not GuardBehaviour,
+    // since Core never sees NPC types
     public Object ClaimedBy { get; private set; }
 
     public event System.Action Resolved;

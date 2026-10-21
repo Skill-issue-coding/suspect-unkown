@@ -85,6 +85,8 @@ Folded or cut from the five-tier plan: the pharmacy tier's civilians move into t
 
 Value scales, but the real difficulty curve is the number of independent observers and the number of routes security has to cover.
 
+**The story thread** (2026-10-21). Each job steals the story item that opens the next: the apartment clerk's cellphone leads to the thrift shop where the clerk works; the thrift shop owner's sketched plan for robbing the jewelry store leads there; the jewelry store holds a note with a safe deposit box number at the bank. As in Payday, every job after the apartment can be finished without its story item, but the next target stays locked until it is stolen. Stolen notes hang on the main menu's board, and selecting a target shows the item that led to it. Details in `Assets/thriftshop-level.md` 3.5.
+
 ---
 
 ## 6. The AI systems, and playing against them

@@ -459,4 +459,4 @@ In `CLAUDE.md`: if a new physics layer is added, add it to the layer table. This
 - **Does the guard who slams the door look through it first?** Decided for now: no, only the confused beat and the slam. Revisit if playtests find it too forgiving.
 - **Controller feel.** The stick speed and the sweet spot sizes need tuning on a gamepad, not only with a mouse.
 - **The skill tree.** Phase 7 decides how Lockpicking levels are bought and saved. `PlayerSkills` is the only thing that changes when it arrives.
-- **Staff and open doors.** The tired clerk notices open doors but is not suspicious of them: it shuts them as a chore. The manager investigates and shuts them. Both errands arrive with civilians in M6 (step 3), using the same claim and `Resolve()` as the guard (decision 22).
+- **Staff and open doors.** The tired clerk notices open doors but is not suspicious of them, and leaves them alone. The manager and the clerk's door chore were both dropped (2026-10-19 and 2026-10-21): only guards deal with an open door.

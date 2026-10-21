@@ -56,7 +56,7 @@ public class NpcAnomalySight : MonoBehaviour
         Vector3 eye = perception.EyePosition;
 
         // Every raised anomaly is checked, whatever its weight: weight 0 means "not suspicious", not
-        // "not noticed" (the tired clerk shuts open doors without suspicion, decision 18)
+        // "not noticed" (a civilian sees an open door without suspicion, decision 18)
         for (int i = raised.Count - 1; i >= 0; i--)
         {
             Anomaly anomaly = raised[i];

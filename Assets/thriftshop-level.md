@@ -1,6 +1,6 @@
 # Suspect Unknown — The Thrift Shop Level
 
-Design and implementation plan for the second job, `Assets/Thriftshop/Thriftshop.unity`. It is the first real heist: the shop is open at dusk, a tired clerk works the register, customers browse, and a guard patrols. The register till is required; everything else is optional and randomised. It is also where the guard first meets the player in a real level, and where adaptive security (concept 6.4, `roadmap.md` Phase 8) is first built: security learns from the player's earlier completed runs of this level and places extra guard points of interest where the player tends to go.
+Design and implementation plan for the second job, `Assets/Thriftshop/Thriftshop.unity`. It is the first real heist: the shop is open at dusk, a tired clerk works the register, customers browse, and a guard patrols. Nothing is strictly required: the story item, the owner's plan for robbing the jewelry store, is in the office safe, and the van opens once the player has taken the plan or any bag item (changed 2026-10-21: the register till is removed). It is also where the guard first meets the player in a real level, and where adaptive security (concept 6.4, `roadmap.md` Phase 8) is first built: security learns from the player's earlier completed runs of this level and places extra guard points of interest where the player tends to go.
 
 Read `CLAUDE.md` first, then decisions 6, 15, 18, 19, 22, 23, 24 and 25 in `roadmap_npc.md`, and `Assets/apartment-level.md` for everything this level reuses (loot, the van, the newspaper, the save, the witness). Each step ends with a check to pass in play mode before moving on.
 
@@ -13,11 +13,12 @@ Read `CLAUDE.md` first, then decisions 6, 15, 18, 19, 22, 23, 24 and 25 in `road
 ## 1. What the level is for
 
 1. **Introduce the guard.** The first NPC who patrols, reads the cone the apartment taught, and catches. A catch fails the job at once (`FailReason.Caught`).
-2. **The first real heist.** One required item, the register till, and a randomised spread of bonus loot, as in Payday's stores: the layout is learnable, what is worth taking changes every run.
+2. **The first real heist.** A story item, the jewelry store plan in the office safe, and a randomised spread of bonus loot, as in Payday's stores: the layout is learnable, what is worth taking changes every run. Which bonus loot the player can reach depends on the tools they own (3.4).
 3. **Teach the bag and the van.** The bag holds two items. With more than two worth taking, the player learns (optionally) to fill the bag, walk to the van, empty it with **G**, and go back for more.
 4. **Introduce adaptive security.** Security watches the player's completed runs of this level. The first run has one guard serving the developers' base POIs. After one completed run, one extra POI appears where the player tends to go (the door they always use, the room they always cross). After two completed runs a second guard is hired and two extra POIs appear; after three, a third extra POI.
 5. **Close the witness loop.** The police description saved by the apartment (W8) is now acted on: a guard who sees the player in a described outfit grows suspicious (decision 25). The counter is to change clothes **between** jobs; the player can never change appearance during a job (decision 23).
 6. **Make civilians matter.** This is the first level that is not a tutorial, so the whole civilian system (M6) is built and played here, not only the apartment clerk's fixed police call: customers and staff who witness, a visible decision window, and reactions that differ in what they cost and what they teach the witness model (2.4). Concept 6.8's "calm witnesses are the dangerous ones" is the done-when.
+7. **Carry the story.** The plan in the safe is what unlocks the jewelry store (3.5). As in Payday, the job can be finished without it; only the next target stays locked.
 
 ### 1.1 The layout and what each part teaches
 
@@ -33,10 +34,10 @@ Each area is one room of the job log (section 4), numbered by its place in `JobL
 | 3    | Shop middle    | The two gondola rows                                 | Public    | Gondolas, loot displays                               | The shop "fades" toward the staff area                   |
 | 4    | Emergency exit | The right pocket between the register and the office | Public    | The emergency exit door, wall shelves, a loot display | A side way in, away from the register                    |
 | 5    | Shop back      | Along the staff wall                                 | Public    | Furniture corner, racks; the doorways to staff rooms  | The risk grows as you go deeper                          |
-| 6    | Register       | Behind the counter, front right                      | Staff     | The register till (required)                          | Timing the clerk's errands                               |
+| 6    | Register       | Behind the counter, front right                      | Staff     | The clerk's counter (the till was removed 2026-10-21) | Timing the clerk's errands                               |
 | 7    | Trash room     | Back left                                            | Staff     | Bins, the clerk's bin run                             | A quiet side way in, with a lockpick                     |
 | 8    | Stockroom      | Back middle, open to the shop back (no front wall)   | Staff     | Bonus loot, the clerk's restocking                    | Greed: the best bonus loot is in staff rooms             |
-| 9    | Office         | Back right, behind the StaffRoom door only           | Staff     | The safe (bonus money), a base POI                    | The greed ratchet: a long hold next to a guard's POI     |
+| 9    | Office         | Back right, behind the StaffRoom door only           | Staff     | The safe (the plan, bonus money), a base POI          | The greed ratchet: a long hold next to a guard's POI     |
 
 **Entrances.** Two at the front, open during opening hours: the left one into the shoe section, the right one into the shop front. One on the left side into the trash room, locked, lock level 1. One on the right side into the emergency exit pocket, locked, lock level 1. The front entrances are static open doorways with **no** `Door` component and no anomaly: they are open because the shop is open, not because a robber opened them. The two side entrances are `Door`s, so opening one raises an `OpenDoor` anomaly (decisions 18 and 19).
 
@@ -60,7 +61,7 @@ Evening, sunset light from a low directional sun, the shop's interior lights on,
 
 **Civilians when Alerted** open the decision window and, if it fills, act on the outcome the reaction tree chose (2.4); a call fails the job with `PoliceCalled`. This is the apartment clerk's window (`apartment-level.md` 2.3) used by every civilian: it fills while the civilian sees the player and drains while not. It is the `Deliberating` state of the reaction tree. The window is extracted from `ResidentBehaviour` into a shared component (`NpcDecisionWindow`), as `apartment-level.md` 2.4 foresaw, so the clerk at home, the clerk at work and customers share one implementation.
 
-**The tired clerk** works the register and leaves it on errands, which are the player's openings to take the till:
+**The tired clerk** works the register and leaves it on errands, which change who is watching the shop floor, the trash room and the stockroom:
 
 | Spot       | Where                               | Stay    | Station    |
 | ---------- | ----------------------------------- | ------- | ---------- |
@@ -68,7 +69,7 @@ Evening, sunset light from a low directional sun, the shop's interior lights on,
 | Bin run    | The trash room                      | 6–10 s  | `Bin`      |
 | Restocking | The stockroom                       | 8–12 s  | `Restock`  |
 
-Errands use the existing `CivilianSpot` mechanism. Spots have no weights (decided 2026-10-19): the clerk picks a free spot evenly, and the register's stay, about three times an errand's, keeps the clerk there most of the time. Each spot's `CivilianStation` picks the clip the clerk plays there. The clerk at work is calm (decision 22): ordinary oddness barely registers. `Stealing` (taking the till in view) and `Lockpicking` weigh 1.0, so being seen taking the till in front of the clerk opens the window within about two seconds. Door chores are part of this level (C4): the clerk shuts an open door without suspicion. There is no manager (dropped 2026-10-19, with the `DistractedShopper` and `Manager` archetypes: nothing in the game needs them). The clerk has a reaction tree of their own, separate from the customers' (C6).
+Errands use the existing `CivilianSpot` mechanism. Spots have no weights (decided 2026-10-19): the clerk picks a free spot evenly, and the register's stay, about three times an errand's, keeps the clerk there most of the time. Each spot's `CivilianStation` picks the clip the clerk plays there. The clerk at work is calm (decision 22): ordinary oddness barely registers. `Stealing` (taking loot in view) and `Lockpicking` weigh 1.0, so being seen taking loot in front of the clerk opens the window within about two seconds. The clerk ignores open doors, like every civilian (C4 dropped 2026-10-21). There is no manager (dropped 2026-10-19, with the `DistractedShopper` and `Manager` archetypes: nothing in the game needs them). The clerk has a reaction tree of their own, separate from the customers' (C6).
 
 **The guard** patrols the base POIs and any adaptive POIs (section 5), opens the StaffRoom door to reach the office and closes it behind them, slams doors the player has left open (M5 step 2.4; not while chasing, when they run straight through), investigates the open safe and closes it (section 2.3), and catches. The guard weighs `InStaffArea` heavily and also recognises a described outfit (decision 25). Guards spawn only inside the shop, at authored spawn candidates.
 
@@ -102,24 +103,27 @@ The rest of M6 (`roadmap_npc.md`), built here, with concept 6.8 and decision 22 
 
 ### 3.1 What is taken
 
-| Loot          | Carry  | Where                                                 | Required | Notes                                                      |
-| ------------- | ------ | ----------------------------------------------------- | -------- | ---------------------------------------------------------- |
-| Register till | Bag    | The register, always                                  | **Yes**  | The only required item; never moves                        |
-| Money stacks  | Bag    | The safe                                              | No       | 1–3 stacks, value rolled                                   |
-| Bonus items   | Bag    | Authored slots in the shop back, stockroom and office | No       | Vintage watch, guitar, record player, fur coat and similar |
-| Cash          | Pocket | Scattered                                             | No       | As in the apartment; takes no bag slot                     |
+| Loot                     | Carry  | Where                                       | Needs                          | Required | Notes                                                              |
+| ------------------------ | ------ | ------------------------------------------- | ------------------------------ | -------- | ------------------------------------------------------------------ |
+| Jewelry store plan       | Pocket | The office safe, always                     | Cracking the safe              | Story    | Unlocks the jewelry store (`ProgressUnlock.JewelryStore`); never moves |
+| Money stacks             | Bag    | The office safe                             | Cracking the safe              | No       | 1–3 stacks, value rolled                                           |
+| Loot display items       | Bag    | The glass `LootDisplay`s, as placed today   | The glass cutter (upgrade)     | No       | Vintage watch, record player and similar; silent to open           |
+| Smash table items        | Bag    | Glass-topped tables like `DisplayTable`     | The hammer, or the glass breaker | No     | Smashed open: loud with the hammer, quieter with the glass breaker |
+| Cash                     | Pocket | Scattered                                   | Nothing                        | No       | As in the apartment; takes no bag slot                             |
 
-The till's `ProgressUnlock` is `None` until the next job exists; the unlock flag is added together with that job (no speculative enum values).
+The register till is removed (2026-10-21), so the register is only where the clerk works.
+
+**What is required** (changed 2026-10-21). Nothing is a hard requirement, as in Payday: the van unlocks once the player has taken the plan **or** any bag item, so a run can end without the story item. The plan is what unlocks the next target: without it the run still pays and still counts as a completed run for adaptive security, but the jewelry store stays locked. Only the apartment keeps hard required items (the tutorial). The plan is a pocket item, so it never competes with bonus loot for the two bag slots. `ProgressUnlock.JewelryStore` is added together with the plan (L2).
 
 ### 3.2 The randomised roll
 
-- **`LootSlot`** (Core): a hand-placed `LootDisplay` (or other authored spot) that already holds its loot pickup. The developers choose the item and the place; the roll only decides which slots are live this run. A slot that is not live is switched off with its pickup.
+- **`LootSlot`** (Core): a hand-placed `LootDisplay` or smash table (or other authored spot) that already holds its loot pickup. The developers choose the item and the place; the roll only decides which slots are live this run. A slot that is not live is switched off with its pickup.
 - **`LootSpawner`** (Core, one per level, on the `Job` object; the roll does not go on `JobLayout`, which only numbers rooms and entrances): a `randomized` toggle.
   - **Off:** every slot stays as authored, so a level can ship with fixed loot.
   - **On:** at load, picks `count` slots at random and switches the rest off. `count` is rolled from a range, base 3 and up to 4 (`minCount`, `maxCount` fields), so the value per run stays fair.
   - A fresh roll every run, from an unseeded `System.Random`; a debug seed field in the inspector repeats a roll while testing.
 - **Deferred:** weighted item pools per slot and spawning pickups from `LootItem`s. Not built until a level needs a slot whose item varies; hand-placed displays cover this level.
-- The required till is a placed `LootPickup`, not a slot.
+- The plan is a placed `LootPickup` inside the safe, not a slot. The money stacks are the safe's own roll (G3), not slots.
 - **Security does not see the roll.** The security model never uses where loot spawned (section 5): loot that moves every run would only add noise to the route model.
 
 ### 3.3 The bag and the van
@@ -133,6 +137,47 @@ The rule from `apartment-level.md` 3.2, finished here:
 - **Objectives count when taken,** not when stashed. Leaving in the van stashes whatever is still in the bag.
 - **Failing loses everything.** As before, a failed job saves nothing (`apartment-level.md` 3.5).
 - **Input.** A new `Stash` action (G) in `PlayerInputs`. `PlayerVanStash` (Player) reads it and calls the van; the van never looks up the player, so dependencies stay Player → Core.
+
+### 3.4 Glass tools
+
+Decided 2026-10-21. Two kinds of glass case, and three tools in two lines. Each case is opened by one line only:
+
+| Tool          | Owned                    | Opens                         | Noise                             |
+| ------------- | ------------------------ | ----------------------------- | --------------------------------- |
+| Hammer        | From the start (base)    | Smash tables only             | Loud: a smash every NPC in range hears, alarming |
+| Glass breaker | Bought; replaces the hammer | Smash tables only          | Quieter: a shorter hearing range  |
+| Glass cutter  | Bought                   | `LootDisplay`s only           | Silent (the glass-cutting minigame, as built) |
+
+- **`LootDisplay`s stay exactly as they are,** with the glass-cutting minigame and the item that becomes reachable once the circle is cut. What changes is the gate: without the glass cutter the display's prompt is greyed ("Needs glass cutter") and the minigame never starts.
+- **Smash tables** are a new case, designed like `DisplayTable`: a glass top over one bag item. Hold E to smash (short), which breaks the glass, emits a `NoiseEvent` at the table (loudness from the tool), and makes the item reachable. The hammer can never open a `LootDisplay`, and the glass cutter never opens a smash table.
+- **Seen smashing** is `Stealing` conduct: a civilian or guard who sees it reacts as to any theft. The noise reaches guards who cannot see it, so a smash is a trade: fast, but it brings someone.
+- **Ownership.** Nothing connects the shop to the player yet (`ShopConcept` and `ShopItem` are a main-menu concept with no save). Until the shop saves what was bought, a placeholder on the player, `PlayerTools` (like `PlayerSkills`), holds the smash tool (hammer or glass breaker) and whether the glass cutter is owned, set in the inspector. When the shop saves, only `PlayerTools`' source changes.
+
+### 3.5 The story thread
+
+Decided 2026-10-21. Each job steals the story item that opens the next one, so the levels form one chain. Every job after the apartment can be finished without its story item; only the next target stays locked until it is stolen on a completed run.
+
+| Job           | Story item                                                                                     | Unlocks           |
+| ------------- | ---------------------------------------------------------------------------------------------- | ----------------- |
+| Apartment     | The clerk's cellphone (required, with the laptop, which unlocks the shop)                      | The thrift shop   |
+| Thrift shop   | The jewelry store plan: the owner's rough sketch of the store, arrows to the exits, in the office safe | The jewelry store |
+| Jewelry store | A note with the number of a safe deposit box at the bank                                       | The bank          |
+
+The apartment's tenant is the tired clerk who works the thrift shop's register, so the phone leads the player to the shop. The plan shows the thrift shop's owner is about to rob the jewelry store himself; the player gets there first.
+
+**In the main menu** (decided 2026-10-21):
+
+- **The board.** Every story **note** stolen on a completed run (the jewelry store plan, the deposit box note) hangs on the main board, below the Settings and Quit buttons, and stays there. The phone does not hang on the board.
+- **The objective position (OP)** is the spot on the map table where the phone sits today. When the player selects a target on the map, the OP shows the story item that led to it, a copy that fades in and gives a quick shake to draw the eye:
+
+  | Selected      | At the OP                                     |
+  | ------------- | --------------------------------------------- |
+  | Apartment     | Nothing (the phone is not shown either)       |
+  | Thrift shop   | The phone, once the apartment is completed    |
+  | Jewelry store | The jewelry store plan, once it is stolen     |
+  | Bank          | The deposit box note, once it is stolen       |
+
+  Each target always shows its own item, also when it is replayed later. A locked target shows nothing, since its item has not been stolen. Deselecting hides the copy; the board's note never moves.
 
 ---
 
@@ -287,7 +332,7 @@ _Check:_ the guard patrols, visits the office most, catches the player standing 
 _Check:_ pick the right side door and leave it open: the guard comes, looks confused and slams it. Two guards never go for the same door. Chased through an open door, the guard follows without slamming it.
 
 **G3. The safe.** The minigame is built (2026-10-20): `Safe` (Core) with a lock level and a combination rolled per heist, `SafeInteraction`, `PlayerSafeCracking` (an `IMinigame`, on `Player.prefab`), `SafeModel`, `SafeView` and `SafeHud`, `SafeTuning` (`DefaultSafeTuning`), and `SafeMinigameView.prefab` with `SafeHud.prefab` in `Minigames.prefab`, on render layer 18 (`SafeCracking`). The dial has 20 numbers (cut from 40 the same day: 9° between numbers was too fine to aim for) printed by `SafeView`'s Rebuild Dial Face; the handle turns −90° about its local Y on opening (+90° turns it up into the dial). Done 2026-10-21: `AnomalyKind.SafeOpen` (guard weight 1, civilians 0); `Safe` raises it on opening and closes on `Resolved`, and a cracked safe reopens without the minigame; the guard closes it with the same errand as a door, playing `Guard_DoorSlam`; `NpcSuspicion.RaiseBaseline` keeps the guard who saw it on edge (2.3); `PoiSafeAlarm` on the office POI raises `PointOfInterest.AlarmFactor` to 1.5 on `Safe.Opened`, a factor apart from the plan's `DecayMultiplier`. Still to do:
-- **Money stacks.** One to three `LootPickup` stacks (`LootCarry.Bag`) inside the safe, replacing the single `enableOnDone` field with an array. `Safe` rolls how many are live in `Awake` and switches the rest off, makes the live ones reachable in `Open()` and unreachable again in `Close()`, so a closed safe hides what is still inside.
+- **Contents.** The jewelry store plan (always) and one to three money stacks (`LootCarry.Bag`) inside the safe, replacing the single `enableOnDone` field with an array. `Safe` rolls how many stacks are live in `Awake` and switches the rest off, makes the live ones reachable in `Open()` and unreachable again in `Close()`, so a closed safe hides what is still inside.
 - **The safe in the level.** Place `Safe.prefab` in the office, check its `Anomaly` gizmos (grey sphere on the door, green one on the NavMesh in front), and add `PoiSafeAlarm` to the office POI with the safe assigned.
 _Check:_ open the safe and hide: the guard comes, closes it, and from then on reaches Curious from a glance that would not have made them Curious before. The office POI's drain readout is 1.5 times its base rate.
 
@@ -302,8 +347,7 @@ _Check:_ the clerk spends most of the time at the register and leaves for each e
 **C3. Witness slice check** (M6 step 2). Postponed 2026-10-19; nothing to build, only the check to run. Play `NpcWitness` on customers and the clerk: the readout shows exposure growing only while the civilian sees the player, calm or not.
 _Check:_ walk past a calm customer in clear view for 10 s: their exposure rises and they stay Idle. Break line of sight and it stops rising. The police description after the job matches who saw you.
 
-**C4. Door chores** (M6 step 3, decision 18). The clerk shuts an open door they can reach without suspicion. Same claim, walk, react and `Resolve()` as the guard. Customers ignore open doors. Civilians never use doors to pass (decision 19), so the chores are limited to doors on their own routes.
-_Check:_ leave the emergency exit open: a customer ignores it and the clerk shuts it on their next errand. The clerk and a guard never claim the same door.
+**C4. Door chores.** Dropped 2026-10-21: the clerk does not close doors. Every civilian ignores an open door; only guards deal with one (G2).
 
 **C5. Civilian animation.** Done and checked 2026-10-19. An animator builder for civilians on `NPC.fbx`: locomotion, idle, browse, register work, and the phone reach and call (a masked layer, as the clerk's, faded in by the window state). As built: `CivilianClipImport` sets the clips' loop and root baking; `CivilianLocomotionBuilder` (Tools → NPC → Civilian → Rebuild Locomotion) builds `CivilianAnimator` with a Standing speed tree (`NPC_Idle`, `NPC_Walk` at 1.2 m/s), a Dwell tree over `Station` (one clip per `CivilianStation`, set on each `CivilianSpot`), and the Phone layer shared with the clerk through `AnimatorBuildUtility.AddPhoneLayer`; `CivilianAnimation` sets `Dwelling`, `Station`, `Deliberating` and `Calling` and fades the Phone layer. The `React_*` clips and `NPC_Run` are imported but unused until C6–C7.
 _Check:_ a customer walks, browses a display and idles with no foot sliding; when the window fills they visibly reach for a phone, and the call is readable from animation alone.
@@ -369,14 +413,23 @@ _Check:_ each civilian state shows its icon on screen and at the screen edge, an
 **L1. `LootSlot` and `LootSpawner`.** Hand-placed loot displays as slots; `LootSpawner` with a `randomized` toggle, a count range (3–4), a fresh roll per run and a debug seed. Randomization off leaves every slot live.
 _Check:_ with the toggle off every display holds its item. With it on, three restarts give three different sets of live displays, each with 3 or 4 items; the same debug seed gives the same set.
 
-**L2. The till and the objective.** The required till at the register, `JobObjectives` listing it, extraction unlocking when it is taken.
-_Check:_ the van zone stays grey until the till is taken.
+**L2. The plan and the way out.** Changed 2026-10-21: the till is removed and nothing is hard-required. The jewelry store plan (`LootItem`, pocket, `ProgressUnlock.JewelryStore`) in the safe. `JobObjectives` stops listing the apartment's laptop and cellphone, and extraction unlocks once the plan **or** any bag item is taken (the apartment keeps its required items). Remove the till from the scene.
+_Check:_ the van zone stays grey until the plan or a bag item is taken. A completed run with the plan unlocks the jewelry store on the map; a completed run without it pays but leaves the jewelry store locked.
 
 **L3. `LootBag`.** Two slots, the "Bag full" prompt, the HUD's bag list and icon driven by slots used.
 _Check:_ with two items in the bag a third shows "Bag full" and cannot be taken; cash still can.
 
 **L4. Stashing at the van.** The side-door stash point, the G prompt, `PlayerVanStash`, and the `Stash` input action.
 _Check:_ fill the bag, walk to the van's side door, press G: the bag empties, the HUD shows two empty slots, and the extraction countdown never started. On completion, the debrief lists every item, stashed or carried.
+
+**L5. Tool gates** (3.4). `PlayerTools` (Player, placeholder): the smash tool (hammer or glass breaker) and whether the glass cutter is owned. `GlassCutterInteraction` blocks the `LootDisplay` (greyed prompt, "Needs glass cutter") without the cutter.
+_Check:_ with the cutter unticked, every `LootDisplay` shows a greyed prompt and cannot be started; ticked, they work as today.
+
+**L6. Smash tables** (3.4). A `DisplayTable`-style prefab with a glass top over one bag item, a short hold to smash, the glass breaking, a `NoiseEvent` whose loudness comes from the smash tool, and `Stealing` conduct while smashing. Smash tables can be `LootSlot`s.
+_Check:_ smash a table with the hammer out of sight: a guard in hearing range comes to investigate. With the glass breaker, the same smash is heard from a shorter distance. The item inside is taken like any loot.
+
+**L7. Story items in the main menu** (3.5). The stolen notes hang on the main board below Settings and Quit, shown from the save like `ShowWhenUnlocked`. Each `MapLocation` names the story item that led to it; selecting it fades a copy in at the OP with a quick shake, and deselecting hides it. The apartment has none.
+_Check:_ after a completed apartment run, selecting the thrift shop fades the phone in at the OP and shakes it; selecting the apartment shows nothing. After a completed thrift shop run with the plan, the plan hangs on the board, and selecting the jewelry store shows a copy at the OP while the board's stays put. A thrift shop run without the plan adds nothing to the board.
 
 ### Track S — adaptive security
 
@@ -423,7 +476,7 @@ _Check:_ finish the apartment after a good look, then start the thrift shop in t
 
 ### Together
 
-**X1. Teaching pass.** Place the till so the clerk's errands are the opening; put the best bonus loot in the stockroom and office so the van trip is worth it; check the first guard can be read from the cone alone.
+**X1. Teaching pass.** Make the clerk's errands the opening on the way to the office; put the best bonus loot in the stockroom and office so the van trip is worth it; check the first guard can be read from the cone alone.
 _Check:_ a player who finished the apartment finishes the thrift shop in two or three tries, and at least one in three playtesters makes a van trip without being told.
 
 **X2. Adaptation pass.** Play three completed runs through the same side door.
@@ -441,4 +494,5 @@ _Check:_ on the third run the player notices without being told that the guards 
 - **Smoothing and propagation.** α = 0.5 and T = 6 are starting values. With only a few runs of data, does the first adaptive POI land where the player expects it to?
 - **Two guards and the open safe.** The raised baseline is per guard. Should the guard who finds the safe open put the other guard on edge too (the first use of `Reporting`)?
 - **How long a civilian stays scared.** The minimum and maximum seconds; long enough to read and to use, short enough that scaring a customer is not a free pass. Playtest.
-- **Which job the till unlocks.** Decided with the next level.
+- **Smash noise.** How loud the hammer and the glass breaker are, and whether a smashed table stays behind as an anomaly a guard notices later. Playtest.
+- **Telling the story in the debrief.** How the newspaper and the debrief mention the stolen plan, so the player knows what it unlocked (3.5).
