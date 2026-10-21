@@ -289,7 +289,7 @@ When an NPC's suspicion crosses the threshold, a decision tree resolves what the
 
 #### Civilians witness first
 
-Civilians are in the store for their own reasons: customers shop and the tired clerk works the register. They are not watching for thieves, so their main role is as **witnesses**: a civilian who can see you is remembering you, even while completely calm.
+Civilians are in the store for their own reasons: customers shop and the tired clerk works the register. They are not watching for thieves, so their main role is as **witnesses**: a civilian who sees you do something abnormal (sprint, pick a lock, take loot) is remembering you, even while completely calm. Someone who only sees you walk by remembers nothing.
 
 Their suspicion rises only on clearly criminal acts: picking a lock (as fast as a guard would notice it), taking loot, smashing glass, a visible tool, or tampering with a device such as a router or a desk phone. Ordinary oddness barely registers: sprinting past a customer takes several seconds of full view before they even look up, and customers ignore an open door. Roles still differ: the tired clerk, almost fixed at the register, shuts an open door as a chore without a second thought. Civilians have no vision cones; their suspicion indicator is the signal. See decision 22 in `roadmap_npc.md`.
 
@@ -315,7 +315,7 @@ Reactions must differ in what they feed the witness model, so the reaction syste
 | Film the player    | Camera-quality visual evidence. Must be stopped.                                                                                                                                                                                      |
 | Confront           | Rare. A physical obstacle.                                                                                                                                                                                                            |
 
-**The resulting inversion: calm witnesses are the dangerous ones.** Scaring a civilian stops them watching for a while. Keeping them calm is quiet but gives them a long clean look at you. A real strategic decision rather than a preference.
+**The resulting inversion: calm witnesses are the dangerous ones.** Only abnormal conduct teaches a witness anything, so the danger is a civilian who watches the act itself. Scaring them stops them watching for a while. Keeping them calm is quiet but gives them a long clean look at you while you work. Acting out of sight avoids both. A real strategic decision rather than a preference.
 
 #### The decision window
 

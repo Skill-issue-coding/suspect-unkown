@@ -211,6 +211,10 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         observation.conduct = playerConduct != null ? playerConduct.Current : ConductFlags.None;
         observation.abnormality = archetype.Abnormality(observation.conduct);
         observation.appearance = playerAppearance != null ? playerAppearance.Current : default;
+        // Observers who recognise no one (every civilian) skip the match
+        observation.recognition = archetype.Recognition > 0f
+            ? archetype.Recognition * JobWitnesses.RecordMatch(observation.appearance)
+            : 0f;
         return true;
     }
 }

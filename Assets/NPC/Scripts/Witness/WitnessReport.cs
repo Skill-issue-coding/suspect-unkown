@@ -100,6 +100,20 @@ public class WitnessReport
         return hasStyle || hasColor;
     }
 
+    // How well an outfit fits this description, 0 to 1 (thrift shop §6). Per slot: the color confidence when the
+    // color matches, halved when the style does not; a part described below minConfidence counts as 0
+    public float Match(CharacterAppearance worn, float minConfidence)
+    {
+        float total = 0f;
+        foreach (FeatureSlot slot in Slots)
+        {
+            if (!TryDescribe(slot, out OutfitFeature described, out _, out float colorConfidence)) continue;
+            if (colorConfidence < minConfidence || worn[slot].color != described.color) continue;
+            total += colorConfidence * (worn[slot].style == described.style ? 1f : 0.5f);
+        }
+        return total / Slots.Length;
+    }
+
     // One line per slot, for logs and the debug readout
     public override string ToString()
     {

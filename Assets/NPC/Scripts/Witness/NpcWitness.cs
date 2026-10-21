@@ -2,8 +2,8 @@ using UnityEngine;
 
 // What this NPC remembers of the player: exposure (seconds of a perfect view, the M6 slice) and, per outfit
 // slot, log-odds beliefs about style and color built from every sighting, weighted by its quality
-// (concept 6.2) and by how long the sighting has lasted (f_duration). Separate from suspicion, which is
-// alarm: a calm civilian who watched for ten seconds is the dangerous witness (decision 22). A poor look can
+// (concept 6.2) and by how long the sighting has lasted (f_duration). Only sightings of abnormal conduct
+// count: someone who just sees the player walk by is not a witness (decision 22). A poor look can
 // be mistaken (W4: colors through a ConfusionMatrix, capped so the truth stays most likely), and every
 // belief fades toward the even start at the archetype's memory half-life (W5). The beliefs live in a
 // WitnessReport; a copy is handed in at job end (W6)
@@ -34,6 +34,8 @@ public class NpcWitness : MonoBehaviour
     private float sightingStart = -1f;
     private float lastSeen = -1f;
     private float lastFade;
+    private float evidenceFactor = 1f;
+    private bool skillsRead;
     private NpcPerception perception;
     private readonly WitnessReport memory = new();
 
@@ -60,6 +62,10 @@ public class NpcWitness : MonoBehaviour
 
     private void OnPerceived(Observation observation)
     {
+        // Each tick counts on its own: watching calmly after the act teaches nothing more, and a gap in
+        // abnormal conduct restarts f_duration like any other gap
+        if (observation.abnormality <= 0f) return;
+
         float interval = 1f / perception.Archetype.TickRate;
         float quality = observation.Strength;
 
@@ -73,6 +79,15 @@ public class NpcWitness : MonoBehaviour
 
         Forget(observation.timestamp);
 
+        // Read on the first sighting, not in Start: NpcPerception finds the player in its own Start, which
+        // may run after this one. Skills do not change during a job, so the factor is kept
+        if (!skillsRead)
+        {
+            skillsRead = true;
+            PlayerSkills skills = perception.Targets.GetComponent<PlayerSkills>();
+            if (skills != null) evidenceFactor = skills.WitnessEvidenceFactor;
+        }
+
         float lookQuality = observation.ViewingConditions * fDuration * perception.Archetype.ObserverSkill;   // 0 to 1, before how much of each slot was in view
         for (int i = 0; i < Slots.Length; i++)
         {
@@ -84,7 +99,7 @@ public class NpcWitness : MonoBehaviour
             if (slotQuality <= 0f) continue;
 
             OutfitFeature seen = Recall(observation.appearance[slot], slotQuality);
-            float weight = slotQuality * interval * evidencePerSecond;
+            float weight = slotQuality * interval * evidencePerSecond * evidenceFactor;   // Forgettable lowers it
             memory.AddEvidence(slot, seen, weight);
         }
     }

@@ -12,8 +12,11 @@ public class PlayerSkills : MonoBehaviour
     [SerializeField, Tooltip("Lowers noise radius when moving.")]
     private bool hasSoftSteps;
 
-    [SerializeField, Tooltip("NPCs lose 10% final confidence (multiplier 0.9).")]
+    [SerializeField, Tooltip("Witnesses gain less evidence per sighting: see forgettableEvidence")]
     private bool hasForgettable;
+
+    [SerializeField, Range(0f, 1f), Tooltip("With Forgettable, the share of evidence a witness gains from each sighting. 0.6 makes a sure description take about 1.7 times as long")]
+    private float forgettableEvidence = 0.6f;
 
     [SerializeField, Tooltip("Caps loot pickup hold time to at most 1.5 seconds.")]
     private bool hasQuickHands;
@@ -36,6 +39,9 @@ public class PlayerSkills : MonoBehaviour
     public bool HasHammer => hasHammer;
     public bool HasGlassBreaker => hasGlassBreaker;
     public bool HasGlassCutter => hasGlassCutter;
+    // Read by NpcWitness on each sighting. Scales evidence as it comes in, not confidence when it is read, so
+    // descriptions saved before the skill was bought keep their strength
+    public float WitnessEvidenceFactor => hasForgettable ? forgettableEvidence : 1f;
 
     private void Awake()
     {
@@ -57,7 +63,5 @@ public class PlayerSkills : MonoBehaviour
             hasForgettable |= save.Has(ProgressUnlock.Skill_Forgettable);
             hasQuickHands |= save.Has(ProgressUnlock.Skill_QuickHands);
         }
-        // Apply Forgettable factor to the witness confidence calculation
-        FeatureBelief.ConfidenceMultiplier = hasForgettable ? 0.9f : 1.0f;
     }
 }
