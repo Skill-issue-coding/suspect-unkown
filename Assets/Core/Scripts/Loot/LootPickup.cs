@@ -41,7 +41,19 @@ public class LootPickup : MonoBehaviour, IInteractionBehaviour
 
         Interactable interactable = GetComponent<Interactable>();
         if (interactable != null)
-            interactable.SetHoldSeconds(item.TakeSeconds);
+        {
+            float seconds = item.TakeSeconds;
+
+            // Check save or inspector toggle on PlayerSkills
+            PlayerSkills playerSkills = FindAnyObjectByType<PlayerSkills>();
+            bool quickHands = (playerSkills != null && playerSkills.HasQuickHands)
+                           || ProgressStore.Load().Has(ProgressUnlock.Skill_QuickHands);
+
+            if (quickHands)
+                seconds = Mathf.Min(seconds, 1.5f);
+
+            interactable.SetHoldSeconds(seconds);
+        }
     }
 
     public void Interact(GameObject interactor) => Take();

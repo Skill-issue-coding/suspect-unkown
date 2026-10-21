@@ -179,12 +179,8 @@ public class PlayerInteraction : MonoBehaviour
                 isHolding = true;
                 HoldStarted?.Invoke(shown);
             }
-            float holdDuration = shown.HoldSeconds;
-            if (skills != null && skills.HasQuickHands && shown.GetComponent<LootPickup>() != null)
-            {
-                holdDuration = Math.Min(holdDuration, 1.5f);
-            }
-            progress += Time.deltaTime / holdDuration;
+
+            progress += Time.deltaTime / shown.HoldSeconds;
             if (shown.Prompt != null)
                 shown.Prompt.SetProgress(Mathf.Clamp01(progress));
 
