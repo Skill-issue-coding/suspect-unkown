@@ -14,6 +14,8 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
     [TextArea]
     [Tooltip("Shown in the detail line on hover")]
     [SerializeField] private string description = "";
+    [Tooltip("Flag saved to progress.json when owned")]
+    [SerializeField] private ProgressUnlock unlock = ProgressUnlock.None;
     [Tooltip("Price in the chosen currency")]
     [SerializeField] private int price = 500;
     [Tooltip("What the price is paid in")]
@@ -54,6 +56,23 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
     private void OnEnable()
     {
         if (wallet == null) return;
+
+        // sync ownership to progress.json
+        if (wallet.HasUnlock(unlock))
+        {
+            owned = true;
+        }
+        else if (owned && unlock != ProgressUnlock.None)
+        {
+            // Starter items
+            wallet.Unlock(unlock);
+        }
+
+        if (owned && fenceRate > 0f)
+        {
+            wallet.ImproveFence(fenceRate);
+        }
+
         wallet.Changed += Refresh;
         Refresh();
     }

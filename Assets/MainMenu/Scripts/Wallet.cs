@@ -10,14 +10,16 @@ public class Wallet : MonoBehaviour
     public enum Currency { Clean, SkillPoints }
 
     [Tooltip("Unlaundered take, dollars")]
-    [SerializeField] private int dirty = 8400;
+    [SerializeField] private int dirty = 0;
     [Tooltip("Spendable money, dollars")]
-    [SerializeField] private int clean = 2750;
+    [SerializeField] private int clean = 0;
     [Tooltip("Unspent skill points")]
-    [SerializeField] private int skillPoints = 2;
+    [SerializeField] private int skillPoints = 0;
     [Tooltip("Fraction of dirty money the fence pays out")]
     [Range(0f, 1f)]
-    [SerializeField] private float fenceRate = 0.65f;
+    [SerializeField] private float fenceRate = 0.7f;
+
+    public ProgressSave save;
 
     public event Action Changed;
 
@@ -25,6 +27,43 @@ public class Wallet : MonoBehaviour
     public int Clean => clean;
     public int SkillPoints => skillPoints;
     public float FenceRate => fenceRate;
+
+    private void Awake()
+    {
+        ReloadFromDisk();
+    }
+
+    public void ReloadFromDisk()
+    {
+        save = ProgressStore.Load();
+        clean = save.money;
+        dirty = save.dirtyMoney;
+        skillPoints = save.skillPoints;
+        Changed?.Invoke();
+    }
+
+    public void SavetoDisk()
+    {
+        if (save == null) save = ProgressStore.Load();
+        save.money = clean;
+        save.dirtyMoney = dirty;
+        save.skillPoints = skillPoints;
+        ProgressStore.Save(save);
+    }
+
+    public bool HasUnlock(ProgressUnlock unlock)
+    {
+        if (save == null) save = ProgressStore.Load();
+        return unlock != ProgressUnlock.None && save.Has(unlock);
+    }
+
+    public void Unlock(ProgressUnlock unlock)
+    {
+        if (unlock == ProgressUnlock.None) return;
+        if (save == null) save = ProgressStore.Load();
+        save.Apply(unlock);
+        SavetoDisk();
+    }
 
     // Invariant culture on purpose: a Swedish locale groups thousands with a no-break space,
     // which the static ASCII Electrolize atlas does not contain
@@ -38,6 +77,7 @@ public class Wallet : MonoBehaviour
         if (!CanAfford(currency, amount)) return false;
         if (currency == Currency.Clean) clean -= amount;
         else skillPoints -= amount;
+        SavetoDisk();
         Changed?.Invoke();
         return true;
     }
@@ -47,6 +87,7 @@ public class Wallet : MonoBehaviour
         if (dirty <= 0) return;
         clean += Mathf.RoundToInt(dirty * fenceRate);
         dirty = 0;
+        SavetoDisk();
         Changed?.Invoke();
     }
 

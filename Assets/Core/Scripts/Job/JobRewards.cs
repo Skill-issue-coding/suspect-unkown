@@ -7,7 +7,8 @@ using UnityEngine;
 // Job object. Hears LootPickup.Taken and JobOutcome.Completed, so nothing needs a reference to it
 public class JobRewards : MonoBehaviour
 {
-    private int money;
+    private int cleanMoney;
+    private int dirtyMoney;
     private ProgressUnlock unlocks;
 
     private readonly JobResult result = new();
@@ -35,7 +36,15 @@ public class JobRewards : MonoBehaviour
 
     private void OnTaken(LootPickup pickup)
     {
-        money += pickup.Item.Value;
+        if (pickup.Item.CarriedIn == LootCarry.Pocket)
+        {
+            cleanMoney += pickup.Item.Value;
+        }
+        else
+        {
+            dirtyMoney += pickup.Item.Value;
+        }
+
         unlocks |= pickup.Item.ProgressUnlock;
         AddLoot(pickup.Item);
     }
@@ -98,7 +107,8 @@ public class JobRewards : MonoBehaviour
 
         ProgressSave save = ProgressStore.Load();
         int levelBefore = Reputation.LevelFor(save.xp, out _);
-        save.money += money;
+        save.money += cleanMoney;
+        save.dirtyMoney += dirtyMoney;
         save.Apply(unlocks);
         save.xp += xp;
         save.skillPoints += Reputation.LevelFor(save.xp, out _) - levelBefore;
@@ -107,6 +117,6 @@ public class JobRewards : MonoBehaviour
         if (!save.completedJobs.Contains(result.job)) save.completedJobs.Add(result.job);
 
         ProgressStore.Save(save);
-        Debug.Log($"Progress saved: +${money}, +{xp} XP, unlocks {unlocks}, witness {result.witness}, job {result.job}");
+        Debug.Log($"Progress saved: +${cleanMoney}, +${dirtyMoney} +{xp} XP, unlocks {unlocks}, witness {result.witness}, job {result.job}");
     }
 }
