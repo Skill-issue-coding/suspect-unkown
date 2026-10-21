@@ -15,14 +15,14 @@ public readonly struct GuardClips
     // 90° over the 36-frame turn clips at 30 fps.
     private const float FallbackTurnRate = 75f;
 
-    public readonly ClipSet Idle, Watch, Search, GiveUp;
+    public readonly ClipSet Idle, Watch, Search, GiveUp, Slam;
     public readonly Gait PatrolWalk, InvestigateWalk, Run;
     public readonly TurnSet Turn;
 
-    private GuardClips(ClipSet idle, ClipSet watch, ClipSet search, ClipSet giveUp,
+    private GuardClips(ClipSet idle, ClipSet watch, ClipSet search, ClipSet giveUp, ClipSet slam,
             Gait patrolWalk, Gait investigateWalk, Gait run, TurnSet turn)
     {
-        Idle = idle; Watch = watch; Search = search; GiveUp = giveUp;
+        Idle = idle; Watch = watch; Search = search; GiveUp = giveUp; Slam = slam;
         PatrolWalk = patrolWalk; InvestigateWalk = investigateWalk; Run = run;
         Turn = turn;
     }
@@ -36,6 +36,7 @@ public readonly struct GuardClips
         giveUp: new ClipSet(GuardAnimatorParams.GiveUp, GuardAnimatorParams.GiveUpVariant,
             Clip("Guard_GiveUp_1"),
             Clip("Guard_GiveUp_2")),
+        slam: new ClipSet(GuardAnimatorParams.Slam, null, Clip("Guard_DoorSlam")),
         patrolWalk: new Gait(Clip("Guard_Walk"), FallbackPatrolSpeed),
         investigateWalk: new Gait(Clip("Guard_InvestigateWalk"), FallbackInvestigateSpeed),
         run: new Gait(Clip("Guard_Run"), FallbackRunSpeed),

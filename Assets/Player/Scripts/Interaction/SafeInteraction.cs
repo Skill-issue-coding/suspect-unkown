@@ -16,6 +16,12 @@ public class SafeInteraction : MonoBehaviour, IInteractionBehaviour
     {
         if (safe.IsOpen) return;
 
+        if (safe.IsCracked)
+        {
+            safe.Open();
+            return;
+        }
+
         PlayerSafeCracking cracking = interactor.GetComponent<PlayerSafeCracking>();
         if (cracking != null)
             cracking.Begin(safe);

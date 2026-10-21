@@ -1,13 +1,15 @@
 using UnityEngine;
 
-// Drives the guard-only animator parameters from GuardBehaviour; NpcAnimator feeds Speed and TurnRate. 
-// Watching follows ActivityChanged; Searching is polled, since arriving is not an activity change. Idle 
+// Drives the guard-only animator parameters from GuardBehaviour; NpcAnimator feeds Speed and TurnRate.
+// Watching follows ActivityChanged; Searching and the slam are polled, since arriving is not an activity
+// change. The slam fires once as the guard starts resolving an anomaly (an open door or safe). Idle
 // and give-up variants are picked at moments where the switch cannot show: on arrival at a POI, and just 
 // before the give-up trigger. Picks never repeat the previous one.
 [RequireComponent(typeof(GuardBehaviour))]
 public class GuardAnimation : MonoBehaviour
 {
     private bool wasDwelling;
+    private bool wasResolving;
     private int lastIdleVariant = -1;
     private int lastGiveUpVariant = -1;
 
@@ -58,6 +60,11 @@ public class GuardAnimation : MonoBehaviour
             animator.SetFloat(GuardAnimatorParams.IdleVariantId,
                 PickVariant(GuardAnimatorParams.IdleVariantCount, ref lastIdleVariant));
         wasDwelling = dwelling;
+
+        bool resolving = guard.IsResolving;
+        if (resolving && !wasResolving)
+            animator.SetTrigger(GuardAnimatorParams.SlamId);
+        wasResolving = resolving;
     }
 
     private void OnActivityChanged(GuardActivity from, GuardActivity to)

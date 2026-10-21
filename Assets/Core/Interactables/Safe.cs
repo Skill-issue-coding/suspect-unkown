@@ -4,6 +4,7 @@ using UnityEngine;
 // A combination safe in the world. It knows nothing about the player: it holds its lock level, a
 // combination rolled once per heist, how many of its numbers have been set so far (so a player who backs
 // off keeps them), and swings its door open when asked. PlayerSafeCracking reads and writes these
+[RequireComponent(typeof(Interactable), typeof(Anomaly))]
 public class Safe : MonoBehaviour
 {
     [Header("Door")]
@@ -34,22 +35,40 @@ public class Safe : MonoBehaviour
 
     public int LockLevel => lockLevel;
     public bool IsOpen { get; private set; }
+
+    // Cracked once, cracked for the heist: a safe a guard has closed reopens without the minigame
+    public bool IsCracked { get; private set; }
     public int NumbersSet { get; private set; }
+
+    // Raised on every opening, the first and any reopening. The office POI listens (step 5)
+    public event System.Action Opened;
 
     private Interactable reach;
     private int[] combination;
     private Tween swing;
 
+    private Anomaly anomaly;
+    private Quaternion closedRotation;
+
     private void Awake()
     {
         reach = GetComponent<Interactable>();
+        anomaly = GetComponent<Anomaly>();
 
         if (door == null)
             Debug.LogWarning($"{name} has no door; it will open without swinging", this);
 
+        if (door != null) closedRotation = door.localRotation;
+
         if (enableOnDone != null)
+        {
+            enableOnDone.enabled = false;
             enableOnDone.SetReachable(false);
+        }
     }
+
+    private void OnEnable() => anomaly.Resolved += Close;
+    private void OnDisable() => anomaly.Resolved -= Close;
 
     // Rolled on first use and fixed for the heist, so numbers set in one try still hold in the next
     public int[] CombinationFor(int length, int dialNumbers)
@@ -80,15 +99,44 @@ public class Safe : MonoBehaviour
             interactOutline.SetActive(false);
 
         if (enableOnDone != null)
+        {
+            enableOnDone.enabled = true;
             enableOnDone.SetReachable(true);
+        }
 
         IsOpen = true;
+        IsCracked = true;
         reach.enabled = false;
         reach.SetReachable(false);
+        anomaly.Raise();
+        Opened?.Invoke();
 
         if (door == null) return;
-
         swing.Stop();
-        swing = Tween.LocalRotation(door, door.localRotation * Quaternion.AngleAxis(openAngle, hingeAxis), swingDuration, Ease.OutCubic);
+        swing = Tween.LocalRotation(door, closedRotation * Quaternion.AngleAxis(openAngle, hingeAxis), swingDuration, Ease.OutCubic);
+    }
+
+    [ContextMenu("Close")]
+    public void Close()
+    {
+        if (!IsOpen) return;
+
+        IsOpen = false;
+        anomaly.Clear();
+        reach.enabled = true;
+        reach.SetReachable(true);
+
+        if (interactOutline != null)
+            interactOutline.SetActive(true);
+
+        if (enableOnDone != null)
+        {
+            enableOnDone.enabled = false;
+            enableOnDone.SetReachable(false);
+        }
+
+        if (door == null) return;
+        swing.Stop();
+        swing = Tween.LocalRotation(door, closedRotation, swingDuration, Ease.OutCubic);
     }
 }

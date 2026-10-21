@@ -8,12 +8,14 @@ using UnityEngine;
 public struct AnomalyWeights
 {
     [Range(0f, 1f)] public float openDoor;
+    [Range(0f, 1f)] public float safeOpen;
 
     public readonly float Get(AnomalyKind kind) => kind switch
     {
         AnomalyKind.OpenDoor => openDoor,
+        AnomalyKind.SafeOpen => safeOpen,
         _ => throw new ArgumentOutOfRangeException(nameof(kind)),
     };
 
-    public AnomalyWeights(float openDoor) => this.openDoor = openDoor;
+    public AnomalyWeights(float openDoor, float safeOpen) { this.openDoor = openDoor; this.safeOpen = safeOpen; }
 }

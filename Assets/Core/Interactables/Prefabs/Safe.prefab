@@ -308,6 +308,7 @@ GameObject:
   - component: {fileID: 2946308040572068774}
   - component: {fileID: 2080952319394986878}
   - component: {fileID: 1807249116802552276}
+  - component: {fileID: 3206777310235723840}
   m_Layer: 0
   m_Name: Safe
   m_TagString: Untagged
@@ -420,6 +421,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c0b5e4cc8effe349b84c28a61d69171, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SafeInteraction
+--- !u!114 &3206777310235723840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2341533328511206685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e59bfe2691e4a041861d161986c4040, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Anomaly
+  kind: 1
+  sightOffset: {x: 0, y: -0.45, z: 0.45}
+  resolveOffset: {x: 0, y: -1.5, z: 0}
 --- !u!1 &3330553765846426384
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,6 +445,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 652006946049058272}
+  - component: {fileID: 1550974388670617471}
   m_Layer: 0
   m_Name: Mesh
   m_TagString: Untagged
@@ -454,6 +471,22 @@ Transform:
   - {fileID: 4545487297568997552}
   m_Father: {fileID: 4398910907801118005}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!208 &1550974388670617471
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3330553765846426384}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 0.33, y: 0.375, z: 0.425}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 1
+  m_Center: {x: 0, y: -0.06, z: 0.4}
+  m_TimeToStationary: 0.5
 --- !u!1 &5641255980707288547
 GameObject:
   m_ObjectHideFlags: 0
@@ -788,10 +821,6 @@ PrefabInstance:
     - target: {fileID: 2642679860828871298, guid: bc44609e2120fa1489605283c13c022b, type: 3}
       propertyPath: m_Name
       value: PocketWatch
-      objectReference: {fileID: 0}
-    - target: {fileID: 5710076932427595418, guid: bc44609e2120fa1489605283c13c022b, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 0.9999995
       objectReference: {fileID: 0}
     - target: {fileID: 5710076932427595418, guid: bc44609e2120fa1489605283c13c022b, type: 3}
       propertyPath: m_LocalPosition.x

@@ -38,6 +38,10 @@ public class NpcSuspicion : MonoBehaviour
         set => decayMultiplier = Mathf.Max(0f, value);
     }
 
+    // Suspicion never decays below this for the rest of the job. 0 unless a role raises it: a guard who
+    // found the safe open stays on edge (thrift shop G3). Only ever goes up
+    public float Baseline { get; private set; }
+
     // Where the NPC's attention last went: every sighting, and alarming sounds while the player is out
     // of sight. Ordinary footsteps never move it, or an alert NPC would track a quiet player through
     // walls step by step. The indicator's arrow points here, and it is the same rule GuardBehaviour
@@ -103,7 +107,17 @@ public class NpcSuspicion : MonoBehaviour
         else if (Time.time - lastAbnormalTime >= archetype.DecayDelay)
             suspicion -= archetype.DecayRate * DecayMultiplier * Time.deltaTime;
 
-        Suspicion = Mathf.Clamp01(suspicion);
+        Suspicion = Mathf.Clamp(suspicion, Baseline, 1f);
+        UpdateState();
+    }
+
+    // A lower value never undoes a higher one, so calling it every tick is harmless
+    public void RaiseBaseline(float value)
+    {
+        Baseline = Mathf.Max(Baseline, Mathf.Clamp01(value));
+        if (Suspicion >= Baseline) return;
+
+        Suspicion = Baseline;
         UpdateState();
     }
 

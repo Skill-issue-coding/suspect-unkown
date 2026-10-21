@@ -49,6 +49,13 @@ public static class GuardLocomotionBuilder
                 AnimatorBuildUtility.AddState(root, GuardAnimatorParams.GiveUp, Variants(controller, clips.GiveUp)),
                 GuardAnimatorParams.GiveUp);
 
+        // The confused beat at an open door or safe, ending in the slam. One clip for every anomaly the guard
+        // resolves; GuardBehaviour's confusedDuration is timed to the clip's impact
+        if (!clips.Slam.IsEmpty)
+            AnimatorBuildUtility.AddOneShotTransitions(root, locomotion,
+                AnimatorBuildUtility.AddState(root, GuardAnimatorParams.Slam, Variants(controller, clips.Slam)),
+                GuardAnimatorParams.Slam);
+
         WarnOnVariantCount(clips.Idle, GuardAnimatorParams.IdleVariantCount);
         WarnOnVariantCount(clips.GiveUp, GuardAnimatorParams.GiveUpVariantCount);
 
@@ -79,6 +86,7 @@ public static class GuardLocomotionBuilder
         controller.AddParameter(GuardAnimatorParams.IdleVariant, AnimatorControllerParameterType.Float);
         controller.AddParameter(GuardAnimatorParams.GiveUp, AnimatorControllerParameterType.Trigger);
         controller.AddParameter(GuardAnimatorParams.GiveUpVariant, AnimatorControllerParameterType.Float);
+        controller.AddParameter(GuardAnimatorParams.Slam, AnimatorControllerParameterType.Trigger);
     }
 
     // Speed tree in metres per second: standing (with turns) at 0, then each gait at its own speed.

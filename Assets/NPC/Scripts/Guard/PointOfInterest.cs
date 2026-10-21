@@ -5,8 +5,8 @@ using UnityEditor;
 using UnityEngine;
 
 // A point of interest guards serve (decision 15). Coverage fills while any guard is inside the radius and 
-// drains at Importance = baseDecayRate × DecayMultiplier. Level design sets the base rate; the Phase 8 
-// security plan sets the multiplier. The POI never learns. Guards report presence with Occupy() and claim 
+// drains at Importance = baseDecayRate × DecayMultiplier × AlarmFactor. Level design sets the base rate; the
+// Phase 8 security plan sets the multiplier; an alarm in the job (PoiSafeAlarm) sets the factor. The POI never learns. Guards report presence with Occupy() and claim 
 // with TryClaim(), so two guards never head for the same POI.
 public class PointOfInterest : MonoBehaviour
 {
@@ -39,7 +39,11 @@ public class PointOfInterest : MonoBehaviour
         set => decayMultiplier = Mathf.Max(0f, value);
     }
 
-    public float Importance => baseDecayRate * decayMultiplier;
+    // Raised during the job by something the player did here (the office safe opened, thrift shop G3). Kept
+    // apart from DecayMultiplier, which the security plan owns, so neither overwrites the other. Only goes up
+    public float AlarmFactor { get; private set; } = 1f;
+
+    public float Importance => baseDecayRate * decayMultiplier * AlarmFactor;
     public float DwellTime => dwellTime;
 
     private bool occupiedThisFrame;
@@ -56,6 +60,8 @@ public class PointOfInterest : MonoBehaviour
     public bool Contains(Vector3 position) => (position - transform.position).sqrMagnitude <= radius * radius;
 
     public void Occupy() => occupiedThisFrame = true;
+
+    public void RaiseAlarm(float factor) => AlarmFactor = Mathf.Max(AlarmFactor, factor);
 
     private void LateUpdate()
     {

@@ -2439,6 +2439,7 @@ MonoBehaviour:
   lostSightGrace: 0.3
   headLook: {fileID: 0}
   glanceDuration: 1.5
+  confusedDuration: 1.45
   debug: 1
 --- !u!114 &8890725952143270588
 MonoBehaviour:

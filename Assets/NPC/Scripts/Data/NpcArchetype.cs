@@ -49,7 +49,7 @@ public class NpcArchetype : ScriptableObject
     private float anomalySuspicion = 0.6f;
 
     [SerializeField, Tooltip("How much each kind of anomaly worries this observer")]
-    private AnomalyWeights anomalyWeights = new AnomalyWeights(1f);
+    private AnomalyWeights anomalyWeights = new AnomalyWeights(1f, 1f);
 
     [Header("Suspicion")]
     [SerializeField, Tooltip("How abnormal each act looks to this observer")]

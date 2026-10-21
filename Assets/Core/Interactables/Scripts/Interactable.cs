@@ -70,9 +70,12 @@ public class Interactable : MonoBehaviour
     // Called by the player side after a completed press or hold
     public void Use(GameObject interactor) => behaviour.Interact(interactor);
 
-    // Enables or disables the reach trigger. Raises Withdrawn when turned off
+    // Enables or disables the reach trigger. Raises Withdrawn when turned off. Safe to call before this
+    // Awake has run: an owner (the safe, the glass cutter) switches its loot off from its own Awake, and
+    // Awake order between objects is not defined
     public void SetReachable(bool reachable)
     {
+        if (trigger == null) trigger = GetComponent<Collider>();
         trigger.enabled = reachable;
         if (!reachable) Withdrawn?.Invoke(this);
     }
