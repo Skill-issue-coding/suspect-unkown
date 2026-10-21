@@ -15,6 +15,7 @@ public class PlayerInteraction : MonoBehaviour
     private bool isHolding;
     private bool isBusy;
     private PlayerInputs input;
+    private PlayerSkills skills;
 
     public bool IsBusy
     {
@@ -33,6 +34,7 @@ public class PlayerInteraction : MonoBehaviour
     private void Awake()
     {
         input = GetComponent<PlayerInputs>();
+        skills = GetComponent<PlayerSkills>();
     }
 
     private void OnEnable()
@@ -177,8 +179,12 @@ public class PlayerInteraction : MonoBehaviour
                 isHolding = true;
                 HoldStarted?.Invoke(shown);
             }
-
-            progress += Time.deltaTime / shown.HoldSeconds;
+            float holdDuration = shown.HoldSeconds;
+            if (skills != null && skills.HasQuickHands && shown.GetComponent<LootPickup>() != null)
+            {
+                holdDuration = Math.Min(holdDuration, 1.5f);
+            }
+            progress += Time.deltaTime / holdDuration;
             if (shown.Prompt != null)
                 shown.Prompt.SetProgress(Mathf.Clamp01(progress));
 
