@@ -14049,7 +14049,7 @@ MonoBehaviour:
   dirty: 8400
   clean: 2750
   skillPoints: 2
-  fenceRate: 0.65
+  fenceRate: 0.7
 --- !u!4 &412953601
 Transform:
   m_ObjectHideFlags: 0
@@ -34205,10 +34205,10 @@ MonoBehaviour:
       - m_Target: {fileID: 1827542566}
         m_TargetAssemblyTypeName: ShopConcept, Assembly-CSharp
         m_MethodName: Launder
-        m_Mode: 0
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 

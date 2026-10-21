@@ -9,6 +9,7 @@ public class ProgressSave
 {
     public ProgressUnlock unlocks;
     public int money;
+    public int dirtyMoney;
     public int xp;
     public int skillPoints;
     public JobResult lastJob = new();
