@@ -22,9 +22,14 @@ public class LootItem : ScriptableObject
     [SerializeField, Min(0), Tooltip("Money added to the save if the job succeeds")]
     private int value = 0;
 
+    [Header("Glass")]
+    [SerializeField, Range(0, 2), Tooltip("0 = not behind glass, 1 = normal glass, 2 = stronger glass")]
+    private int glassLevel = 0;
+
     public string DisplayName => displayName;
     public float TakeSeconds => takeSeconds;
     public LootCarry CarriedIn => carriedIn;
     public ProgressUnlock ProgressUnlock => progressUnlock;
     public int Value => value;
+    public int GlassLevel => glassLevel;
 }

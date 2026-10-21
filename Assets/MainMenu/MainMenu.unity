@@ -525,8 +525,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Lockpicks, level 3
   description: 'Opens level 3 locks: safes and vault gates.'
-  unlock: 0
-  price: 3000
+  unlock: 16
+  price: 5000
   currency: 0
   requires: {fileID: 1365531918}
   owned: 0
@@ -854,7 +854,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Forgettable
   description: Witnesses observe you at reduced confidence.
-  unlock: 0
+  unlock: 512
   price: 2
   currency: 1
   requires: {fileID: 0}
@@ -2006,7 +2006,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 550, y: -160}
+  m_AnchoredPosition: {x: 1060, y: -160}
   m_SizeDelta: {x: 4, y: 24}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &64250099
@@ -7085,8 +7085,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Hammer
   description: be able to break glass.
-  unlock: 0
-  price: 1500
+  unlock: 32
+  price: 250
   currency: 0
   requires: {fileID: 0}
   owned: 0
@@ -16256,7 +16256,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Quick hands
   description: Be able to loot objectives at a faster rate.
-  unlock: 0
+  unlock: 1024
   price: 1
   currency: 1
   requires: {fileID: 0}
@@ -25121,8 +25121,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Negotiator
   description: Get a better contract for money laundry.
-  unlock: 0
-  price: 1
+  unlock: 4096
+  price: 3
   currency: 1
   requires: {fileID: 581209263}
   owned: 0
@@ -28165,7 +28165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Lockpicks, level 1
   description: Opens level 1 locks. Picks never break.
-  unlock: 0
+  unlock: 4
   price: 0
   currency: 0
   requires: {fileID: 0}
@@ -29017,7 +29017,7 @@ MonoBehaviour:
   title: Signal jammer
   description: Disables the ability for civilians to call the police for a short duration.
   unlock: 0
-  price: 2800
+  price: 5000
   currency: 0
   requires: {fileID: 0}
   owned: 0
@@ -29656,7 +29656,7 @@ MonoBehaviour:
   title: Camera looper
   description: Blinds one camera for a while.
   unlock: 0
-  price: 2200
+  price: 7000
   currency: 0
   requires: {fileID: 0}
   owned: 0
@@ -40418,8 +40418,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Lockpicks, level 2
   description: 'Opens level 2 locks: back offices, display cases.'
-  unlock: 0
-  price: 1200
+  unlock: 8
+  price: 2000
   currency: 0
   requires: {fileID: 977813310}
   owned: 0
@@ -43707,8 +43707,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Glass breaker
   description: Be able to break glass with less noice.
-  unlock: 0
-  price: 1500
+  unlock: 64
+  price: 3500
   currency: 0
   requires: {fileID: 0}
   owned: 0
@@ -55181,7 +55181,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Soft steps
   description: Less noise while moving.
-  unlock: 0
+  unlock: 256
   price: 1
   currency: 1
   requires: {fileID: 0}
@@ -56916,8 +56916,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Glass cutter
   description: Be able to break tougher glass.
-  unlock: 0
-  price: 1500
+  unlock: 16512
+  price: 6500
   currency: 0
   requires: {fileID: 0}
   owned: 0

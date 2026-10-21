@@ -12,11 +12,23 @@ public class LootPickup : MonoBehaviour, IInteractionBehaviour
     private LootItem item;
 
     public LootItem Item => item;
+    private string blockedReason;
+    public string BlockedText => blockedReason;
 
-    public bool IsBlockedFor(GameObject interactor) =>
-        item.CarriedIn == LootCarry.Bag && LootBag.Active != null && LootBag.Active.IsFull;
+    public bool IsBlockedFor(GameObject interactor)
+    {
+        if (item == null) return false;
 
-    public string BlockedText => "Bag full";
+        // Bag capacity check
+        if (item.CarriedIn == LootCarry.Bag && LootBag.Active != null && LootBag.Active.IsFull)
+        {
+            blockedReason = "Bag full";
+            return true;
+        }
+
+        blockedReason = null;
+        return false;
+    }
 
     private void Awake()
     {

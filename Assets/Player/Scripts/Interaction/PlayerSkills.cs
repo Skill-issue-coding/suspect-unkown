@@ -23,12 +23,36 @@ public class PlayerSkills : MonoBehaviour
     public bool HasForgettable => hasForgettable;
     public bool HasQuickHands => hasQuickHands;
 
+    [Header("Gear")]
+    [SerializeField, Tooltip("Allows breaking of normal glass (level 1). Player starts with this")]
+    private bool hasHammer = true;
+
+    [SerializeField, Tooltip("Muffles the noise when breaking level 1 glass")]
+    private bool hasGlassBreaker;
+
+    [SerializeField, Tooltip("Allows cutting of level 2 glass")]
+    private bool hasGlassCutter;
+
+    public bool HasHammer => hasHammer;
+    public bool HasGlassBreaker => hasGlassBreaker;
+    public bool HasGlassCutter => hasGlassCutter;
+
     private void Awake()
     {
         ProgressSave save = ProgressStore.Load();
         if (save != null)
         {
-            // Bitwise OR so any checkbox ticked in the Inspector remains active for testing
+            // Lockpick levels: player starts at 1, upgraded by Lockpick 2 & 3
+            if (save.Has(ProgressUnlock.Gear_Lockpick3)) lockpickingLevel = Mathf.Max(lockpickingLevel, 3);
+            else if (save.Has(ProgressUnlock.Gear_Lockpick2)) lockpickingLevel = Mathf.Max(lockpickingLevel, 2);
+            else if (save.Has(ProgressUnlock.Gear_Lockpick)) lockpickingLevel = Mathf.Max(lockpickingLevel, 1);
+
+            // Gear tools
+            hasHammer |= save.Has(ProgressUnlock.Gear_Hammer) || true;
+            hasGlassBreaker |= save.Has(ProgressUnlock.Gear_GlassBreaker);
+            hasGlassCutter |= save.Has(ProgressUnlock.Gear_GlassCutter);
+
+            // Skills
             hasSoftSteps |= save.Has(ProgressUnlock.Skill_SoftSteps);
             hasForgettable |= save.Has(ProgressUnlock.Skill_Forgettable);
             hasQuickHands |= save.Has(ProgressUnlock.Skill_QuickHands);
