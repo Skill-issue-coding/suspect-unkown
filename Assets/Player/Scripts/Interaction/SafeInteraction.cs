@@ -7,10 +7,7 @@ public class SafeInteraction : MonoBehaviour, IInteractionBehaviour
 {
     private Safe safe;
 
-    private void Awake()
-    {
-        safe = GetComponent<Safe>();
-    }
+    private void Awake() => safe = GetComponent<Safe>();
 
     // Any player can try a safe; an open one offers nothing
     public bool IsBlockedFor(GameObject interactor) => safe.IsOpen;

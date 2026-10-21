@@ -26,20 +26,29 @@ public class Safe : MonoBehaviour
     [SerializeField, Tooltip("Positions either side of the previous number (and of 0, for the first) a number never lands on, so each number needs a real turn")]
     private int minimumTurn = 3;
 
+    [SerializeField, Tooltip("Interact outline object, disables when the safe is done")]
+    private GameObject interactOutline;
+
+    [SerializeField, Tooltip("Component to enable after GlassCutting is done")]
+    private Interactable enableOnDone;
+
     public int LockLevel => lockLevel;
     public bool IsOpen { get; private set; }
     public int NumbersSet { get; private set; }
 
-    private Interactable[] reaches;
+    private Interactable reach;
     private int[] combination;
     private Tween swing;
 
     private void Awake()
     {
-        reaches = GetComponentsInChildren<Interactable>(true);
+        reach = GetComponent<Interactable>();
 
         if (door == null)
             Debug.LogWarning($"{name} has no door; it will open without swinging", this);
+
+        if (enableOnDone != null)
+            enableOnDone.SetReachable(false);
     }
 
     // Rolled on first use and fixed for the heist, so numbers set in one try still hold in the next
@@ -60,19 +69,22 @@ public class Safe : MonoBehaviour
         return combination;
     }
 
-    public void RememberNumbers(int numbersSet)
-    {
-        NumbersSet = Mathf.Max(NumbersSet, numbersSet);
-    }
+    public void RememberNumbers(int numbersSet) => NumbersSet = Mathf.Max(NumbersSet, numbersSet);
 
     [ContextMenu("Open")]
     public void Open()
     {
         if (IsOpen) return;
 
+        if (interactOutline != null)
+            interactOutline.SetActive(false);
+
+        if (enableOnDone != null)
+            enableOnDone.SetReachable(true);
+
         IsOpen = true;
-        foreach (Interactable reach in reaches)
-            reach.SetReachable(false);
+        reach.enabled = false;
+        reach.SetReachable(false);
 
         if (door == null) return;
 
