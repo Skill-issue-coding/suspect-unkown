@@ -13348,6 +13348,39 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 473941431}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &475068632
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 475068633}
+  m_Layer: 0
+  m_Name: StoryItems
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &475068633
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 475068632}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.4142, y: 0.9573, z: -2.85}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1819585233681352048}
+  - {fileID: 845116010}
+  m_Father: {fileID: 1683315113}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &479985378
 GameObject:
   m_ObjectHideFlags: 0
@@ -24532,7 +24565,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 1442043093}
+    m_TransformParent: {fileID: 475068633}
     m_Modifications:
     - target: {fileID: 174068, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_Name
@@ -24560,15 +24593,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -24576,7 +24609,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 28.536
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 488338, guid: 1b9925b02d7968d45b8d566ed8ca99b5, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -24612,7 +24645,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8538d1a98fda5024e8e87e0965ab09d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoryItemDisplay
-  popDuration: 0.25
+  popInDuration: 0.25
+  popOutDuration: 0.15
   shakeStrength: 8
   shakeDuration: 0.4
 --- !u!1 &854832898
@@ -49234,7 +49268,7 @@ Transform:
   - {fileID: 543450653290084847}
   - {fileID: 1326291842}
   - {fileID: 1148606637}
-  - {fileID: 1442043093}
+  - {fileID: 475068633}
   m_Father: {fileID: 1552175538}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1684558143
@@ -62289,13 +62323,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 432424416566378861}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.6868426, y: -0.16806932, z: -0.16806932, w: 0.6868426}
+  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.20999996, y: 0.297, z: 1}
+  m_LocalScale: {x: 0.20999998, y: 0.29699996, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1442043093}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: -27.5}
+  m_Father: {fileID: 475068633}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!33 &1836994529160230368
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -62698,7 +62732,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8538d1a98fda5024e8e87e0965ab09d4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StoryItemDisplay
-  popDuration: 0.25
+  popInDuration: 0.25
+  popOutDuration: 0.15
   shakeStrength: 8
   shakeDuration: 0.4
 --- !u!1 &3221798562443377268
