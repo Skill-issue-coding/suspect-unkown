@@ -76,6 +76,9 @@ public class NpcArchetype : ScriptableObject
     [SerializeField, Tooltip("How far suspicion must drop below a threshold to leave that state"), Range(0f, 0.1f)]
     private float hysteresis = 0.05f;
 
+    [SerializeField, Range(0f, 1f), Tooltip("How much an outfit matching the police record worries this observer. Guard about 0.6, civilians 0")]
+    private float recognition;
+
     [Header("Witness")]
     [SerializeField, Range(0f, 1f), Tooltip("How good an observer this is, a factor in every piece of evidence. Tired clerk ~0.4, civilian ~0.6, guard 1")]
     private float observerSkill = 0.6f;
@@ -112,6 +115,7 @@ public class NpcArchetype : ScriptableObject
     public float FeatureVisibility(FeatureSlot slot) => featureVisibility.Get(slot);
     public float AnomalyWeight(AnomalyKind kind) => anomalyWeights.Get(kind);
     public ReactionTree ReactionTree => reactionTree;
+    public float Recognition => recognition;
 
     // Light level 0 is darkness, 1 full light. Shadow lowers visibility but never to zero:
     // a figure in the dark is harder to see, not invisible.

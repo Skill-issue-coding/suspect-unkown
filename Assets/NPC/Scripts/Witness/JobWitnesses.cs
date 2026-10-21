@@ -17,6 +17,12 @@ public static class JobWitnesses
     // drops to "probably" after one job and out of the caption after about three (burns are temporary)
     private const float RecordKeptPerJob = 0.5f;
 
+    // SuspectSketch's vagueAt: a part the newspaper could not print cannot be recognised
+    private const float RecogniseFrom = 0.2f;
+
+    private static float recordMatch;
+    private static bool matched;
+
     // What the police knew when this job started, from earlier jobs; empty on a first run
     public static WitnessReport Record { get; private set; }
 
@@ -26,12 +32,27 @@ public static class JobWitnesses
     // The job's police description; null until the job ends
     public static WitnessReport Description { get; private set; }
 
+    // How well the worn outfit fits what the police knew at job start, 0 to 1 (thrift shop §6). Worked out on
+    // the first call and kept: the record is fixed for the job, and so is the outfit (decision 23). Not when
+    // the record loads, because PlayerAppearance reads the outfit in its Start, after witnesses register
+    public static float RecordMatch(CharacterAppearance worn)
+    {
+        if (Record == null) return 0f;
+        if (!matched)
+        {
+            recordMatch = Record.Match(worn, RecogniseFrom);
+            matched = true;
+        }
+        return recordMatch;
+    }
+
     public static void Register(NpcWitness witness)
     {
         if (witnesses.Contains(witness)) return;
         if (witnesses.Count == 0)
         {
             Record = PoliceStore.Load();
+            matched = false;
             JobOutcome.Failed += OnFailed;
             JobOutcome.Completed += OnCompleted;
             Debug.Log(Record.SawAnything ? $"Police record at job start:\n{Record}" : "Police record at job start: nothing on file");
@@ -53,6 +74,7 @@ public static class JobWitnesses
         Description = null;
         Described = null;
         Record = null;
+        matched = false;
     }
 
     private static void OnFailed(FailReason reason) => OnEnded(false);

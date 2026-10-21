@@ -97,11 +97,17 @@ public class NpcSuspicion : MonoBehaviour
             HasStimulus = true;
         }
 
-        if (sees && observation.abnormality > 0f)
-        {
-            suspicion += observation.Strength * observation.abnormality *
-                archetype.RiseRate * RiseMultiplier * Time.deltaTime;
+        // Recognition alone stops just short of Alerted (thrift shop §6): a known outfit walking normally gets a
+        // closer look; only conduct on top tips the NPC into pursuit
+        float recognitionCeiling = archetype.Threshold(NpcAlertState.Alerted) - archetype.Hysteresis;
+        bool abnormal = sees && observation.abnormality > 0f;
+        bool recognised = sees && observation.recognition > 0f && suspicion < recognitionCeiling;
 
+        if (abnormal || recognised)
+        {
+            float weight = 1f - (1f - observation.abnormality) * (1f - observation.recognition);   // decision 6
+            suspicion += observation.Strength * weight * archetype.RiseRate * RiseMultiplier * Time.deltaTime;
+            if (!abnormal) suspicion = Mathf.Min(suspicion, recognitionCeiling);
             lastAbnormalTime = Time.time;
         }
         else if (Time.time - lastAbnormalTime >= archetype.DecayDelay)

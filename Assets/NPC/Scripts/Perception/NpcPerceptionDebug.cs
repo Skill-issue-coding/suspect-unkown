@@ -124,6 +124,7 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label($"fStance     {observation.fStance:F2}");
             GUILayout.Label($"conduct     {observation.conduct}");
             GUILayout.Label($"abnormality {observation.abnormality:F2}");
+            GUILayout.Label($"recognition {observation.recognition:F2} (match {JobWitnesses.RecordMatch(observation.appearance):P0})");
 
             IReadOnlyList<float> fractions = perception.DebugRegionFraction;
 

@@ -19,6 +19,7 @@ public struct Observation
     public ConductFlags conduct;
     public float abnormality;
     public CharacterAppearance appearance;
+    public float recognition;
 
     // Share of a region's points with a clear line, 0 to 1. A region the archetype ignores casts no rays and stays 0
     private float headFraction;
