@@ -167,5 +167,5 @@ Packages/packages-lock.json linguist-generated
 # Spine export file for Unity
 *.skel.bytes            lfs
 
-# Exceptions for .asset files such as lightning pre-baking
-LightingData.asset     binary
+# Baked lighting data is large and binary: stored in LFS, not as YAML
+LightingData.asset     lfs
