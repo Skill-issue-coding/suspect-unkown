@@ -1,5 +1,6 @@
 using PrimeTween;
 using UnityEngine;
+using TMPro;
 
 // The ground marking at the van's back doors: a frame the size of the zone, grey with a lock while
 // locked, pulsing in the accent color once unlocked, and a fill that grows toward the van with the
@@ -18,8 +19,8 @@ public class ExtractionMarker : MonoBehaviour
     [SerializeField, Tooltip("Grows along local +Y with progress. Draw Mode Sliced, sized to the full zone")]
     private SpriteRenderer fill;
 
-    [SerializeField, Tooltip("Shown while the zone is locked")]
-    private SpriteRenderer lockIcon;
+    [SerializeField, Tooltip("Label inside the marker")]
+    private TMP_Text leaveLabel;
 
     [Header("Look")]
     [SerializeField, Tooltip("Frame color while locked")]
@@ -35,13 +36,14 @@ public class ExtractionMarker : MonoBehaviour
     private float pulsePeriod = 1.2f;
 
     private Tween pulse;
+    private Tween labelPulse;
     private float fullDepth;
     private Vector3 fillStart;
     private float shownProgress = -1f;
 
     private void Awake()
     {
-        if (zone == null || frame == null || fill == null || lockIcon == null)
+        if (zone == null || frame == null || fill == null)
         {
             Debug.LogWarning($"{name} needs its zone, frame, fill and lock icon", this);
             enabled = false;
@@ -61,6 +63,7 @@ public class ExtractionMarker : MonoBehaviour
     {
         if (zone != null) zone.StateChanged -= ShowState;
         pulse.Stop();
+        labelPulse.Stop();
     }
 
     private void Start() => ShowState();
@@ -80,12 +83,22 @@ public class ExtractionMarker : MonoBehaviour
     private void ShowState()
     {
         bool unlocked = zone.IsUnlocked;
-        lockIcon.enabled = !unlocked;
-
         pulse.Stop();
-        frame.color = unlocked ? unlockedColor : lockedColor;
+        labelPulse.Stop();
+
+        Color color = unlocked ? unlockedColor : lockedColor;
+        frame.color = color;
+        if (leaveLabel != null)
+        {
+            leaveLabel.text = "LEAVE";
+            leaveLabel.color = color;
+        }
         if (!unlocked) return;
 
         pulse = Tween.Alpha(frame, pulseLowAlpha, pulsePeriod * 0.5f, Ease.InOutSine, cycles: -1, cycleMode: CycleMode.Yoyo);
+        if (leaveLabel != null)
+        {
+            labelPulse = Tween.Alpha(leaveLabel, pulseLowAlpha, pulsePeriod * 0.5f, Ease.InOutSine, cycles: -1, cycleMode: CycleMode.Yoyo);
+        }
     }
 }

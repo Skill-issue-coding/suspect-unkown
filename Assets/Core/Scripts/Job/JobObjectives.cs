@@ -1,20 +1,20 @@
 using System;
 using UnityEngine;
 
-// The level's objective loot and when the getaway van will leave. By default every listed item must be
-// taken (the apartment, where a level with nothing listed is complete from the start). With story items
-// optional, the listed items are the story items, and taking any of them or any bag item lets the van
-// leave (the thrift shop, as in Payday). Hears every pickup through LootPickup.Taken, so pickups need no
-// reference to it. One per level
+// The level's objective loot and when the getaway van will leave. Listed items appear on the HUD
+// checklist card and count as primary objectives on the debrief screen. When canLeaveAnytime or
+// storyItemsOptional is on, the getaway van is ready from the start (no loot required to leave).
+// Hears every pickup through LootPickup.Taken, so pickups need no reference to it. One per level
 public class JobObjectives : MonoBehaviour
 {
-    [SerializeField, Tooltip("Items that must be taken before the van leaves. List an item twice to require two of it")]
+    [SerializeField, Tooltip("Items listed on the HUD checklist and debrief. If storyItemsOptional and canLeaveAnytime are off, all must be taken to leave")]
     private LootItem[] required;
 
-    [SerializeField, Tooltip("Off: every listed item must be taken (the apartment). On: listed items are optional story items, and the van leaves once any of them or any bag item is taken")]
+    [SerializeField, Tooltip("Off: all listed items must be taken (Apartment). On: items are optional story items, and the van can leave anytime(Thriftshop)")]
     private bool storyItemsOptional;
 
-    private bool bagItemTaken;
+    [SerializeField, Tooltip("When enabled, the getaway van can leave at any time without collecting loot")]
+    private bool canLeaveAnytime = true;
 
     private bool[] taken;
     private bool[] previouslyUnlocked;
@@ -22,8 +22,8 @@ public class JobObjectives : MonoBehaviour
     public event Action Changed;
 
     public int Collected { get; private set; }
-    public int Required => required.Length;
-    public bool IsComplete => storyItemsOptional ? Collected > 0 || bagItemTaken : Collected >= Required;
+    public int Required => required != null ? required.Length : 0;
+    public bool IsComplete => canLeaveAnytime || storyItemsOptional || (Collected >= Required);
     public bool StoryItemsOptional => storyItemsOptional;
 
     // One slot of the required list, for the job card's checklist. Index from 0 to Required - 1
@@ -32,12 +32,13 @@ public class JobObjectives : MonoBehaviour
 
     private void Awake()
     {
-        taken = new bool[required.Length];
-        previouslyUnlocked = new bool[required.Length];
-        if (!storyItemsOptional) return;
-        ProgressSave save = ProgressStore.Load();
+        taken = new bool[Required];
+        previouslyUnlocked = new bool[Required];
 
-        for (int i = 0; i < required.Length; i++)
+        if (!storyItemsOptional) return;
+
+        ProgressSave save = ProgressStore.Load();
+        for (int i = 0; i < Required; i++)
         {
             if (required[i] != null && required[i].ProgressUnlock != ProgressUnlock.None && save.Has(required[i].ProgressUnlock))
             {
@@ -45,13 +46,14 @@ public class JobObjectives : MonoBehaviour
             }
         }
     }
+
     private void OnEnable() => LootPickup.Taken += OnTaken;
 
     private void OnDisable() => LootPickup.Taken -= OnTaken;
 
     private void OnTaken(LootPickup pickup)
     {
-        for (int i = 0; i < required.Length; i++)
+        for (int i = 0; i < Required; i++)
         {
             if (taken[i] || required[i] != pickup.Item) continue;
 
@@ -61,18 +63,12 @@ public class JobObjectives : MonoBehaviour
             Changed?.Invoke();
             return;
         }
-
-        if (!storyItemsOptional || bagItemTaken || pickup.Item.CarriedIn != LootCarry.Bag) return;
-
-        bagItemTaken = true;
-        Debug.Log("Objectives: a bag item is taken, the van will leave");
-        Changed?.Invoke();
     }
 
     private void OnValidate()
     {
         if (required == null) return;
         foreach (LootItem item in required)
-            if (item == null) { Debug.LogWarning($"{name} has an empty required item; the job can never complete", this); return; }
+            if (item == null) { Debug.LogWarning($"{name} has an empty required item", this); return; }
     }
 }
