@@ -31,6 +31,16 @@ public class PlayerInteraction : MonoBehaviour
     public event Action<Interactable> HoldStarted;
     public event Action<Interactable> HoldEnded;
 
+    // Item name and value for an Appraiser looking at loot; null hides the prompt's detail line.
+    // Runs on SetShown only, so the string building is not per frame
+    private string DetailFor(Interactable interactable)
+    {
+        if (skills == null || !skills.HasAppraiser) return null;
+        if (interactable.Behaviour is not LootPickup loot || loot.Item == null) return null;
+
+        return $"{loot.Item.DisplayName.ToUpperInvariant()}\n<color=#FFB547>VALUE: {loot.Item.Value}$</color>";
+    }
+
     private void Awake()
     {
         input = GetComponent<PlayerInputs>();
@@ -148,7 +158,7 @@ public class PlayerInteraction : MonoBehaviour
 
         if (shown != null)
         {
-            if (shown.Prompt != null) shown.Prompt.Show(transform, shown.PromptPoint, shown.UseText, shown.IsBlockedFor(gameObject));
+            if (shown.Prompt != null) shown.Prompt.Show(transform, shown.PromptPoint, shown.UseText, shown.IsBlockedFor(gameObject), DetailFor(shown));
             if (shown.Outline != null) shown.Outline.SetVisible(true);
         }
     }

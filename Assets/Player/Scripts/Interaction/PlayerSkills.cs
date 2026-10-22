@@ -24,11 +24,15 @@ public class PlayerSkills : MonoBehaviour
     [SerializeField, Tooltip("Increases the aim cone width for the glass cutter minigame")]
     private bool hasBetterCutter;
 
+    [SerializeField, Tooltip("Loot prompts show the item's name and value")]
+    private bool hasAppraiser;
+
     public int LockpickingLevel => lockpickingLevel;
     public bool HasSoftSteps => hasSoftSteps;
     public bool HasForgettable => hasForgettable;
     public bool HasQuickHands => hasQuickHands;
     public bool HasBetterCutter => hasBetterCutter;
+    public bool HasAppraiser => hasAppraiser;
 
     [Header("Gear")]
     [SerializeField, Tooltip("Allows breaking of normal glass (level 1)")]
@@ -67,6 +71,7 @@ public class PlayerSkills : MonoBehaviour
             hasForgettable |= save.Has(ProgressUnlock.Skill_Forgettable);
             hasQuickHands |= save.Has(ProgressUnlock.Skill_QuickHands);
             hasBetterCutter |= save.Has(ProgressUnlock.Skill_BetterCutter);
+            hasAppraiser |= save.Has(ProgressUnlock.Skill_Appraiser);
         }
     }
 }

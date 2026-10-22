@@ -105,9 +105,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootPickup
   item: {fileID: 11400000, guid: bff0602fadaacb3468a5a0a7a2c1d2f2, type: 2}
-  prompt: {fileID: 4839809526351441806}
-  outline: {fileID: 8966869268595971603}
-  promptOffset: {x: 0, y: 0.2, z: 0}
 --- !u!1 &2692200822097229858
 GameObject:
   m_ObjectHideFlags: 0

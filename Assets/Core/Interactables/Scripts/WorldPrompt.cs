@@ -49,6 +49,13 @@ public class WorldPrompt : MonoBehaviour
     [SerializeField, Tooltip("Optional. Filled image over the box showing hold progress; doors never fill it")]
     private Image holdFill;
 
+    [Header("Appraiser")]
+    [SerializeField, Tooltip("Optional. The tag behind the appraiser label; shown only when there is a detail")]
+    private GameObject appraiserTag;
+
+    [SerializeField, Tooltip("Optional. Shows the detail line (item name and value with Appraiser)")]
+    private TMP_Text appraiserLabel;
+
     private static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
 
     private Tween fade;
@@ -87,7 +94,7 @@ public class WorldPrompt : MonoBehaviour
     }
 
     // Blocked: the door is locked above the player's Lockpicking level. Shows the lock and greys the rest
-    public void Show(Transform follower, Vector3 target, string text, bool blocked)
+    public void Show(Transform follower, Vector3 target, string text, bool blocked, string detail = null)
     {
         this.follower = follower;
         this.target = target;
@@ -102,8 +109,17 @@ public class WorldPrompt : MonoBehaviour
         if (!enabled) return;
 
         label.text = text;
+
         SetBlocked(blocked);
         SetProgress(0f);
+
+        // Set on every Show: one prompt can serve loot then a door, which must clear the old detail
+        if (appraiserTag != null && appraiserLabel != null)
+        {
+            bool hasDetail = !string.IsNullOrEmpty(detail);
+            appraiserTag.SetActive(hasDetail);
+            if (hasDetail) appraiserLabel.text = detail;
+        }
 
         if (visible) return;
         visible = true;

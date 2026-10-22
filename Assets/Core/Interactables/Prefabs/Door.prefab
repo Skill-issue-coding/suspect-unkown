@@ -593,6 +593,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Anomaly
   kind: 0
   sightOffset: {x: -0.615, y: 1.2, z: 0}
+  resolveOffset: {x: 0, y: 0, z: -1}
 --- !u!208 &2767033526572923613
 NavMeshObstacle:
   m_ObjectHideFlags: 0
