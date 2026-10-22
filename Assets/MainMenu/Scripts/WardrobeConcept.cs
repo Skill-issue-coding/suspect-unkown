@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -30,9 +28,6 @@ public class WardrobeConcept : MonoBehaviour
     [SerializeField] private TMP_Text warning;
     [Tooltip("Button to wipe police.json memory")]
     [SerializeField] private Button identityResetButton;
-    [Tooltip("How many known pieces to show per category (2 or 3 based on space)")]
-    [Range(1, 3)]
-    [SerializeField] private int maxPiecesPerSlot = 3;
 
     private WitnessReport record;
 
@@ -73,8 +68,7 @@ public class WardrobeConcept : MonoBehaviour
     {
         if (record == null) record = PoliceStore.Load();
 
-        int matches = 0;
-        StringBuilder sb = new StringBuilder();
+        int burnedCount = 0;
 
         foreach (Row row in rows)
         {
@@ -84,57 +78,33 @@ public class WardrobeConcept : MonoBehaviour
             GameObject part = category.parts[category.currentIndex];
             string partName = part != null ? part.name : "";
 
-            var knownPieces = record.DescribeTop(row.slot, maxPiecesPerSlot);
+            // Burned by the same rule recognition uses in a job (WitnessReport.IsBurned), so the wardrobe
+            // never says one thing and the guards do another
+            bool burned = OutfitFeature.TryParse(partName, out _, out OutfitFeature equipped) && record.IsBurned(row.slot, equipped);
+            if (burned) burnedCount++;
 
-            // Check if the currently active piece in this slot is shown on the police board
-            bool onBoard = false;
-            if (TryParsePart(partName, out int equippedStyle, out AppearanceColor equippedColor))
-            {
-                foreach (var piece in knownPieces)
-                {
-                    if (piece.feature.style == equippedStyle && piece.feature.color == equippedColor)
-                    {
-                        onBoard = true;
-                        break;
-                    }
-                }
-            }
-
-            if (onBoard) matches++;
-
-            row.partLabel.text = onBoard ? $"{Pretty(partName)}  <color=#FF6B5B>BURNED</color>" : Pretty(partName);
+            row.partLabel.text = burned ? $"{Pretty(partName)}  <color=#FF6B5B>BURNED</color>" : Pretty(partName);
             row.countLabel.text = $"{category.currentIndex + 1} / {category.parts.Length}";
 
-            // Format the Police Profile text for this category
+            // What the police believe about this slot: the leading part, with color and style confidence apart,
+            // as recognition reads them
             if (row.profileLabel != null)
             {
-                sb.Clear();
-
-                if (knownPieces.Count == 0)
-                {
-                    sb.Append("[?]");
-                }
-                else
-                {
-                    for (int i = 0; i < knownPieces.Count; i++)
-                    {
-                        var p = knownPieces[i];
-                        int pct = Mathf.Max(1, Mathf.RoundToInt(p.confidence * 100f));
-                        sb.Append($"[Style {p.feature.style} {p.feature.color}] - {pct}%");
-                        if (i < knownPieces.Count - 1) sb.AppendLine();
-                    }
-                }
-
-                row.profileLabel.text = sb.ToString();
+                row.profileLabel.text = record.TryDescribe(row.slot, out OutfitFeature known, out float styleConfidence, out float colorConfidence)
+                    ? $"[Style {known.style} {known.color}]\nColor {Percent(colorConfidence)} - Style {Percent(styleConfidence)}"
+                    : "[?]";
             }
         }
 
-        // Red warning text at the bottom showing how many active pieces are on the police board
+        // Red warning text at the bottom: burned pieces, and whether there are enough to be known on sight
         if (warning != null)
         {
-            warning.text = matches == 0
-                ? "<color=#8FD18B>Outfit does not match the suspect on file</color>"
-                : $"<color=#FF6B5B>{matches} active piece{(matches > 1 ? "s" : "")} currently on the police board. Witnesses will connect you.</color>";
+            int toKnow = WitnessReport.BurnedPartsToKnow;
+            warning.text = burnedCount == 0
+                ? "<color=#8FD18B>No burned pieces in this outfit</color>"
+                : burnedCount >= toKnow
+                    ? $"<color=#FF6B5B>{burnedCount} burned pieces. You will be recognised on sight.</color>"
+                    : $"<color=#FF6B5B>{burnedCount} burned piece{(burnedCount > 1 ? "s" : "")}. {toKnow - burnedCount} more and you will be recognised on sight.</color>";
         }
     }
 
@@ -145,17 +115,7 @@ public class WardrobeConcept : MonoBehaviour
         return null;
     }
 
-    private static bool TryParsePart(string partName, out int style, out AppearanceColor color)
-    {
-        style = 0;
-        color = default;
-        if (string.IsNullOrEmpty(partName)) return false;
-
-        string[] bits = partName.Split('_');
-        return bits.Length == 3
-            && int.TryParse(bits[1], out style)
-            && Enum.TryParse(bits[2], true, out color);
-    }
+    private static string Percent(float confidence) => $"{Mathf.RoundToInt(confidence * 100f)}%";
 
     // "Chest_002_Red" reads as "Style 2  Red"; anything else is shown as it is
     public static string Pretty(string partName)

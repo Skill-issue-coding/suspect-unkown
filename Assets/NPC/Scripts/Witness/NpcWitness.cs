@@ -34,8 +34,6 @@ public class NpcWitness : MonoBehaviour
     private float sightingStart = -1f;
     private float lastSeen = -1f;
     private float lastFade;
-    private float evidenceFactor = 1f;
-    private bool skillsRead;
     private NpcPerception perception;
     private readonly WitnessReport memory = new();
 
@@ -79,15 +77,6 @@ public class NpcWitness : MonoBehaviour
 
         Forget(observation.timestamp);
 
-        // Read on the first sighting, not in Start: NpcPerception finds the player in its own Start, which
-        // may run after this one. Skills do not change during a job, so the factor is kept
-        if (!skillsRead)
-        {
-            skillsRead = true;
-            PlayerSkills skills = perception.Targets.GetComponent<PlayerSkills>();
-            if (skills != null) evidenceFactor = skills.WitnessEvidenceFactor;
-        }
-
         float lookQuality = observation.ViewingConditions * fDuration * perception.Archetype.ObserverSkill;   // 0 to 1, before how much of each slot was in view
         for (int i = 0; i < Slots.Length; i++)
         {
@@ -99,7 +88,7 @@ public class NpcWitness : MonoBehaviour
             if (slotQuality <= 0f) continue;
 
             OutfitFeature seen = Recall(observation.appearance[slot], slotQuality);
-            float weight = slotQuality * interval * evidencePerSecond * evidenceFactor;   // Forgettable lowers it
+            float weight = slotQuality * interval * evidencePerSecond;
             memory.AddEvidence(slot, seen, weight);
         }
     }

@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using System.Collections.Generic;
 
 // One witness's belief about one property of one slot (a slot's style, or its color): a log-odds score per
 // value, all starting at 0, so every value starts even. Each sighting adds evidence for the value seen;
@@ -69,33 +68,5 @@ public class FeatureBelief
         value = best + 1;
         confidence = 1f / total;
         return true;
-    }
-
-    // Returns all learned values (1-based) and their softmax confidence (0 to 1), highest first
-    public List<(int value, float confidence)> GetRanked(float minScore = 0.05f)
-    {
-        List<(int value, float confidence)> results = new();
-        if (!learned || scores == null || scores.Length == 0) return results;
-
-        int best = 0;
-        for (int i = 1; i < scores.Length; i++)
-            if (scores[i] > scores[best]) best = i;
-
-        // Ignore slots where even the highest score has negligible evidence
-        if (scores[best] < minScore) return results;
-
-        float total = 0f;
-        for (int i = 0; i < scores.Length; i++)
-            total += Mathf.Exp(scores[i] - scores[best]);
-
-        for (int i = 0; i < scores.Length; i++)
-        {
-            if (scores[i] < minScore) continue;
-            float conf = Mathf.Exp(scores[i] - scores[best]) / total;
-            results.Add((i + 1, conf));
-        }
-
-        results.Sort((a, b) => b.confidence.CompareTo(a.confidence));
-        return results;
     }
 }

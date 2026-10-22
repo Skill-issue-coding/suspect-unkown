@@ -211,10 +211,17 @@ public class NpcPerception : MonoBehaviour, IPerceiver
         observation.conduct = playerConduct != null ? playerConduct.Current : ConductFlags.None;
         observation.abnormality = archetype.Abnormality(observation.conduct);
         observation.appearance = playerAppearance != null ? playerAppearance.Current : default;
-        // Observers who recognise no one (every civilian) skip the match
-        observation.recognition = archetype.Recognition > 0f
-            ? archetype.Recognition * JobWitnesses.RecordMatch(observation.appearance)
-            : 0f;
+        observation.recognition = Recognition(observation.appearance);
         return true;
+    }
+
+    // Observers who recognise no one (recognition 0) skip the match. A burned outfit is known on sight, so
+    // every observer who recognises at all weighs it at least BurnedRecognition
+    private float Recognition(CharacterAppearance worn)
+    {
+        if (archetype.Recognition <= 0f) return 0f;
+
+        float recognition = archetype.Recognition * JobWitnesses.RecordMatch(worn);
+        return JobWitnesses.IsBurned(worn) ? Mathf.Max(recognition, JobWitnesses.BurnedRecognition) : recognition;
     }
 }

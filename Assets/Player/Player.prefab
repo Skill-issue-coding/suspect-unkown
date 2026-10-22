@@ -1433,7 +1433,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e15119de0c52240e58928ee909f8afcf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerLighting
-  samplePoint: {fileID: 0}
+  samplePoint: {fileID: 3525450920545983926}
   occluderMask:
     serializedVersion: 2
     m_Bits: 1024
@@ -1478,60 +1478,60 @@ MonoBehaviour:
   categories:
   - categoryName: Head
     parts:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    - {fileID: 6681153122478016074}
+    - {fileID: 30005098312775476}
+    - {fileID: 3312011150535466313}
+    - {fileID: 8467584910766753061}
+    - {fileID: 1404615381978604233}
+    - {fileID: 3141852439778431802}
+    - {fileID: 8380984244565605113}
+    - {fileID: 3420695267976048597}
+    - {fileID: 2382724739453684152}
+    - {fileID: 6602113522750049070}
+    - {fileID: 4850767861821341332}
+    - {fileID: 5716718782617469344}
+    - {fileID: 2334829900905921822}
+    - {fileID: 7127957515886587250}
+    - {fileID: 6592072840868705566}
+    - {fileID: 6088898036370376899}
+    - {fileID: 4122988080389043784}
     currentIndex: 0
   - categoryName: Chest
     parts:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    - {fileID: 3954080389777308293}
+    - {fileID: 4387752498062312258}
+    - {fileID: 8811918483501985821}
+    - {fileID: 6398429441368620433}
+    - {fileID: 5242863225215265183}
+    - {fileID: 3323523680218958856}
+    - {fileID: 3859955487975101628}
+    - {fileID: 652977181775179546}
+    - {fileID: 6952730629469489209}
     currentIndex: 3
   - categoryName: Legs
     parts:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    - {fileID: 7676580474889430027}
+    - {fileID: 6869728322521184987}
+    - {fileID: 8764366445455393646}
+    - {fileID: 5600552150891373113}
     currentIndex: 0
   - categoryName: Feet
     parts:
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
-    - {fileID: 0}
+    - {fileID: 2722218090625281797}
+    - {fileID: 1897637215245649753}
+    - {fileID: 828657976471541390}
+    - {fileID: 6008110275561396206}
+    - {fileID: 5044316147530759230}
+    - {fileID: 6697874105474774775}
+    - {fileID: 6468338465273181227}
+    - {fileID: 4403672332650070063}
+    - {fileID: 5409349864518433212}
+    - {fileID: 3678651312249005891}
+    - {fileID: 5826585020702912684}
+    - {fileID: 8201112868770521330}
+    - {fileID: 1604392506144106531}
+    - {fileID: 391127833564583443}
+    - {fileID: 1416269501030864637}
     currentIndex: 5
 --- !u!114 &-818215352608075208
 MonoBehaviour:
@@ -1548,8 +1548,11 @@ MonoBehaviour:
   lockpickingLevel: 1
   hasSoftSteps: 0
   hasForgettable: 0
-  forgettableEvidence: 0.6
+  forgettableEvidence: 0.8
   hasQuickHands: 0
+  hasHammer: 1
+  hasGlassBreaker: 0
+  hasGlassCutter: 0
 --- !u!114 &-1011108268404151007
 MonoBehaviour:
   m_ObjectHideFlags: 0

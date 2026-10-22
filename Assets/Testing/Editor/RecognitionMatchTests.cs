@@ -73,4 +73,42 @@ public class RecognitionMatchTests
     {
         Assert.AreEqual(0f, new WitnessReport().Match(Outfit(), VagueAt));
     }
+
+    // Burned parts: color and style both match, believed at least WitnessReport.BurnedColorAt and BurnedStyleAt
+    [Test]
+    public void SureDescription_BurnsEveryPart()
+    {
+        WitnessReport report = Describe(Outfit(), Sure);
+
+        Assert.AreEqual(4, report.BurnedCount(Outfit()));
+    }
+
+    [Test]
+    public void DifferentStyle_DoesNotBurnThatPart()
+    {
+        WitnessReport report = Describe(Outfit(), Sure);
+
+        CharacterAppearance changed = Outfit();
+        changed.chest = new OutfitFeature(1, AppearanceColor.Red);
+
+        Assert.AreEqual(3, report.BurnedCount(changed));
+    }
+
+    [Test]
+    public void VagueDescription_BurnsNothing()
+    {
+        WitnessReport report = Describe(Outfit(), Vague);
+
+        Assert.AreEqual(0, report.BurnedCount(Outfit()));
+    }
+
+    [Test]
+    public void OnlyDescribedParts_Burn()
+    {
+        WitnessReport report = new WitnessReport();
+        report.AddEvidence(FeatureSlot.Head, Outfit().head, Sure);
+        report.AddEvidence(FeatureSlot.Chest, Outfit().chest, Sure);
+
+        Assert.AreEqual(2, report.BurnedCount(Outfit()));
+    }
 }

@@ -12,11 +12,11 @@ public class PlayerSkills : MonoBehaviour
     [SerializeField, Tooltip("Lowers noise radius when moving.")]
     private bool hasSoftSteps;
 
-    [SerializeField, Tooltip("Witnesses gain less evidence per sighting: see forgettableEvidence")]
+    [SerializeField, Tooltip("The police keep less of the job's evidence: see forgettableEvidence")]
     private bool hasForgettable;
 
-    [SerializeField, Range(0f, 1f), Tooltip("With Forgettable, the share of evidence a witness gains from each sighting. 0.6 makes a sure description take about 1.7 times as long")]
-    private float forgettableEvidence = 0.6f;
+    [SerializeField, Range(0f, 1f), Tooltip("With Forgettable, the share of the job's merged evidence that reaches the police description. 0.8 makes a sure description take about 1.25 times as long to build")]
+    private float forgettableEvidence = 0.8f;
 
     [SerializeField, Tooltip("Caps loot pickup hold time to at most 1.5 seconds.")]
     private bool hasQuickHands;
@@ -39,7 +39,7 @@ public class PlayerSkills : MonoBehaviour
     public bool HasHammer => hasHammer;
     public bool HasGlassBreaker => hasGlassBreaker;
     public bool HasGlassCutter => hasGlassCutter;
-    // Read by NpcWitness on each sighting. Scales evidence as it comes in, not confidence when it is read, so
+    // Read by JobWitnesses at job end. Scales the job's merged evidence, not confidence when it is read, so
     // descriptions saved before the skill was bought keep their strength
     public float WitnessEvidenceFactor => hasForgettable ? forgettableEvidence : 1f;
 

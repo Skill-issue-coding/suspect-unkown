@@ -100,8 +100,8 @@ MonoBehaviour:
   investigatingAt: 0.55
   alertedAt: 0.9
   hysteresis: 0.05
-  recognition: 0.6
-  observerSkill: 0.35
+  recognition: 0.9
+  observerSkill: 0.6
   featureVisibility:
     head: 1
     chest: 1

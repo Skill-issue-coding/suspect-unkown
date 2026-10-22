@@ -1,7 +1,6 @@
 using System;
 using System.Text;
 using UnityEngine;
-using System.Collections.Generic;
 
 // One description of the player's appearance: per outfit slot, log-odds beliefs about style and color.
 // NpcWitness keeps a live one as its memory and hands out a copy at job end; JobWitnesses merges the copies
@@ -14,6 +13,11 @@ public class WitnessReport
     // until this grows
     public const int StyleCount = 3;
     public static readonly int ColorCount = Enum.GetValues(typeof(AppearanceColor)).Length - 1; // minus Unknown
+
+    // A burned part (IsBurned), and how many make an outfit known on sight (thrift shop §6)
+    public const float BurnedColorAt = 0.6f;
+    public const float BurnedStyleAt = 0.5f;
+    public const int BurnedPartsToKnow = 2;
 
     private static readonly FeatureSlot[] Slots = (FeatureSlot[])Enum.GetValues(typeof(FeatureSlot));
 
@@ -114,6 +118,24 @@ public class WitnessReport
         return total / Slots.Length;
     }
 
+    // True when this description pins down the worn part: its leading color and style both match, the color
+    // at least BurnedColorAt (SuspectSketch's certainAt: printed without "probably") and the style at least
+    // BurnedStyleAt. The one rule for recognition and the wardrobe, so both say the same
+    public bool IsBurned(FeatureSlot slot, OutfitFeature worn)
+    {
+        if (!TryDescribe(slot, out OutfitFeature described, out float styleConfidence, out float colorConfidence)) return false;
+        return worn.color == described.color && colorConfidence >= BurnedColorAt
+            && worn.style == described.style && styleConfidence >= BurnedStyleAt;
+    }
+
+    public int BurnedCount(CharacterAppearance worn)
+    {
+        int count = 0;
+        foreach (FeatureSlot slot in Slots)
+            if (IsBurned(slot, worn[slot])) count++;
+        return count;
+    }
+
     // One line per slot, for logs and the debug readout
     public override string ToString()
     {
@@ -126,24 +148,5 @@ public class WitnessReport
                 text.AppendLine($"{slot} —");
         }
         return text.ToString();
-    }
-
-    public List<(OutfitFeature feature, float confidence)> DescribeTop(FeatureSlot slot, int maxCount = 3, float minScore = 0.05f)
-    {
-        int i = (int)slot;
-        var topStyles = styles[i].GetRanked(minScore);
-        var topColors = colors[i].GetRanked(minScore);
-
-        int count = Mathf.Min(maxCount, Mathf.Min(topStyles.Count, topColors.Count));
-        List<(OutfitFeature feature, float confidence)> results = new(count);
-
-        for (int k = 0; k < count; k++)
-        {
-            OutfitFeature feature = new OutfitFeature(topStyles[k].value, (AppearanceColor)topColors[k].value);
-            float combinedConfidence = (topStyles[k].confidence + topColors[k].confidence) * 0.5f;
-            results.Add((feature, combinedConfidence));
-        }
-
-        return results;
     }
 }

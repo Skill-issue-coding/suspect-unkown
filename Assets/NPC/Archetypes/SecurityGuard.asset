@@ -91,7 +91,7 @@ MonoBehaviour:
     feet: 0.6
   tickRate: 10
   hearingSensitivity: 3
-  hearingSuspicion: 0.5
+  hearingSuspicion: 0.7
   anomalySuspicion: 0.6
   anomalyWeights:
     openDoor: 1
@@ -109,7 +109,7 @@ MonoBehaviour:
   investigatingAt: 0.5
   alertedAt: 0.9
   hysteresis: 0.08
-  recognition: 0.8
+  recognition: 1
   observerSkill: 1
   featureVisibility:
     head: 1

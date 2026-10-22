@@ -4,7 +4,8 @@ using UnityEngine;
 
 // The job's witnesses and, once the job ends, their merged description: what the police know of the
 // player's appearance from this job. Every enabled NpcWitness registers here; when JobOutcome ends the job,
-// their reports merge in log-odds and Described hands the result on (the witness sketch). Also keeps the
+// their reports merge in log-odds, the player's Forgettable skill scales the result, and Described hands it
+// on (the witness sketch). Also keeps the
 // police record across jobs: loaded when the first witness registers, and on a completed job faded by
 // RecordKeptPerJob, merged with this job's description and saved. A failed job only produces the
 // description (the mugshot). Listens to JobOutcome only while a witness exists, because JobOutcome clears
@@ -20,7 +21,12 @@ public static class JobWitnesses
     // SuspectSketch's vagueAt: a part the newspaper could not print cannot be recognised
     private const float RecogniseFrom = 0.2f;
 
+    // The least recognition weight any observer who recognises outfits gives a burned one, whatever its
+    // archetype says
+    public const float BurnedRecognition = 0.9f;
+
     private static float recordMatch;
+    private static bool recordBurned;
     private static bool matched;
 
     // What the police knew when this job started, from earlier jobs; empty on a first run
@@ -37,13 +43,32 @@ public static class JobWitnesses
     // the record loads, because PlayerAppearance reads the outfit in its Start, after witnesses register
     public static float RecordMatch(CharacterAppearance worn)
     {
-        if (Record == null) return 0f;
-        if (!matched)
-        {
-            recordMatch = Record.Match(worn, RecogniseFrom);
-            matched = true;
-        }
+        MatchOnce(worn);
         return recordMatch;
+    }
+
+    // True when the record pins down at least BurnedPartsToKnow worn parts: the outfit is known on sight, and
+    // every observer who recognises weighs it at least BurnedRecognition. Kept like RecordMatch
+    public static bool IsBurned(CharacterAppearance worn)
+    {
+        MatchOnce(worn);
+        return recordBurned;
+    }
+
+    private static void MatchOnce(CharacterAppearance worn)
+    {
+        if (matched) return;
+        if (Record == null)
+        {
+            // No witness has registered yet: nothing on file to match, and nothing kept
+            recordMatch = 0f;
+            recordBurned = false;
+            return;
+        }
+
+        recordMatch = Record.Match(worn, RecogniseFrom);
+        recordBurned = Record.BurnedCount(worn) >= WitnessReport.BurnedPartsToKnow;
+        matched = true;
     }
 
     public static void Register(NpcWitness witness)
@@ -84,6 +109,12 @@ public static class JobWitnesses
     {
         WitnessReport merged = new WitnessReport();
         foreach (NpcWitness witness in witnesses) merged.Merge(witness.Report());
+
+        // Forgettable: the police keep only part of what the witnesses saw. Scaling log-odds is the same
+        // operation as fading them, so Fade does it. Once per job, so the lookup is not on a hot path
+        PlayerSkills skills = UnityEngine.Object.FindAnyObjectByType<PlayerSkills>();
+        if (skills != null) merged.Fade(skills.WitnessEvidenceFactor);
+
         Description = merged;
         Debug.Log(merged.SawAnything ? $"Police description:\n{merged}" : "Police description: no witnesses came forward");
         Described?.Invoke(merged);
