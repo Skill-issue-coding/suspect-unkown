@@ -2229,8 +2229,10 @@ MonoBehaviour:
   - {fileID: 4633318874219280094}
   - {fileID: 231150380303114551}
   hammerRadius: 12
+  hammerHoldSeconds: 2.5
   hammerAlarm: 1
   glassBreakerRadius: 6
+  breakerHoldSeconds: 1.5
   glassBreakerAlarm: 1
 --- !u!114 &4728139331436717355
 MonoBehaviour:
@@ -5228,7 +5230,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6336213564420968566, guid: 10e36a0a632b8ab4db746fb802b101a6, type: 3}
       propertyPath: m_StaticEditorFlags
-      value: 0
+      value: 2147483647
       objectReference: {fileID: 0}
     - target: {fileID: 6675759640919313100, guid: 10e36a0a632b8ab4db746fb802b101a6, type: 3}
       propertyPath: m_LocalPosition.x
