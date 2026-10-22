@@ -14,6 +14,8 @@ public enum ProgressUnlock
     Gear_Hammer = 1 << 5,
     Gear_GlassBreaker = 1 << 6,
     Gear_GlassCutter = 1 << 7,
+    Gear_SignalJammer = 1 << 15,
+    Gear_CameraLooper = 1 << 16,
 
     // Skills
     Skill_SoftSteps = 1 << 8,

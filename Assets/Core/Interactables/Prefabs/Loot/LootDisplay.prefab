@@ -323,6 +323,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd0959cecdb205d4b8b7db186c7f6df4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlassCutterInteraction
+  glassTier: 2
   glassPane: {fileID: 2548657704096900111}
   enableOnDone: {fileID: 8930330620171488751}
 --- !u!1 &3856025133813691430

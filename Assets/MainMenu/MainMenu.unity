@@ -50735,7 +50735,6 @@ MonoBehaviour:
     profileLabel: {fileID: 398357267}
   warning: {fileID: 840660227}
   identityResetButton: {fileID: 1670344824}
-  maxPiecesPerSlot: 3
 --- !u!1 &1747130327
 GameObject:
   m_ObjectHideFlags: 0
@@ -56916,7 +56915,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Glass cutter
   description: Be able to break tougher glass.
-  unlock: 16512
+  unlock: 128
   price: 6500
   currency: 0
   requires: {fileID: 0}

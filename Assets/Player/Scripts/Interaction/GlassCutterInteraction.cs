@@ -14,6 +14,23 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     [SerializeField, Tooltip("Component to enable after glass is broken/cut (the loot inside)")]
     private Interactable enableOnDone;
 
+    [Header("Hammer Specifics")]
+    [SerializeField, Min(0f), Tooltip("Noise radius for hammer")]
+    private float hammerRadius = 12f;
+
+    [SerializeField, Min(0f), Tooltip("Noise alarm for hammer")]
+    private float hammerAlarm = 1f;
+
+    [Header("Glass Breaker Specifics")]
+    [SerializeField, Min(0f), Tooltip("Noise radius for glass breaker")]
+    private float glassBreakerRadius = 6f;
+
+    [SerializeField, Min(0f), Tooltip("Noise alarm for glass breaker")]
+    private float glassBreakerAlarm = 1f;
+
+    private GameObject cachedInteractor;
+    private PlayerSkills cachedSkills;
+
     private string blockedReason;
     public string BlockedText => blockedReason;
     public int GlassTier => glassTier;
@@ -25,14 +42,25 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
             enableOnDone.SetReachable(false);
     }
 
-    // Glass cutting is currently not blocked by level/skills
+    // The interactor is always the player, so its skills are looked up once instead of on every check.
+    // IsBlockedFor runs every frame of a hold, where GetComponent does not belong
+    private PlayerSkills SkillsOf(GameObject interactor)
+    {
+        if (interactor != cachedInteractor)
+        {
+            cachedInteractor = interactor;
+            cachedSkills = interactor != null ? interactor.GetComponent<PlayerSkills>() : null;
+        }
+        return cachedSkills;
+    }
+
+    // Tier 1 needs the hammer or the glass breaker, tier 2 the glass cutter
     public bool IsBlockedFor(GameObject interactor)
     {
-        PlayerSkills skills = interactor != null ? interactor.GetComponent<PlayerSkills>() : null;
+        PlayerSkills skills = SkillsOf(interactor);
         if (skills == null) return true;
 
-        // Tier 1 needs the hammer
-        if (glassTier == 1 && !skills.HasHammer)
+        if (glassTier == 1 && !skills.HasHammer && !skills.HasGlassBreaker)
         {
             blockedReason = "Needs hammer";
             return true;
@@ -53,16 +81,16 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     {
         if (IsBlockedFor(interactor)) return;
 
-        PlayerSkills skills = interactor != null ? interactor.GetComponent<PlayerSkills>() : null;
-
         if (glassTier == 1)
         {
-            // smash normal glass
-            bool hasBreaker = skills != null && skills.HasGlassBreaker;
-            float radius = hasBreaker ? 6f : 12f;
-            float alarm = hasBreaker ? 1f : 1f;
+            // Smash normal glass. The glass breaker is quieter than the hammer and wins when both are owned
+            bool hasBreaker = SkillsOf(interactor).HasGlassBreaker;
+            float radius = hasBreaker ? glassBreakerRadius : hammerRadius;
+            float alarm = hasBreaker ? glassBreakerAlarm : hammerAlarm;
 
-            NoiseBus.Publish(new NoiseEvent(transform.position, radius, alarm));
+            // From the player's feet, not the glass: the case sits a metre up inside its own carved hole in the
+            // NavMesh, too far from walkable floor for NpcHearing to place the sound, so nobody would hear it
+            NoiseBus.Publish(new NoiseEvent(interactor.transform.position, radius, alarm));
             OnCut(); // removes the glass => loot available
         }
         else if (glassTier == 2)

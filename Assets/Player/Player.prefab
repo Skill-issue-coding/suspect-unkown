@@ -1550,7 +1550,7 @@ MonoBehaviour:
   hasForgettable: 0
   forgettableEvidence: 0.8
   hasQuickHands: 0
-  hasHammer: 1
+  hasHammer: 0
   hasGlassBreaker: 0
   hasGlassCutter: 0
 --- !u!114 &-1011108268404151007

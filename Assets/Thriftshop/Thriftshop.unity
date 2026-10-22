@@ -22623,10 +22623,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5210404170316744205, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
-      propertyPath: glassTier
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 7894853462890091664, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
       propertyPath: m_Name
       value: LootDisplay (3)
