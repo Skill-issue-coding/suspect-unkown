@@ -79,7 +79,12 @@ public class PlayerConduct : MonoBehaviour
 
     private void OnHoldStarted(Interactable interactable)
     {
-        if (interactable != null && interactable.GetComponentInParent<LootPickup>() != null)
+        if (interactable == null) return;
+
+        // Taking loot, or smashing a tier-1 case open to reach it. Cutting tier-2 glass is a minigame,
+        // which reports its own conduct
+        GlassCutterInteraction glass = interactable.GetComponentInParent<GlassCutterInteraction>();
+        if (interactable.GetComponentInParent<LootPickup>() != null || (glass != null && glass.GlassTier == 1))
             isStealing = true;
     }
 

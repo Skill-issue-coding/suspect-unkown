@@ -12,8 +12,8 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     [SerializeField, Tooltip("Optional mesh/object disabled when the glass is fully cut")]
     private GameObject glassPane;
 
-    [SerializeField, Tooltip("Component to enable after glass is broken/cut (the loot inside)")]
-    private Interactable enableOnDone;
+    [SerializeField, Tooltip("The loot inside, unreachable until the glass is broken/cut. List every item the case can hold, so whichever one is active this run is unlocked")]
+    private Interactable[] enableOnDone;
 
     [Header("Hammer Specifics")]
     [SerializeField, Min(0f), Tooltip("Noise radius for hammer")]
@@ -45,8 +45,15 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
         if (interactable != null)
             interactable.SetHoldSeconds(glassTier == 1 ? hammerHoldSeconds : 0f);
         // Keep the loot inside unreachable while the glass barrier is intact
-        if (enableOnDone != null)
-            enableOnDone.SetReachable(false);
+        SetLootReachable(false);
+    }
+
+    // Works on inactive loot too (a variant that did not roll this run), since SetReachable only toggles its trigger
+    private void SetLootReachable(bool reachable)
+    {
+        foreach (Interactable loot in enableOnDone)
+            if (loot != null)
+                loot.SetReachable(reachable);
     }
 
     // The interactor is always the player, so its skills are looked up once instead of on every check.
@@ -131,7 +138,6 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
         if (glassPane != null)
             glassPane.SetActive(false);
 
-        if (enableOnDone != null)
-            enableOnDone.SetReachable(true);
+        SetLootReachable(true);
     }
 }
