@@ -321,12 +321,13 @@ The shop is the workbench TV in the main menu (`ShopConcept`, the site "FENCE.NE
 - **`ShopItem`**: one buyable row or skill node, with a price in clean money or skill points, an optional `requires` (another item that must be owned first), and the `ProgressUnlock` flag it saves. Buying marks it owned, pays (which raises `Changed`, so items that require it unlock at once), and saves its flag immediately, so a job started straight after buying already has it. Owned items come from the save when the page shows.
 - **Locked items** show LOCKED as their price; hovering one names what it needs in the detail line ("NEGOTIATOR  NEEDS APPRAISER").
 - **Starter items.** Only Lockpicks level 1 is owned from the start (price 0). Soft steps and Call the guard's mum were starters by mistake and no longer are (2026-10-22).
-- **What the game reads.** Gear: lockpick levels (`DoorInteraction`), hammer, glass breaker and glass cutter (`PlayerSkills`, `GlassCutterInteraction`; the glass breaker does not need the hammer, thrift shop 3.4). Skills: Soft steps (`PlayerNoise`), Forgettable (`PlayerSkills.WitnessEvidenceFactor`), Quick hands (`LootPickup`), Negotiator (`Wallet`).
+- **The trees.** Gear: lockpicks level 1 → 2 → 3, and hammer → glass breaker → glass cutter. Skills: Soft steps → Forgettable; Quick hands → Better cutter; Appraiser → Negotiator. The skill links match the lines drawn on the page (fixed 2026-10-22).
+- **What the game reads.** Gear: lockpick levels (`DoorInteraction`), hammer, glass breaker and glass cutter (`PlayerSkills`, `GlassCutterInteraction`; tier-1 glass needs the hammer, and the glass breaker makes the smash quicker and quieter, thrift shop 3.4). Skills: Soft steps (`PlayerNoise`), Forgettable (`PlayerSkills.WitnessEvidenceFactor`), Quick hands (`LootPickup`, caps a take at 2 s), Better cutter (`PlayerGlassCutting`, a wider cutting cone), Negotiator (`Wallet`).
+- **`ProgressUnlock` values are saved as numbers.** A new flag takes the next free bit and an existing one never moves: inserting `Skill_BetterCutter` in the middle (2026-10-22, reverted the same day) shifted Appraiser, Negotiator, `JewlryStore` and `Bank`, so the jewelry store plan would have unlocked Negotiator and `Bank` shared a bit with `Gear_SignalJammer`. `Skill_BetterCutter` is `1 << 17`.
 - **The TV.** The shop canvas (`MonitorCanvas`, 2150 × 1260) was scaled on 2026-10-22 to fill the bigger screen: 50 px margins left and right, 30 px top and bottom.
 
 **Known issues, not fixed yet** (review of 2026-10-22):
-- The five abilities, Camera looper, Signal jammer and Appraiser have no unlock flag, so buying one spends the money but is not saved, and it can be bought again after a restart. The abilities and the two gadgets do not exist in the game yet and should not be buyable until they do; Appraiser should save `Skill_Appraiser`, which nothing in the game reads yet.
-- The skill tree's prerequisites do not match its drawn links: Forgettable should need Soft steps, Appraiser nothing, and Negotiator Appraiser (both need Quick hands today).
+- The five abilities, Camera looper, Signal jammer and Appraiser have no unlock flag on their `ShopItem`, so buying one spends the money but is not saved, and it can be bought again after a restart. The abilities and the two gadgets do not exist in the game yet and should not be buyable until they do (`Gear_SignalJammer` and `Gear_CameraLooper` already exist as flags); Appraiser should save `Skill_Appraiser`, which nothing in the game reads yet.
 - The detail line fills on mouse hover only (`OnPointerEnter`), not on gamepad or keyboard selection.
 - Dead code: `ShopItem.fenceRate` and `Wallet.ImproveFence` (Negotiator raises the rate through its flag instead), and `LootItem.glassLevel`.
 
@@ -468,6 +469,7 @@ Fixed on 2026-10-13: shadows were flickering in the street and switching on and 
 - **Budget rule:** with every realtime shadowed light counted (6 per point, 1 per spot), stay at 32 or fewer. A new shadowed light means another one goes Baked or loses its shadows.
 - **Rebake after changing a light's mode.** URP reads the mode from the last bake, so a light switched to Baked keeps casting realtime shadows until the scene is rebaked.
 - **Baked lights reach characters through light probes only.** Add a Light Probe Group to the rooms before baking.
+- **Rugs are lit by light probes, not the lightmap** (2026-10-22). The eight `SM_Prop_Apt_Rug…` lie flush on the floor and have no undersides, so floor texels under them saw the rug from inside, were marked invalid and dilated into dark notches along the rug edges (the runner showed it worst, with bright specks bloomed at its corners). Each rug now has Contribute GI off, Receive GI from Light Probes, and no shadow; the floor bakes as if they were not there. Rebake after this change. If bright specks remain away from the rugs, raise Indirect Samples to 512 or Bloom's threshold to 1.1.
 
 ---
 

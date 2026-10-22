@@ -47,6 +47,8 @@ public class Interactable : MonoBehaviour
     private Collider trigger;
     private IInteractionBehaviour behaviour;
 
+    public IInteractionBehaviour Behaviour => behaviour;
+
     private void Awake()
     {
         trigger = GetComponent<Collider>();
