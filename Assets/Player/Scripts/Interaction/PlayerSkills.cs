@@ -21,10 +21,14 @@ public class PlayerSkills : MonoBehaviour
     [SerializeField, Tooltip("Caps loot pickup hold time to at most 1.5 seconds.")]
     private bool hasQuickHands;
 
+    [SerializeField, Tooltip("Increases the aim cone width for the glass cutter minigame")]
+    private bool hasBetterCutter;
+
     public int LockpickingLevel => lockpickingLevel;
     public bool HasSoftSteps => hasSoftSteps;
     public bool HasForgettable => hasForgettable;
     public bool HasQuickHands => hasQuickHands;
+    public bool HasBetterCutter => hasBetterCutter;
 
     [Header("Gear")]
     [SerializeField, Tooltip("Allows breaking of normal glass (level 1)")]
@@ -62,6 +66,7 @@ public class PlayerSkills : MonoBehaviour
             hasSoftSteps |= save.Has(ProgressUnlock.Skill_SoftSteps);
             hasForgettable |= save.Has(ProgressUnlock.Skill_Forgettable);
             hasQuickHands |= save.Has(ProgressUnlock.Skill_QuickHands);
+            hasBetterCutter |= save.Has(ProgressUnlock.Skill_BetterCutter);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 
 // The interaction behaviour for physical glass.
@@ -17,14 +18,16 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     [Header("Hammer Specifics")]
     [SerializeField, Min(0f), Tooltip("Noise radius for hammer")]
     private float hammerRadius = 12f;
-
+    [SerializeField, Tooltip("Seconds to hold E to smash normal glass with only the hammer")]
+    private float hammerHoldSeconds = 2.5f;
     [SerializeField, Min(0f), Tooltip("Noise alarm for hammer")]
     private float hammerAlarm = 1f;
 
     [Header("Glass Breaker Specifics")]
     [SerializeField, Min(0f), Tooltip("Noise radius for glass breaker")]
     private float glassBreakerRadius = 6f;
-
+    [SerializeField, Tooltip("Seconds to hold E to smash normal glass with the glass breaker")]
+    private float breakerHoldSeconds = 1.5f;
     [SerializeField, Min(0f), Tooltip("Noise alarm for glass breaker")]
     private float glassBreakerAlarm = 1f;
 
@@ -34,9 +37,13 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     private string blockedReason;
     public string BlockedText => blockedReason;
     public int GlassTier => glassTier;
+    private Interactable interactable;
 
     private void Awake()
     {
+        interactable = GetComponent<Interactable>();
+        if (interactable != null)
+            interactable.SetHoldSeconds(glassTier == 1 ? hammerHoldSeconds : 0f);
         // Keep the loot inside unreachable while the glass barrier is intact
         SetLootReachable(false);
     }
@@ -64,20 +71,31 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     // Tier 1 needs the hammer or the glass breaker, tier 2 the glass cutter
     public bool IsBlockedFor(GameObject interactor)
     {
-        PlayerSkills skills = SkillsOf(interactor);
+        PlayerSkills skills = interactor != null ? interactor.GetComponent<PlayerSkills>() : null;
         if (skills == null) return true;
 
-        if (glassTier == 1 && !skills.HasHammer && !skills.HasGlassBreaker)
+        if (glassTier == 1)
         {
-            blockedReason = "Needs hammer";
-            return true;
+            if (!skills.HasHammer)
+            {
+                blockedReason = "Needs hammer";
+                return true;
+            }
+            if (interactable != null)
+                interactable.SetHoldSeconds(skills.HasGlassBreaker ? breakerHoldSeconds : hammerHoldSeconds);
+
         }
 
         // Tier 2 needs the glass cutter
-        if (glassTier == 2 && !skills.HasGlassCutter)
+        if (glassTier == 2)
         {
-            blockedReason = "Needs glass cutter";
-            return true;
+            if (!skills.HasGlassCutter)
+            {
+                blockedReason = "Needs glass cutter";
+                return true;
+            }
+            if (interactable != null)
+                interactable.SetHoldSeconds(0f);
         }
 
         blockedReason = null;

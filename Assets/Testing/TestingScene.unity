@@ -1046,6 +1046,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasHammer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasQuickHands
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasGlassBreaker
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1281951801932075715, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
       propertyPath: m_Name
       value: Player
@@ -3115,6 +3127,7 @@ MonoBehaviour:
   required:
   - {fileID: 11400000, guid: 69be6c07969b2fe47b49386993d609f6, type: 2}
   - {fileID: 11400000, guid: df1053a10c3fb8d49a72ea2974201d0f, type: 2}
+  storyItemsOptional: 0
 --- !u!4 &510362095
 Transform:
   m_ObjectHideFlags: 0
@@ -4866,8 +4879,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd0959cecdb205d4b8b7db186c7f6df4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlassCutterInteraction
+  glassTier: 1
   glassPane: {fileID: 1102367986}
   enableOnDone: {fileID: 0}
+  hammerRadius: 12
+  hammerHoldSeconds: 2.5
+  hammerAlarm: 1
+  glassBreakerRadius: 6
+  breakerHoldSeconds: 1.5
+  glassBreakerAlarm: 1
 --- !u!65 &1102367996
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13745,6 +13765,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5101997804089898, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1336871915856736089, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1989468233980152637, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2224831032904965920, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4056394853338689768, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
       propertyPath: m_LocalPosition.x
       value: 10.5
@@ -13784,6 +13820,10 @@ PrefabInstance:
     - target: {fileID: 4056394853338689768, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5210404170316744205, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
+      propertyPath: glassTier
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7894853462890091664, guid: 936c3a8d46ec849ceadbeb9354c4c923, type: 3}
       propertyPath: m_Name

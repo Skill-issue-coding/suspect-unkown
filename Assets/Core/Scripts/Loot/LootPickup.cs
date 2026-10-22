@@ -50,7 +50,7 @@ public class LootPickup : MonoBehaviour, IInteractionBehaviour
                            || ProgressStore.Load().Has(ProgressUnlock.Skill_QuickHands);
 
             if (quickHands)
-                seconds = Mathf.Min(seconds, 1.5f);
+                seconds = Mathf.Min(seconds, 2f);
 
             interactable.SetHoldSeconds(seconds);
         }

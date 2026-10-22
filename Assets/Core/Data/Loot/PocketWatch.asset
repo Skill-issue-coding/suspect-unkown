@@ -17,3 +17,4 @@ MonoBehaviour:
   carriedIn: 0
   progressUnlock: 0
   value: 200
+  glassLevel: 0
