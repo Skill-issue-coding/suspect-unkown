@@ -148,7 +148,7 @@ Assume nothing from older Unity tutorials. If you are not certain an API exists 
 
 ### Engine behaviour that trips people up
 
-- **Execution order:** all `Awake`, then all `OnEnable`, then all `Start`, then per frame `Update` → animation → `LateUpdate`. `Awake` is not called on inactive GameObjects. `OnEnable` runs right after `Awake`, before `Start`.
+- **Execution order:** per object, `Awake` then `OnEnable` straight after; then all `Start`; then per frame `Update` → animation → `LateUpdate`. `Awake` is not called on inactive GameObjects. The order **between** objects is not defined: another object's `OnEnable` can run before this one's `Awake`, so never rely on a different component having loaded in its `Awake` (load lazily instead, as `Wallet` does).
 - **Unity null:** a destroyed object compares `== null` as true. `?.` and `??` bypass this check. Use explicit `!= null` on anything derived from `UnityEngine.Object`.
 - **Serialization:** Unity does not serialize dictionaries, properties, or static fields. Use named fields or a `[Serializable]` struct. A new field on an existing asset keeps its field initializer value.
 - **Editor-only code:** `using UnityEditor;` must be inside `#if UNITY_EDITOR`, or the build fails even when the editor compiles. Editor scripts go in folders named `Editor`.

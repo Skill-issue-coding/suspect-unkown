@@ -15,6 +15,8 @@ public class ShopConcept : MonoBehaviour
     [SerializeField] private TMP_Text detailTitle, detailBody;
     [Tooltip("Wallet the launder button converts")]
     [SerializeField] private Wallet wallet;
+    [Tooltip("Launder button, locked while there is no dirty money to launder")]
+    [SerializeField] private MenuButtonFx launderButton;
 
     private void Awake()
     {
@@ -23,6 +25,23 @@ public class ShopConcept : MonoBehaviour
             Debug.LogWarning($"{name} needs one page per tab", this);
             enabled = false;
         }
+    }
+
+    private void OnEnable()
+    {
+        if (wallet == null) return;
+        wallet.Changed += RefreshLaunder;
+        RefreshLaunder();
+    }
+
+    private void OnDisable()
+    {
+        if (wallet != null) wallet.Changed -= RefreshLaunder;
+    }
+
+    private void RefreshLaunder()
+    {
+        if (launderButton != null) launderButton.SetLocked(wallet.Dirty <= 0);
     }
 
     private void Start()
@@ -46,9 +65,12 @@ public class ShopConcept : MonoBehaviour
         detailBody.text = "<color=#9A9A9A>Hover an item for details.</color>";
     }
 
+    // A locked item names what it needs, since its price label only says LOCKED
     public void ShowDetail(ShopItem item)
     {
-        detailTitle.text = item.Title.ToUpperInvariant();
+        detailTitle.text = item.IsLocked
+            ? $"{item.Title.ToUpperInvariant()}  <color=#7A7A7A>NEEDS {item.Requires.Title.ToUpperInvariant()}</color>"
+            : item.Title.ToUpperInvariant();
         detailBody.text = item.Description;
     }
 
