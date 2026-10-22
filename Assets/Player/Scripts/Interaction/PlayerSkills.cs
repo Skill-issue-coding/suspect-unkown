@@ -27,8 +27,8 @@ public class PlayerSkills : MonoBehaviour
     public bool HasQuickHands => hasQuickHands;
 
     [Header("Gear")]
-    [SerializeField, Tooltip("Allows breaking of normal glass (level 1). Player starts with this")]
-    private bool hasHammer = true;
+    [SerializeField, Tooltip("Allows breaking of normal glass (level 1)")]
+    private bool hasHammer;
 
     [SerializeField, Tooltip("Muffles the noise when breaking level 1 glass")]
     private bool hasGlassBreaker;
@@ -54,7 +54,7 @@ public class PlayerSkills : MonoBehaviour
             else if (save.Has(ProgressUnlock.Gear_Lockpick)) lockpickingLevel = Mathf.Max(lockpickingLevel, 1);
 
             // Gear tools
-            hasHammer |= save.Has(ProgressUnlock.Gear_Hammer) || true;
+            hasHammer |= save.Has(ProgressUnlock.Gear_Hammer);
             hasGlassBreaker |= save.Has(ProgressUnlock.Gear_GlassBreaker);
             hasGlassCutter |= save.Has(ProgressUnlock.Gear_GlassCutter);
 
