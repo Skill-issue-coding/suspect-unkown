@@ -89,6 +89,7 @@ public class GlassCutterView : MonoBehaviour
     private Quaternion initialCutterRotation;
     private Quaternion initialConeRotation;
     private Vector3 initialConePosition;
+    private Vector3 initialConeScale;
 
     private Vector3 aimDirection;
     private float cutterRadius;
@@ -122,6 +123,7 @@ public class GlassCutterView : MonoBehaviour
         initialConeRotation = coneVisual.localRotation;
         initialConePosition = coneVisual.localPosition;
         aimDirection = conePivot.up;
+        initialConeScale = coneVisual.localScale;
 
         if (coneRenderer is SpriteRenderer sr)
             coneSpriteRenderer = sr;
@@ -195,6 +197,7 @@ public class GlassCutterView : MonoBehaviour
             cutLineRenderer.positionCount = 0;
             cutLineRenderer.enabled = false;
         }
+        if (coneVisual != null) coneVisual.localScale = initialConeScale;
     }
 
     private void OnDisable()
@@ -408,5 +411,13 @@ public class GlassCutterView : MonoBehaviour
             float y = Mathf.Sin(angle) * localRadius;
             lineRenderer.SetPosition(i, localCenter + new Vector3(x, y, lineZOffset));
         }
+    }
+
+    public void SetConeScaleX(float scaleX)
+    {
+        if (coneVisual == null) return;
+        Vector3 scale = coneVisual.localScale;
+        scale.x = scaleX;
+        coneVisual.localScale = scale;
     }
 }

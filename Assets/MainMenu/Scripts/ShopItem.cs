@@ -93,6 +93,7 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
     {
         if (owned || Locked || !wallet.TrySpend(currency, price)) return;
         owned = true;
+        wallet.Unlock(unlock);
         if (fenceRate > 0f) wallet.ImproveFence(fenceRate);
         Refresh();
         if (shop != null) shop.ShowDetail(this);

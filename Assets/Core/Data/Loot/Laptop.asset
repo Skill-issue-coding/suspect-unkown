@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Laptop
   m_EditorClassIdentifier: Assembly-CSharp::LootItem
   displayName: Laptop
-  takeSeconds: 1.2
+  takeSeconds: 2
+  carriedIn: 0
   progressUnlock: 1
   value: 400
+  glassLevel: 0

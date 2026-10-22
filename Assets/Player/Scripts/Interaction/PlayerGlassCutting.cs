@@ -24,11 +24,13 @@ public class PlayerGlassCutting : MonoBehaviour, IMinigame
     // Free cursor: the cone follows the pointer
     public bool LocksCursor => false;
     public ConductFlags Conduct => ConductFlags.GlassCutting;
+    private PlayerSkills skills;
 
     private void Awake()
     {
         input = GetComponent<PlayerInputs>();
         minigame = GetComponent<PlayerMinigame>();
+        skills = GetComponent<PlayerSkills>();
 
         if (tuning == null)
         {
@@ -51,13 +53,16 @@ public class PlayerGlassCutting : MonoBehaviour, IMinigame
             return;
         }
 
+        float coneScaleX = (skills != null && skills.HasBetterCutter) ? 0.15f : 0.1f;
+        view.SetConeScaleX(coneScaleX);
         view.Begin(model, tuning.CutClockwise);
     }
 
     public void Tick(float deltaTime)
     {
         bool aimed = view.TryGetAim(input.aim, tuning.MinAimDistance, out float angleToTangent);
-        model.Tick(deltaTime, aimed && angleToTangent <= tuning.AlignmentTolerance, input.tension);
+        float tolorance = (skills != null && skills.HasBetterCutter) ? tuning.AlignmentTolerance * 1.5f : tuning.AlignmentTolerance;
+        model.Tick(deltaTime, aimed && angleToTangent <= tolorance, input.tension);
     }
 
     public void Complete() => targetGlass.OnCut();
