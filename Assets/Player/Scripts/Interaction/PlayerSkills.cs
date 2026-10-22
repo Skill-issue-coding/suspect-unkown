@@ -18,7 +18,7 @@ public class PlayerSkills : MonoBehaviour
     [SerializeField, Range(0f, 1f), Tooltip("With Forgettable, the share of the job's merged evidence that reaches the police description. 0.8 makes a sure description take about 1.25 times as long to build")]
     private float forgettableEvidence = 0.8f;
 
-    [SerializeField, Tooltip("Caps loot pickup hold time to at most 1.5 seconds.")]
+    [SerializeField, Tooltip("Caps loot pickup hold time to at most 2 seconds.")]
     private bool hasQuickHands;
 
     [SerializeField, Tooltip("Increases the aim cone width for the glass cutter minigame")]

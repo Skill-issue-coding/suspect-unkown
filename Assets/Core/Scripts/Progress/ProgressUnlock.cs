@@ -21,15 +21,16 @@ public enum ProgressUnlock
     Skill_SoftSteps = 1 << 8,
     Skill_Forgettable = 1 << 9,
     Skill_QuickHands = 1 << 10,
-    Skill_BetterCutter = 1 << 11,
-    Skill_Appraiser = 1 << 12,
-    Skill_Negotiator = 1 << 13,
+    Skill_Appraiser = 1 << 11,
+    Skill_Negotiator = 1 << 12,
+    // A new flag takes the next free bit, never one in the middle: saves and assets store these numbers
+    Skill_BetterCutter = 1 << 17,
 
     // Abilities
 
     // Jobs
     Shop = 1 << 0,
     ThriftShop = 1 << 1,
-    JewlryStore = 1 << 14,
-    Bank = 1 << 15,
+    JewlryStore = 1 << 13,
+    Bank = 1 << 14,
 }

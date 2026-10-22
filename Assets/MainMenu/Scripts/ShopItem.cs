@@ -40,6 +40,8 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
     public bool Owned => owned;
     public string Title => title;
     public string Description => description;
+    public ShopItem Requires => requires;
+    public bool IsLocked => requires != null && !requires.Owned;
 
     private void Awake()
     {
@@ -87,12 +89,15 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
         if (shop != null) shop.ShowDetail(this);
     }
 
-    private bool Locked => requires != null && !requires.Owned;
-
     private void Buy()
     {
-        if (owned || Locked || !wallet.TrySpend(currency, price)) return;
+        if (owned || IsLocked || !wallet.CanAfford(currency, price)) return;
+
+        // Owned before paying: TrySpend raises the wallet's Changed, and items that require this one
+        // refresh their LOCKED state from it, also when this item has no unlock flag to save
         owned = true;
+        wallet.TrySpend(currency, price);
+        // Saved now, not on the next OnEnable: a job started straight after buying must already have it
         wallet.Unlock(unlock);
         if (fenceRate > 0f) wallet.ImproveFence(fenceRate);
         Refresh();
@@ -105,10 +110,10 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
         string cost = currency == Wallet.Currency.Clean ? Wallet.Money(price) : $"{price} SP";
         Color tint;
         if (owned) { priceLabel.text = "<color=#8FD18B>OWNED</color>"; tint = new Color(0.56f, 0.82f, 0.55f, 0.9f); }
-        else if (Locked) { priceLabel.text = $"<color=#7A7A7A>LOCKED</color>"; tint = new Color(1f, 1f, 1f, 0.12f); }
+        else if (IsLocked) { priceLabel.text = $"<color=#7A7A7A>LOCKED</color>"; tint = new Color(1f, 1f, 1f, 0.12f); }
         else if (!wallet.CanAfford(currency, price)) { priceLabel.text = $"<color=#FF6B5B>{cost}</color>"; tint = new Color(1f, 1f, 1f, 0.28f); }
         else { priceLabel.text = $"<color=#F2B33D>{cost}</color>"; tint = new Color(0.95f, 0.7f, 0.24f, 0.75f); }
         if (border != null) border.color = tint;
-        button.interactable = !owned && !Locked;
+        button.interactable = !owned && !IsLocked;
     }
 }

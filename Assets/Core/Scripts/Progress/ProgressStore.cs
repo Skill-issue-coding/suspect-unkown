@@ -28,12 +28,17 @@ public static class ProgressStore
         }
     }
 
-    // Warns instead of throwing: a full disk or a locked file must not break a successful job
+    // Warns instead of throwing: a full disk or a locked file must not break a successful job. Writes a temp
+    // file and swaps it in, so a crash mid-write leaves the old save rather than a cut-off one, which would
+    // load as a fresh save and be written over everything on the next save
     public static void Save(ProgressSave save)
     {
+        string temp = FilePath + ".tmp";
         try
         {
-            File.WriteAllText(FilePath, JsonUtility.ToJson(save, true));
+            File.WriteAllText(temp, JsonUtility.ToJson(save, true));
+            if (File.Exists(FilePath)) File.Replace(temp, FilePath, null);
+            else File.Move(temp, FilePath);
         }
         catch (Exception e)
         {

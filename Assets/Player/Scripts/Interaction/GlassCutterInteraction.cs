@@ -1,8 +1,7 @@
-using System.Runtime.Serialization.Formatters;
 using UnityEngine;
 
 // The interaction behaviour for physical glass.
-// Tier 1 (Normal): Smashed with a hammer (loud) or glass breaker (muffled).
+// Tier 1 (Normal): Smashed with the hammer (loud, slow), or quicker and muffled once the glass breaker is owned too.
 // Tier 2 (Strong): Cut with the glass cutter via the minigame.
 // Once broken/cut, enables the loot inside so it can be picked up.
 public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
@@ -68,10 +67,11 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
         return cachedSkills;
     }
 
-    // Tier 1 needs the hammer or the glass breaker, tier 2 the glass cutter
+    // Tier 1 needs the hammer (the glass breaker is an upgrade bought after it), tier 2 the glass cutter.
+    // Also sets the hold time for the tool the player has, since the prompt reads it when shown
     public bool IsBlockedFor(GameObject interactor)
     {
-        PlayerSkills skills = interactor != null ? interactor.GetComponent<PlayerSkills>() : null;
+        PlayerSkills skills = SkillsOf(interactor);
         if (skills == null) return true;
 
         if (glassTier == 1)
@@ -83,7 +83,6 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
             }
             if (interactable != null)
                 interactable.SetHoldSeconds(skills.HasGlassBreaker ? breakerHoldSeconds : hammerHoldSeconds);
-
         }
 
         // Tier 2 needs the glass cutter

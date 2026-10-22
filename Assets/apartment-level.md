@@ -4,7 +4,7 @@ Design and implementation plan for the first playable level, `Assets/Apartment/A
 
 Read `CLAUDE.md` first, then decisions 6, 7, 9, 13, 14, 18, 19, 21, 22 and 23 in `roadmap_npc.md`, and `Assets/doors-and-lockpicking.md`. Each step ends with a check to pass in play mode before moving on.
 
-> Written 2026-10-13. Already in place: the street and building, doors with lockpicking (`Apartment House Door`), the roof that fades when the player walks inside (`InteriorReveal`), and the light setup described in section 5.
+> Written 2026-10-13. Updated 2026-10-22: clean and dirty money and the load-change-save rule for every writer (3.5), and the wallet and shop (3.8). Already in place: the street and building, doors with lockpicking (`Apartment House Door`), the roof that fades when the player walks inside (`InteriorReveal`), and the light setup described in section 5.
 
 ---
 
@@ -251,19 +251,21 @@ A small JSON file, `progress.json` in `Application.persistentDataPath`, written 
 
 ```json
 {
-  "unlocks": 3, "money": 670, "xp": 968, "skillPoints": 1,
+  "unlocks": 3, "money": 180, "dirtyMoney": 550, "xp": 968, "skillPoints": 1,
   "lastJob": { "job": "Apartment", "seconds": 161, "loot": [ ... ], "peakAlert": 0, "witness": 1, "witnessCaption": "..." },
   "debriefPending": true,
   "completedJobs": ["Apartment"]
 }
 ```
 
-- `ProgressSave` is the plain serializable data; `ProgressStore` (static) loads and saves it, and treats a missing or broken file as a fresh save.
-- `JobRewards` (on the level's `Job` object) adds up the value and unlocks of everything taken, required or extra. On `JobOutcome.Completed` it loads the save, adds them, records the job by scene name, and saves.
+- `ProgressSave` is the plain serializable data; `ProgressStore` (static) loads and saves it, and treats a missing or broken file as a fresh save. Since 2026-10-22 it writes a temp file and swaps it in (`File.Replace`), so a crash mid-save leaves the old save instead of a cut-off one that would load as fresh and be written over everything.
+- `JobRewards` (on the level's `Job` object) adds up the value and unlocks of everything taken, required or extra, at the moment it is taken (stashed or carried counts the same). On `JobOutcome.Completed` it loads the save, adds them, records the job by scene name, and saves.
+- **Clean and dirty money.** What an item pays depends on where it is carried (`LootItem.carriedIn`): **pocket** items (cash) go into `money`, clean and spendable at once; **bag** items go into `dirtyMoney`, which must be laundered in the menu before it can be spent (3.8). The safe's money stacks are bag items, so they are dirty (decided 2026-10-22). Carry type and money type are one setting on purpose.
+- **Every writer loads, changes only its own fields, and saves at once** (2026-10-22). Nothing keeps a copy of the save between frames, or it writes back what another script changed in the meantime. The writers: `JobRewards` (the take, unlocks, XP, the debrief), `DebriefConcept` (clears `debriefPending`), the menu's `Wallet` (money fields only, or one unlock flag), and the editor's Progress menu. The rule came from a bug where the `Wallet` kept a serialized `ProgressSave` in the scene and wrote it, all zeros plus its inspector money, over the real save (3.8).
 - **Written on job success only.** Taking an item and then failing unlocks nothing and earns nothing. A replayed job pays again but is listed once.
 - `unlocks` holds every `ProgressUnlock` flag earned so far as one number (3 is `Shop` and `ThriftShop`). `ProgressSave.Has` asks for one, `Apply` adds new ones and never removes any. Flags are saved as numbers, so a value is never renumbered.
 - `xp` is every XP point ever earned; the level is worked out from it (`Reputation`, 3.7), so the two can never disagree. `skillPoints` is the unspent count. `lastJob` and `debriefPending` carry the debrief from the job to the menu (3.7).
-- Tools/Suspect Unknown/Progress logs, reveals or deletes the file, or unlocks everything, while testing.
+- Tools/Suspect Unknown/Progress logs, reveals or deletes the file, unlocks everything (every bit, so the log shows `"unlocks": -1`), or fakes a debrief, while testing.
 - The Phase 7 save system (police profile, wardrobe) grows from this file rather than replacing it.
 
 ### 3.7 The debrief: the take, XP and levels
@@ -303,12 +305,30 @@ The apartment played well (both items, $180 cash, no alarm, unseen) gives 500 + 
 
 The cut-off is "probably", not "certain" (`certainAt`, 60 %), because the clerk forgets (90 s half-life) while the player walks to the van: in testing, a long look faded to 24 % by job end, and only a catch reached 46 %, so a 60 % rule would almost never score an escape as clear. A description too thin to name anything counts as unseen: if the paper cannot describe the player, the police have nothing.
 
-**How it travels from the job to the menu.** Through the save, not a singleton. At `JobOutcome.Completed`, `JobRewards` builds a `JobResult` (plain facts: the job, the time, one `JobLoot` line per item kind, `JobAlert.Peak`, the witness clarity and caption), adds the take to `money` and the XP to `xp`, adds a skill point per level gained, sets `lastJob` and `debriefPending`, and saves. The menu reads the save on load: with `debriefPending` set it starts on the Debrief station, fills the board from `lastJob`, and clears the flag once shown. This survives quitting between the van and the menu, works when play starts in any scene, and keeps one source of truth.
+**How it travels from the job to the menu.** Through the save, not a singleton. At `JobOutcome.Completed`, `JobRewards` builds a `JobResult` (plain facts: the job, the time, one `JobLoot` line per item kind, `JobAlert.Peak`, the witness clarity and caption), adds the take to `money` (pocket) and `dirtyMoney` (bag) and the XP to `xp`, adds a skill point per level gained, sets `lastJob` and `debriefPending`, and saves. The menu reads the save on load: with `debriefPending` set it starts on the Debrief station, fills the board from `lastJob`, and clears the flag once shown. This survives quitting between the van and the menu, works when play starts in any scene, and keeps one source of truth.
 
 - A `DontDestroyOnLoad` singleton was considered and rejected: it is missing or doubled when play starts in a single scene, it loses the result on quit, and it hides its own lifetime. Within a scene, static Core hubs (`JobOutcome`, `JobAlert`, `JobNews`) stay the pattern; between scenes, the save is.
 - `JobAlert.Peak` and `JobNews.Clarity` are reset on every single-mode scene load, so a restart starts a fresh job.
 
-**What it deliberately does not do yet.** Skill points are counted but cannot be spent (the shop's skill tab is still a mock-up). The wallet in the menu still shows mock money; it moves to the save with the shop work. Dirty and clean money (laundering) is not split yet: the take goes straight into `money`.
+**Spending it** is the shop's job (3.8): skill points buy skills, clean money buys gear, and dirty money is laundered first.
+
+### 3.8 The wallet and the shop
+
+The shop is the workbench TV in the main menu (`ShopConcept`, the site "FENCE.NET"), with three tabs: Skills, Abilities, Gear. Everything it shows and changes lives in `progress.json`.
+
+- **`Wallet`** (MainMenu, on `MenuConcept`) shows dirty money, clean money, skill points and the fence rate; `WalletView` draws them in the shop header and the HUD corner. It keeps no copy of the save: it reads the three money values once, lazily on first use, and every write loads the file, changes only its own fields and saves (3.5). `Unlock` writes one flag and nothing else; spending and laundering write only `money`, `dirtyMoney` and `skillPoints`. Lazy, because a `ShopItem`'s `OnEnable` may run before the wallet's `Awake`: Unity runs `Awake` and `OnEnable` per object, in no fixed order between objects.
+- **Laundering.** The Launder button turns all dirty money into clean at the fence rate: 65 %, or 85 % with the Negotiator skill (`Skill_Negotiator`). The button is locked (dimmed, unclickable, `MenuButtonFx.SetLocked`) while there is no dirty money; `ShopConcept` updates it on the wallet's `Changed`.
+- **`ShopItem`**: one buyable row or skill node, with a price in clean money or skill points, an optional `requires` (another item that must be owned first), and the `ProgressUnlock` flag it saves. Buying marks it owned, pays (which raises `Changed`, so items that require it unlock at once), and saves its flag immediately, so a job started straight after buying already has it. Owned items come from the save when the page shows.
+- **Locked items** show LOCKED as their price; hovering one names what it needs in the detail line ("NEGOTIATOR  NEEDS APPRAISER").
+- **Starter items.** Only Lockpicks level 1 is owned from the start (price 0). Soft steps and Call the guard's mum were starters by mistake and no longer are (2026-10-22).
+- **What the game reads.** Gear: lockpick levels (`DoorInteraction`), hammer, glass breaker and glass cutter (`PlayerSkills`, `GlassCutterInteraction`; the glass breaker does not need the hammer, thrift shop 3.4). Skills: Soft steps (`PlayerNoise`), Forgettable (`PlayerSkills.WitnessEvidenceFactor`), Quick hands (`LootPickup`), Negotiator (`Wallet`).
+- **The TV.** The shop canvas (`MonitorCanvas`, 2150 × 1260) was scaled on 2026-10-22 to fill the bigger screen: 50 px margins left and right, 30 px top and bottom.
+
+**Known issues, not fixed yet** (review of 2026-10-22):
+- The five abilities, Camera looper, Signal jammer and Appraiser have no unlock flag, so buying one spends the money but is not saved, and it can be bought again after a restart. The abilities and the two gadgets do not exist in the game yet and should not be buyable until they do; Appraiser should save `Skill_Appraiser`, which nothing in the game reads yet.
+- The skill tree's prerequisites do not match its drawn links: Forgettable should need Soft steps, Appraiser nothing, and Negotiator Appraiser (both need Quick hands today).
+- The detail line fills on mouse hover only (`OnPointerEnter`), not on gamepad or keyboard selection.
+- Dead code: `ShopItem.fenceRate` and `Wallet.ImproveFence` (Negotiator raises the rate through its flag instead), and `LootItem.glassLevel`.
 
 ---
 
