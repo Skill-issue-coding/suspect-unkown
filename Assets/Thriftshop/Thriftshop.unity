@@ -15094,7 +15094,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3094306196608635000, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: lockLevel
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3094306196608635000, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: startsLocked
@@ -18029,6 +18029,18 @@ PrefabInstance:
       propertyPath: m_TextStyleHashCode
       value: -1183493901
       objectReference: {fileID: 0}
+    - target: {fileID: 3859236490651845987, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
+      propertyPath: caught
+      value: 
+      objectReference: {fileID: 11400000, guid: b16acceeb2893f3429afd7407a7c57f2, type: 2}
+    - target: {fileID: 3859236490651845987, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
+      propertyPath: completed
+      value: 
+      objectReference: {fileID: 11400000, guid: 41b841b87ff0cc14083b14954962fd5a, type: 2}
+    - target: {fileID: 3859236490651845987, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
+      propertyPath: policeCalled
+      value: 
+      objectReference: {fileID: 11400000, guid: 0c85cba3410a07b4993613e7b3956743, type: 2}
     - target: {fileID: 3948819181308473995, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
       propertyPath: objectives
       value: 

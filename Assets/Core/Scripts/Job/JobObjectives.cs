@@ -17,6 +17,7 @@ public class JobObjectives : MonoBehaviour
     private bool bagItemTaken;
 
     private bool[] taken;
+    private bool[] previouslyUnlocked;
 
     public event Action Changed;
 
@@ -27,23 +28,23 @@ public class JobObjectives : MonoBehaviour
 
     // One slot of the required list, for the job card's checklist. Index from 0 to Required - 1
     public LootItem RequiredItem(int index) => required[index];
-    public bool IsTaken(int index) => taken[index];
+    public bool IsTaken(int index) => taken[index] || previouslyUnlocked[index];
 
-    private void Awake() => taken = new bool[required.Length];
-    // {
-    //     taken = new bool[required.Length];
-    //     ProgressSave save = ProgressStore.Load();
-    //     if (save != null)
-    //     {
-    //         for (int i = 0; i < required.Length; i++)
-    //         {
-    //             if (required[i] != null && required[i].ProgressUnlock != ProgressUnlock.None && save.Has(required[i].ProgressUnlock))
-    //             {
-    //                 taken[i] = true;
-    //             }
-    //         }
-    //     }
-    // }
+    private void Awake()
+    {
+        taken = new bool[required.Length];
+        previouslyUnlocked = new bool[required.Length];
+        if (!storyItemsOptional) return;
+        ProgressSave save = ProgressStore.Load();
+
+        for (int i = 0; i < required.Length; i++)
+        {
+            if (required[i] != null && required[i].ProgressUnlock != ProgressUnlock.None && save.Has(required[i].ProgressUnlock))
+            {
+                previouslyUnlocked[i] = true;
+            }
+        }
+    }
     private void OnEnable() => LootPickup.Taken += OnTaken;
 
     private void OnDisable() => LootPickup.Taken -= OnTaken;
