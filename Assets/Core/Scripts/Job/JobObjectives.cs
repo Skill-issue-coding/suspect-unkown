@@ -30,7 +30,20 @@ public class JobObjectives : MonoBehaviour
     public bool IsTaken(int index) => taken[index];
 
     private void Awake() => taken = new bool[required.Length];
-
+    // {
+    //     taken = new bool[required.Length];
+    //     ProgressSave save = ProgressStore.Load();
+    //     if (save != null)
+    //     {
+    //         for (int i = 0; i < required.Length; i++)
+    //         {
+    //             if (required[i] != null && required[i].ProgressUnlock != ProgressUnlock.None && save.Has(required[i].ProgressUnlock))
+    //             {
+    //                 taken[i] = true;
+    //             }
+    //         }
+    //     }
+    // }
     private void OnEnable() => LootPickup.Taken += OnTaken;
 
     private void OnDisable() => LootPickup.Taken -= OnTaken;
