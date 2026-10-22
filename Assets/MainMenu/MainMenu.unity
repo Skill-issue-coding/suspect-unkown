@@ -49017,7 +49017,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShopItem
   title: Better cutter
   description: Be able to cut glass more effective.
-  unlock: 2048
+  unlock: 131072
   price: 1
   currency: 1
   requires: {fileID: 581209263}
