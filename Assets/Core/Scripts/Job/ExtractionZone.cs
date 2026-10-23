@@ -10,6 +10,8 @@ public class ExtractionZone : MonoBehaviour
 {
     [SerializeField, Tooltip("The level's objectives. The zone unlocks once they are completed")]
     private JobObjectives objectives;
+    private JobRewards rewards;
+    private JobRewards Rewards => rewards != null ? rewards : (rewards = FindAnyObjectByType<JobRewards>());
 
     [SerializeField, Min(0.1f), Tooltip("Seconds of standing in the unlocked zone to leave")]
     private float secondsToLeave = 2.5f;
@@ -18,6 +20,7 @@ public class ExtractionZone : MonoBehaviour
     private static readonly Color UnlockedColor = new Color(1f, 0.71f, 0.28f, 0.8f);
 
     private bool playerInside;
+    private bool waitingForConfirm;
 
     public bool IsUnlocked => objectives.IsComplete;
     public bool IsPlayerInside => playerInside;
@@ -50,7 +53,24 @@ public class ExtractionZone : MonoBehaviour
         if (Progress == target) return;
 
         Progress = Mathf.MoveTowards(Progress, target, Time.deltaTime / secondsToLeave);
-        if (Progress >= 1f) JobOutcome.Complete();
+        if (Progress >= 1f)
+        {
+            if (Rewards != null && Rewards.HasBagLoot)
+                JobOutcome.Complete();
+            else if (Rewards != null && Rewards.HasCashOnly)
+            {
+                if (ExtractionWarning.Active != null && !waitingForConfirm)
+                {
+                    waitingForConfirm = true;
+                    ExtractionWarning.Active.Show(
+                        OnLeave: () => JobOutcome.Exit(),
+                        OnStay: () => { waitingForConfirm = false; Progress = 0f; }
+                    );
+                }
+            }
+            else
+                JobOutcome.Exit();
+        }
     }
 
     private void OnEnable()

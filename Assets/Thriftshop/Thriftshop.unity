@@ -14982,6 +14982,9 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6377603724670218365, guid: 9abce90f96662a043b111c1db214f01d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
     - targetCorrespondingSourceObject: {fileID: 513262576212912055, guid: 9abce90f96662a043b111c1db214f01d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 0}
@@ -24634,6 +24637,7 @@ MonoBehaviour:
   required:
   - {fileID: 11400000, guid: a0b3f7248089e194d9b558aa7bad5518, type: 2}
   storyItemsOptional: 1
+  canLeaveAnytime: 1
 --- !u!114 &1727077503
 MonoBehaviour:
   m_ObjectHideFlags: 0
