@@ -4150,7 +4150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 290757ee6a3ed8743b248f0b787d9bac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootSlot
-  liveContent: {fileID: 1655722952576012485}
+  liveContent: {fileID: 7041179138181522306}
   dormantContent: {fileID: 1975748426279572706}
 --- !u!114 &5977179687048922003
 MonoBehaviour:
