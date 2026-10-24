@@ -128,6 +128,7 @@ public class JobOutcomeScreen : MonoBehaviour
     {
         JobOutcome.Failed += OnFailed;
         JobOutcome.Completed += OnCompleted;
+        JobOutcome.Exited += OnExited;
         JobNews.Changed += ShowPhoto;
     }
 
@@ -135,6 +136,7 @@ public class JobOutcomeScreen : MonoBehaviour
     {
         JobOutcome.Failed -= OnFailed;
         JobOutcome.Completed -= OnCompleted;
+        JobOutcome.Exited += OnExited;
         JobNews.Changed -= ShowPhoto;
     }
 
@@ -152,6 +154,13 @@ public class JobOutcomeScreen : MonoBehaviour
     {
         failed = false;
         Show(completed, continueButton);
+    }
+
+    private void OnExited()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        SceneTransition.Load(menuScene);
     }
 
     private void Show(HeadlineSet set, GameObject button)

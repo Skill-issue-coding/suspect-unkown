@@ -14,6 +14,8 @@ public class JobRewards : MonoBehaviour
     private readonly JobResult result = new();
     private readonly List<XpLine> xpLines = new();
     private JobObjectives objectives;
+    public bool HasBagLoot => dirtyMoney > 0;
+    public bool HasCashOnly => cleanMoney > 0 && dirtyMoney == 0;
 
     private void Awake()
     {

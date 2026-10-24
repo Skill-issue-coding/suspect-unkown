@@ -24,12 +24,14 @@ public class PlayerJobEnd : MonoBehaviour
     {
         JobOutcome.Failed += OnFailed;
         JobOutcome.Completed += End;
+        JobOutcome.Exited += End;
     }
 
     private void OnDisable()
     {
         JobOutcome.Failed -= OnFailed;
         JobOutcome.Completed -= End;
+        JobOutcome.Exited -= End;
     }
 
     private void OnFailed(FailReason reason) => End();

@@ -6,6 +6,7 @@ public static class JobOutcome
 {
     public static event Action<FailReason> Failed;
     public static event Action Completed;
+    public static event Action Exited;
 
     public static bool HasEnded { get; private set; }
 
@@ -25,12 +26,21 @@ public static class JobOutcome
         Completed?.Invoke();
     }
 
+    public static void Exit()
+    {
+        if (HasEnded) return;
+        HasEnded = true;
+        Debug.Log("Job Exited");
+        Exited?.Invoke();
+    }
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetOnPlay()
     {
         HasEnded = false;
         Failed = null;
         Completed = null;
+        Exited = null;
         SceneManager.sceneLoaded -= OnSceneLoaded;
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
