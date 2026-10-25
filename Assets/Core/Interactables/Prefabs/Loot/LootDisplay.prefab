@@ -158,7 +158,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -332,8 +332,10 @@ MonoBehaviour:
   - {fileID: 2145732772984676978}
   - {fileID: 8930330620171488751}
   hammerRadius: 12
+  hammerHoldSeconds: 2.5
   hammerAlarm: 1
   glassBreakerRadius: 6
+  breakerHoldSeconds: 1.5
   glassBreakerAlarm: 1
 --- !u!1 &3856025133813691430
 GameObject:

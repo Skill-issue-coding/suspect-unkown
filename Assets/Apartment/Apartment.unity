@@ -4797,6 +4797,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 902159914}
     m_Modifications:
+    - target: {fileID: 877857076862223848, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1756400103756763201, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1779922044968576883, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.7071068
@@ -4817,6 +4825,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 3094306196608635000, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: hinge
+      value: 
+      objectReference: {fileID: 547872852}
     - target: {fileID: 3638748839563304636, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -4881,6 +4893,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apartment door
       objectReference: {fileID: 0}
+    - target: {fileID: 5999220388612564060, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6019224543652670092, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -4895,6 +4911,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6967400900036164007, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7672042113176193590, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9080589023950854612, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
@@ -4925,7 +4945,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
 --- !u!23 &547872851 stripped
 MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7866765122308532571, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+  m_CorrespondingSourceObject: {fileID: 8524528064470726147, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+  m_PrefabInstance: {fileID: 547872849}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &547872852 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1313973081238832808, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
   m_PrefabInstance: {fileID: 547872849}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &559023239 stripped
@@ -13078,6 +13103,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 902159914}
     m_Modifications:
+    - target: {fileID: 877857076862223848, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1756400103756763201, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1779922044968576883, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.7071068
@@ -13166,6 +13199,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apartment Bedroom Door
       objectReference: {fileID: 0}
+    - target: {fileID: 5999220388612564060, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6019224543652670092, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -13180,6 +13217,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6967400900036164007, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7672042113176193590, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9080589023950854612, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
@@ -13198,7 +13239,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
 --- !u!23 &1368570564 stripped
 MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7866765122308532571, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+  m_CorrespondingSourceObject: {fileID: 8524528064470726147, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
   m_PrefabInstance: {fileID: 1368570562}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1372402876 stripped
@@ -15395,6 +15436,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: df1053a10c3fb8d49a72ea2974201d0f, type: 2}
   - {fileID: 11400000, guid: 69be6c07969b2fe47b49386993d609f6, type: 2}
   storyItemsOptional: 0
+  canLeaveAnytime: 1
 --- !u!4 &1608125063
 Transform:
   m_ObjectHideFlags: 0
@@ -17525,6 +17567,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 902159914}
     m_Modifications:
+    - target: {fileID: 877857076862223848, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1779922044968576883, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.7071068
@@ -17545,6 +17591,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.x
       value: -90
       objectReference: {fileID: 0}
+    - target: {fileID: 2556076311227984130, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3094306196608635000, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: hinge
+      value: 
+      objectReference: {fileID: 1819116901}
     - target: {fileID: 3094306196608635000, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: startsLocked
       value: 0
@@ -17609,6 +17663,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apartment House Door
       objectReference: {fileID: 0}
+    - target: {fileID: 5999220388612564060, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6019224543652670092, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -17623,6 +17681,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6967400900036164007, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
       propertyPath: m_StaticEditorFlags
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7672042113176193590, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9080589023950854612, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
@@ -17641,7 +17703,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
 --- !u!23 &1819116900 stripped
 MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: 7866765122308532571, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+  m_CorrespondingSourceObject: {fileID: 8524528064470726147, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
+  m_PrefabInstance: {fileID: 1819116898}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1819116901 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1313973081238832808, guid: 876ca4b9db4821b49b21ab31b9028dbc, type: 3}
   m_PrefabInstance: {fileID: 1819116898}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1821107459 stripped
@@ -29181,7 +29248,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6377603724670218365, guid: 9abce90f96662a043b111c1db214f01d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 100100000, guid: 9abce90f96662a043b111c1db214f01d, type: 3}
 --- !u!33 &4237520082182026660
 MeshFilter:

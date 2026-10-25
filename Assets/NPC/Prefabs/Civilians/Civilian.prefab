@@ -184,7 +184,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -611,7 +611,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -818,7 +818,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1310,7 +1310,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1868,6 +1868,7 @@ GameObject:
   - component: {fileID: 608853574139031668}
   - component: {fileID: 8078593193365997196}
   - component: {fileID: 8773592687440257053}
+  - component: {fileID: 8322906022787146357}
   m_Layer: 15
   m_Name: Civilian
   m_TagString: NPC
@@ -2144,6 +2145,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cd1f457cffa1f94caeb7ec5ec28f035, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcReactionReporter
+--- !u!114 &8322906022787146357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6720325424012129814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85cfda84e99f42d4e9b4aa10510d888e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FloorHideable
+  checkInterval: 0.5
 --- !u!1 &6777814201772802451
 GameObject:
   m_ObjectHideFlags: 0
@@ -2201,7 +2215,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2659,7 +2673,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

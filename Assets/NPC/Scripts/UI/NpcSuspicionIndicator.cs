@@ -77,6 +77,7 @@ public class NpcSuspicionIndicator : MonoBehaviour
     private NpcDecisionWindow window;
 
     private NpcPerception perception;
+    private FloorHideable floorHideable;
     private float arrowAlpha;
     private NpcSuspicion suspicion;
     private CanvasGroup group;
@@ -107,6 +108,7 @@ public class NpcSuspicionIndicator : MonoBehaviour
         }
 
         perception = GetComponentInParent<NpcPerception>();
+        floorHideable = GetComponentInParent<FloorHideable>();
 
         if (fill == null || icon == null)
         {
@@ -179,11 +181,14 @@ public class NpcSuspicionIndicator : MonoBehaviour
         if (canRotate)
             UpdateArrow();
 
+        // On another floor the whole indicator fades with the NPC, edge arrow included (decision 26)
+        float shown = floorHideable != null ? 1f - floorHideable.Hide : 1f;
+
         bool visible = showingReaction || displayedFill > 0.001f || suspicion.State != NpcAlertState.Idle;
-        group.alpha = Mathf.MoveTowards(group.alpha, visible ? 1f : 0f, fadeSpeed * Time.deltaTime);
+        group.alpha = Mathf.MoveTowards(group.alpha, visible ? shown : 0f, fadeSpeed * Time.deltaTime);
 
         bool seesPlayer = perception != null && perception.TryGetLatest(out _);
-        arrowAlpha = Mathf.MoveTowards(arrowAlpha, seesPlayer ? 1f : 0f, arrowFadeSpeed * Time.deltaTime);
+        arrowAlpha = Mathf.MoveTowards(arrowAlpha, seesPlayer ? shown : 0f, arrowFadeSpeed * Time.deltaTime);
 
         UpdateOffscreen();
     }

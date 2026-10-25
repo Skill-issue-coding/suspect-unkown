@@ -2296,6 +2296,7 @@ GameObject:
   - component: {fileID: 7929661741115065216}
   - component: {fileID: 6652728458607151797}
   - component: {fileID: -7865312120789787377}
+  - component: {fileID: 2388954916918824537}
   m_Layer: 15
   m_Name: Guard
   m_TagString: NPC
@@ -2440,6 +2441,7 @@ MonoBehaviour:
   headLook: {fileID: 0}
   glanceDuration: 1.5
   confusedDuration: 1.45
+  onEdgeMargin: 0.01
   debug: 1
 --- !u!114 &8890725952143270588
 MonoBehaviour:
@@ -2557,6 +2559,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7ad6fc4c0fc06ee42b291ce0d02af133, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GuardReactionReporter
+--- !u!114 &2388954916918824537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6720325424012129814}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 85cfda84e99f42d4e9b4aa10510d888e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FloorHideable
+  checkInterval: 0.5
 --- !u!1 &7060616932561885397
 GameObject:
   m_ObjectHideFlags: 0
@@ -2810,6 +2825,7 @@ MonoBehaviour:
   damping: 4
   restPull: 2
   maxAngle: 70
+  smoothing: 20
   teleportDistance: 1
 --- !u!1 &7550256163652579667
 GameObject:
@@ -2957,6 +2973,7 @@ MonoBehaviour:
   damping: 4
   restPull: 2
   maxAngle: 70
+  smoothing: 20
   teleportDistance: 1
 --- !u!1 &7906917028722538469
 GameObject:
@@ -3015,7 +3032,7 @@ SkinnedMeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3197,7 +3214,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3382,7 +3399,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3535,7 +3552,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - {fileID: 2100000, guid: 3d19050d6faee4c4cb8d00561fddfffd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3642,4 +3659,5 @@ MonoBehaviour:
   damping: 4
   restPull: 2
   maxAngle: 70
+  smoothing: 20
   teleportDistance: 1

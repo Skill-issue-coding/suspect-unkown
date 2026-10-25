@@ -7,6 +7,16 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: BaseMaterial
+    second: {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Glass
+    second: {fileID: 2100000, guid: 00b9ed2cec7c5b741b0ac35350166819, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: PolyTexture
     second: {fileID: 2100000, guid: 09601c3cb36f0e84b91f588517b4e707, type: 2}
   - first:

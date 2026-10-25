@@ -60,6 +60,7 @@ public class NpcVisionCone : MonoBehaviour
     private float edgeSoftness = 0.4f;
 
     private NpcSuspicion suspicion;
+    private FloorHideable floorHideable;
     private MeshRenderer coneRenderer;
     private MaterialPropertyBlock block;
     private Color targetColor;
@@ -85,14 +86,26 @@ public class NpcVisionCone : MonoBehaviour
         }
 
         suspicion = GetComponentInParent<NpcSuspicion>();
+        floorHideable = GetComponentInParent<FloorHideable>();
         coneRenderer = GetComponent<MeshRenderer>();
         block = new MaterialPropertyBlock();
         targetColor = displayColor = idleColor;
     }
 
-    private void OnEnable() { if (suspicion != null) suspicion.AlertStateChanged += OnAlertStateChanged; }
+    private void OnEnable()
+    {
+        if (suspicion != null) suspicion.AlertStateChanged += OnAlertStateChanged;
+        if (floorHideable != null) floorHideable.HideChanged += OnFloorHideChanged;
+    }
 
-    private void OnDisable() { if (suspicion != null) suspicion.AlertStateChanged -= OnAlertStateChanged; }
+    private void OnDisable()
+    {
+        if (suspicion != null) suspicion.AlertStateChanged -= OnAlertStateChanged;
+        if (floorHideable != null) floorHideable.HideChanged -= OnFloorHideChanged;
+    }
+
+    // On another floor (decision 26) the cone is not drawn, so isVisible stays false and no rays are cast
+    private void OnFloorHideChanged(float hide) => coneRenderer.enabled = hide < 1f;
 
     private void Start()
     {
@@ -162,7 +175,9 @@ public class NpcVisionCone : MonoBehaviour
 
         block.SetFloat(SoftnessId, edgeSoftness / range);
         displayColor = Color.Lerp(displayColor, targetColor, 1f - Mathf.Exp(-colorSpeed * Time.deltaTime));
-        block.SetColor(BaseColorId, displayColor);
+        Color shownColor = displayColor;
+        if (floorHideable != null) shownColor.a *= 1f - floorHideable.Hide;
+        block.SetColor(BaseColorId, shownColor);
         block.SetFloat(RangeScaleId, perception.RangeScale);
         block.SetFloat(FovScaleId, perception.FovScale);
         coneRenderer.SetPropertyBlock(block);
