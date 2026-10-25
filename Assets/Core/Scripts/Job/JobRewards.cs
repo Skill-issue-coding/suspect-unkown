@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // The job's takings: every item taken this run, required or extra, adds its value and unlocks here.
-// They reach the save only when the job succeeds; a failed job writes nothing. One per level, on the
-// Job object. Hears LootPickup.Taken and JobOutcome.Completed, so nothing needs a reference to it
+// They reach the save only when the job succeeds; a failed job, or one left without bag loot, writes
+// nothing. One per level, on the Job object. Hears LootPickup.Taken and JobOutcome.Completed, so nothing
+// needs a reference to it
 public class JobRewards : MonoBehaviour
 {
     private int cleanMoney;
@@ -14,8 +15,11 @@ public class JobRewards : MonoBehaviour
     private readonly JobResult result = new();
     private readonly List<XpLine> xpLines = new();
     private JobObjectives objectives;
-    public bool HasBagLoot => dirtyMoney > 0;
-    public bool HasCashOnly => cleanMoney > 0 && dirtyMoney == 0;
+
+    // True once a bag item (carried or stashed alike) or a story item from the objective list is taken.
+    // Leaving with it completes the job; leaving with only pocket cash forfeits the run, so ExtractionZone
+    // asks first
+    public bool HasLootToKeep { get; private set; }
 
     private void Awake()
     {
@@ -47,6 +51,7 @@ public class JobRewards : MonoBehaviour
             dirtyMoney += pickup.Item.Value;
         }
 
+        if (pickup.Item.CarriedIn == LootCarry.Bag || IsObjective(pickup.Item)) HasLootToKeep = true;
         unlocks |= pickup.Item.ProgressUnlock;
         AddLoot(pickup.Item);
     }

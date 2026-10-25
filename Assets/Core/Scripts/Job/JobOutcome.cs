@@ -26,11 +26,12 @@ public static class JobOutcome
         Completed?.Invoke();
     }
 
+    // The player left without bag loot and confirmed it: the job ends with nothing saved and no debrief
     public static void Exit()
     {
         if (HasEnded) return;
         HasEnded = true;
-        Debug.Log("Job Exited");
+        Debug.Log("Job left empty-handed");
         Exited?.Invoke();
     }
 

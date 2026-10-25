@@ -115,6 +115,8 @@ The register till is removed (2026-10-21), so the register is only where the cle
 
 **What is required** (changed 2026-10-21). Nothing is a hard requirement, as in Payday: the van unlocks once the player has taken the plan **or** any bag item, so a run can end without the story item. The plan is what unlocks the next target: without it the run still pays and still counts as a completed run for adaptive security, but the jewelry store stays locked. Only the apartment keeps hard required items (the tutorial). The plan is a pocket item, so it never competes with bonus loot for the two bag slots. `ProgressUnlock.JewelryStore` is added together with the plan (L2).
 
+**Leaving is always possible** (changed 2026-10-25). The van is open from the start (`JobObjectives.canLeaveAnytime`). Filling the extraction zone completes the job only if a bag item (carried or stashed) or a story item from the objective list was taken (`JobRewards.HasLootToKeep`), so the pocket-carried plan counts. With only pocket cash, `ExtractionWarning` (in `PlayerHud`) freezes the world and asks: Continue ends the job with `JobOutcome.Exit`, which saves nothing and returns to the menu without a newspaper; Cancel (or Escape) empties the bar, and the zone stays shut until the player steps out and back in.
+
 ### 3.2 The randomised roll
 
 Two rolls, made by two components: `LootSpawner` decides which slots are live this run, and each slot's `LootChoice` decides what it holds.

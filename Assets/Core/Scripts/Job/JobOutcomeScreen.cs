@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 // Shows how a job ended. On failure the picture turns grey, time slows, and the newspaper spins in
 // with a "caught" headline and a restart button; on success it comes in with a positive headline and
-// a continue button. The photo shows the witness sketch from JobNews: a mugshot when caught, a wanted
+// a continue button. A job left empty-handed shows no paper and goes straight to the menu. The photo shows the witness sketch from JobNews: a mugshot when caught, a wanted
 // picture when the player got away, a "?" when nobody saw them. Listens to JobOutcome and JobNews only,
 // so it never needs to know who ended the job or who saw the player. Lives on the always-active canvas
 // root, because an inactive object never receives the event
@@ -136,7 +136,7 @@ public class JobOutcomeScreen : MonoBehaviour
     {
         JobOutcome.Failed -= OnFailed;
         JobOutcome.Completed -= OnCompleted;
-        JobOutcome.Exited += OnExited;
+        JobOutcome.Exited -= OnExited;
         JobNews.Changed -= ShowPhoto;
     }
 
@@ -156,12 +156,8 @@ public class JobOutcomeScreen : MonoBehaviour
         Show(completed, continueButton);
     }
 
-    private void OnExited()
-    {
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        SceneTransition.Load(menuScene);
-    }
+    // Left empty-handed: nothing to report, so no paper, straight back to the menu
+    private void OnExited() => Leave(menuScene);
 
     private void Show(HeadlineSet set, GameObject button)
     {
