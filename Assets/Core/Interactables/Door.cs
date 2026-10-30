@@ -7,7 +7,8 @@ using UnityEngine.AI;
 // doorway, and the leaf (on the Occluder layer) blocks sight. Open, it is a route and evidence: the
 // obstacle is off and its Anomaly is raised. The door knows nothing about the player or skills. It
 // holds its lock level and sweet spot and opens when asked, so any opener (the lockpick now, a
-// crowbar or keycard later) calls the same Open(). It slams when an NPC resolves its anomaly, so
+// crowbar or keycard later) calls the same Open(). A double door is one Door with a second leaf:
+// one lock, one anomaly, one doorway. It slams when an NPC resolves its anomaly, so
 // NPCs never reference the door to shut it
 [RequireComponent(typeof(Anomaly))]
 [RequireComponent(typeof(NavMeshObstacle))]
@@ -19,6 +20,9 @@ public class Door : MonoBehaviour
 
     [SerializeField, Tooltip("Degrees the leaf swings when open. Negative swings it the other way")]
     private float openAngle = 100f;
+
+    [SerializeField, Tooltip("Second leaf of a double door (optional). Swings the mirrored angle, so both leaves open the same way")]
+    private Transform secondHinge;
 
     [SerializeField, Tooltip("Seconds to open or close normally")]
     private float swingDuration = 0.35f;
@@ -50,7 +54,9 @@ public class Door : MonoBehaviour
     private NavMeshObstacle obstacle;
     private Interactable[] reaches;
     private Quaternion closedRotation;
+    private Quaternion secondClosedRotation;
     private Tween swing;
+    private Tween secondSwing;
 
     // World bounds of the reach triggers, taken in Awake while the door is shut and the triggers are on:
     // a disabled collider reports empty bounds, and an open door's reaches are off
@@ -77,6 +83,9 @@ public class Door : MonoBehaviour
             Debug.LogWarning($"{name} has no hinge; it will open and close without swinging", this);
         else
             closedRotation = hinge.localRotation;
+
+        if (secondHinge != null)
+            secondClosedRotation = secondHinge.localRotation;
 
         IsLocked = startsLocked;
         SweetSpot = UnityEngine.Random.Range(-130f, 130f);
@@ -140,13 +149,21 @@ public class Door : MonoBehaviour
     }
 
     // Rotates around the parent's up axis (pre-multiplied), so a leaf imported with a -90° X
-    // correction from Blender still swings horizontally
+    // correction from Blender still swings horizontally. A double door's second leaf is hinged on
+    // the opposite side, so it takes the negated angle to swing the same way
     private void Swing(float angle, float duration)
     {
-        if (hinge == null) return;
+        if (hinge != null)
+        {
+            swing.Stop();
+            swing = Tween.LocalRotation(hinge, Quaternion.Euler(0f, angle, 0f) * closedRotation, duration, Ease.OutCubic);
+        }
 
-        swing.Stop();
-        swing = Tween.LocalRotation(hinge, Quaternion.Euler(0f, angle, 0f) * closedRotation, duration, Ease.OutCubic);
+        if (secondHinge != null)
+        {
+            secondSwing.Stop();
+            secondSwing = Tween.LocalRotation(secondHinge, Quaternion.Euler(0f, -angle, 0f) * secondClosedRotation, duration, Ease.OutCubic);
+        }
     }
 
     private void Reset()
