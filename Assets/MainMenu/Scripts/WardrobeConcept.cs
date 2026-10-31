@@ -29,7 +29,22 @@ public class WardrobeConcept : MonoBehaviour
     [Tooltip("Button to wipe police.json memory")]
     [SerializeField] private Button identityResetButton;
 
+    [Header("Identity Reset Cost")]
+    [Tooltip("Wallet the reset is paid from")]
+    [SerializeField] private Wallet wallet;
+    [Tooltip("Price of a reset in clean money, dollars")]
+    [SerializeField] private int resetPrice = 12500;
+    [Tooltip("Shows the player's clean money above the reset button")]
+    [SerializeField] private TMP_Text moneyLabel;
+
+    [Header("Audio")]
+    [Tooltip("Plays the purchase sound")]
+    [SerializeField] private AudioSource sfxSource;
+    [Tooltip("Played when a reset is bought")]
+    [SerializeField] private AudioClip purchaseSound;
+
     private WitnessReport record;
+    private MenuButtonFx resetFx;
 
     private void Awake()
     {
@@ -50,18 +65,46 @@ public class WardrobeConcept : MonoBehaviour
         }
 
         if (identityResetButton != null)
+        {
             identityResetButton.onClick.AddListener(ResetIdentity);
+            resetFx = identityResetButton.GetComponent<MenuButtonFx>();
+        }
 
         // Load directly from police.json
         record = PoliceStore.Load();
         Refresh();
+        RefreshMoney();
     }
 
+    private void OnEnable()
+    {
+        if (wallet != null) wallet.Changed += RefreshMoney;
+    }
+
+    private void OnDisable()
+    {
+        if (wallet != null) wallet.Changed -= RefreshMoney;
+    }
+
+    // Paid from clean money like a shop item: nothing is wiped unless the wallet takes the payment
     public void ResetIdentity()
     {
+        if (wallet == null || !wallet.TrySpend(Wallet.Currency.Clean, resetPrice)) return;
+
         PoliceStore.Delete();
         record = PoliceStore.Load(); // Returns empty WitnessReport
         Refresh();
+        if (sfxSource != null && purchaseSound != null)
+            sfxSource.PlayOneShot(purchaseSound);
+    }
+
+    // Also called by the wallet event, so laundering or buying in the shop updates the label and the lock
+    private void RefreshMoney()
+    {
+        if (wallet == null) return;
+        if (moneyLabel != null)
+            moneyLabel.text = $"CLEAN MONEY  <color=#F2B33D>{Wallet.Money(wallet.Clean)}</color>";
+        if (resetFx != null) resetFx.SetLocked(!wallet.CanAfford(Wallet.Currency.Clean, resetPrice));
     }
 
     private void Refresh()

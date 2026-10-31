@@ -101,7 +101,11 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
         wallet.Unlock(unlock);
         if (fenceRate > 0f) wallet.ImproveFence(fenceRate);
         Refresh();
-        if (shop != null) shop.ShowDetail(this);
+        if (shop != null)
+        {
+            shop.ShowDetail(this);
+            shop.PlayPurchase();
+        }
     }
 
     // Also called by the wallet event, so a purchase elsewhere unlocks dependants here

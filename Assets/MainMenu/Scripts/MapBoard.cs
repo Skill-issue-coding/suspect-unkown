@@ -24,6 +24,12 @@ public class MapBoard : MonoBehaviour
     [Tooltip("Start Heist button, disabled while the selected job is locked")]
     [SerializeField] private MenuButtonFx startHeistButton;
 
+    [Header("Audio")]
+    [Tooltip("Plays the start heist sound")]
+    [SerializeField] private AudioSource sfxSource;
+    [Tooltip("Played when a heist starts. Keep it short: the loading card fades all sound out in about 0.4s")]
+    [SerializeField] private AudioClip startHeistSound;
+
     private MapLocation selected;
     private ProgressSave progress;
     private ActionSave actions;
@@ -91,6 +97,8 @@ public class MapBoard : MonoBehaviour
     public void StartHeist()
     {
         if (selected == null || !IsOpen(selected)) return;
+        if (sfxSource != null && startHeistSound != null)
+            sfxSource.PlayOneShot(startHeistSound);
         // Warns by itself when the scene is not in the build scene list
         SceneTransition.Load(selected.SceneName);
     }

@@ -85,14 +85,15 @@ public class Wallet : MonoBehaviour
         return true;
     }
 
-    public void Launder()
+    public bool TryLaunder()
     {
         EnsureLoaded();
-        if (dirty <= 0) return;
+        if (dirty <= 0) return false;
         clean += Mathf.RoundToInt(dirty * fenceRate);
         dirty = 0;
         SaveMoney();
         Changed?.Invoke();
+        return true;
     }
 
     public void ImproveFence(float rate)

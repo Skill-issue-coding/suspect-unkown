@@ -17,6 +17,13 @@ public class ShopConcept : MonoBehaviour
     [SerializeField] private Wallet wallet;
     [Tooltip("Launder button, locked while there is no dirty money to launder")]
     [SerializeField] private MenuButtonFx launderButton;
+    [Header("Audio")]
+    [Tooltip("Plays one-shot sounds for the shop")]
+    [SerializeField] private AudioSource sfxSource;
+    [Tooltip("Played when an item is bought")]
+    [SerializeField] private AudioClip purchaseSound;
+    [Tooltip("Played when dirty money is laundered")]
+    [SerializeField] private AudioClip launderSound;
 
     private void Awake()
     {
@@ -76,6 +83,16 @@ public class ShopConcept : MonoBehaviour
 
     public void Launder()
     {
-        if (wallet != null) wallet.Launder();
+        if (wallet != null && wallet.TryLaunder())
+            Play(launderSound);
+
+    }
+
+    public void PlayPurchase() => Play(purchaseSound);
+
+    private void Play(AudioClip clip)
+    {
+        if (sfxSource != null && clip != null)
+            sfxSource.PlayOneShot(clip);
     }
 }
