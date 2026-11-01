@@ -29584,7 +29584,7 @@ MonoBehaviour:
   title: Signal jammer
   description: Disables the ability for civilians to call the police for a short duration.
   unlock: 0
-  price: 5000
+  price: 4000
   currency: 0
   requires: {fileID: 0}
   owned: 0
@@ -30223,7 +30223,7 @@ MonoBehaviour:
   title: Camera looper
   description: Blinds one camera for a while.
   unlock: 0
-  price: 7000
+  price: 5000
   currency: 0
   requires: {fileID: 0}
   owned: 0
@@ -44480,7 +44480,7 @@ MonoBehaviour:
   title: Glass breaker
   description: Break glass with less noise.
   unlock: 64
-  price: 3500
+  price: 1500
   currency: 0
   requires: {fileID: 236516834}
   owned: 0
@@ -47533,7 +47533,7 @@ MonoBehaviour:
   title: Appraiser
   description: See values of loot before taking it.
   unlock: 0
-  price: 1
+  price: 2
   currency: 1
   requires: {fileID: 0}
   owned: 0
@@ -58083,7 +58083,7 @@ MonoBehaviour:
   title: Glass cutter
   description: Be able to break tougher glass.
   unlock: 128
-  price: 6500
+  price: 3500
   currency: 0
   requires: {fileID: 1508045419}
   owned: 0

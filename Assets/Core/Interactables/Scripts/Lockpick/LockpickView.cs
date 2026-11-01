@@ -25,6 +25,10 @@ public class LockpickView : MonoBehaviour
     [SerializeField, Tooltip("The lockpick HUD beside this view in Minigames.prefab. Kept outside this object so it can fade out after the view hides")]
     private LockpickHud hud;
 
+    [Header("Audio")]
+    [SerializeField, Tooltip("Optional. The pick, slip and open sounds, on this object or beside it")]
+    private LockpickAudio lockAudio;
+
     private LockpickModel currentModel;
     private float bindingTimer;
 
@@ -48,6 +52,7 @@ public class LockpickView : MonoBehaviour
         currentModel = model;
         bindingTimer = 0f;
         if (hud != null) hud.Show(model, lockLevel);
+        if (lockAudio != null) lockAudio.Begin(model);
 
         if (currentModel != null)
         {
@@ -60,6 +65,7 @@ public class LockpickView : MonoBehaviour
         if (currentModel == null) return;
 
         if (hud != null) hud.Hide();
+        if (lockAudio != null) lockAudio.End();
         currentModel.Slipped -= OnSlipped;
         currentModel = null;
     }
