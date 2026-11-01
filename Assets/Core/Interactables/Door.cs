@@ -41,6 +41,15 @@ public class Door : MonoBehaviour
     [SerializeField, Tooltip("Metres a slam carries along the NavMesh")]
     private float slamNoiseRadius = 8f;
 
+    [Header("Audio")]
+    [SerializeField, Tooltip("3D source for the door slam sound.")]
+    private AudioSource audioSource;
+
+    [SerializeField, Tooltip("Played when a guard walks through a door")]
+    private AudioClip closeClip;
+    [SerializeField, Tooltip("Played when an NPC slams shut a door the player left open.")]
+    private AudioClip slamClip;
+
     public int LockLevel => lockLevel;
     public bool IsOpen { get; private set; }
     public bool IsLocked { get; private set; }
@@ -105,8 +114,16 @@ public class Door : MonoBehaviour
         anomaly.Raise();
     }
 
+    // Close at normal speed, as a guard does behind them. The sound plays only when the door was open,
+    // so closing a shut door stays silent
     [ContextMenu("Close")]
-    public void Close() => CloseOver(swingDuration);
+    public void Close()
+    {
+        if (!enabled || !IsOpen) return;
+
+        CloseOver(swingDuration);
+        PlaySound(closeClip);
+    }
 
     // Close fast and loud. Alarm 0: NPCs glance at a slam but don't grow suspicious of it
     [ContextMenu("Slam")]
@@ -116,6 +133,7 @@ public class Door : MonoBehaviour
 
         CloseOver(slamDuration);
         NoiseBus.Publish(new NoiseEvent(transform.position, slamNoiseRadius, 0f));
+        PlaySound(slamClip);
     }
 
     private void CloseOver(float duration)
@@ -197,5 +215,10 @@ public class Door : MonoBehaviour
         Gizmos.matrix = transform.localToWorldMatrix;
         Gizmos.color = IsOpen ? Color.green : Color.red;
         Gizmos.DrawWireCube(box.center, box.size);
+    }
+    private void PlaySound(AudioClip clip)
+    {
+        if (audioSource != null && clip != null)
+            audioSource.PlayOneShot(clip);
     }
 }

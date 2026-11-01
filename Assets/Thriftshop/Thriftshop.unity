@@ -11129,6 +11129,61 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4259079349893253337, guid: 7c4b6613dc9dc2c4988d9feda44712db, type: 3}
   m_PrefabInstance: {fileID: 846545603}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &859602570
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 859602573}
+  - component: {fileID: 859602572}
+  - component: {fileID: 859602571}
+  m_Layer: 0
+  m_Name: AudioListener
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &859602571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859602570}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bdcccf85d2740f94da00d690a1d4a266, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ListenerAnchor
+  target: {fileID: 1728047821}
+  offset: {x: 0, y: 1.8, z: 0}
+--- !u!81 &859602572
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859602570}
+  m_Enabled: 1
+--- !u!4 &859602573
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 859602570}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &866998845
 GameObject:
   m_ObjectHideFlags: 0
@@ -31389,7 +31444,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2106134247}
   - component: {fileID: 2106134246}
-  - component: {fileID: 2106134245}
   - component: {fileID: 2106134244}
   - component: {fileID: 2106134243}
   - component: {fileID: 2106134242}
@@ -31491,14 +31545,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!81 &2106134245
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2106134241}
-  m_Enabled: 1
 --- !u!20 &2106134246
 Camera:
   m_ObjectHideFlags: 0
@@ -33978,3 +34024,4 @@ SceneRoots:
   - {fileID: 1698980627}
   - {fileID: 1131993944}
   - {fileID: 3650635556099435352}
+  - {fileID: 859602573}
