@@ -72,6 +72,10 @@ public class GlassCutterView : MonoBehaviour
     [SerializeField, Tooltip("The glass cutter HUD beside this view in Minigames.prefab. Kept outside this object so it can fade out after the view hides")]
     private GlassCutterHud hud;
 
+    [Header("Audio")]
+    [SerializeField, Tooltip("Optional. The looping scratch while the cut advances, on this object or beside it")]
+    private GlassCutterAudio cutterAudio;
+
     private GlassCutterModel currentModel;
     private LineRenderer lineRenderer;
     private Camera cutterCamera;
@@ -182,6 +186,7 @@ public class GlassCutterView : MonoBehaviour
 
         currentModel.Misaligned += OnMisaligned;
         if (hud != null) hud.Show(model);
+        if (cutterAudio != null) cutterAudio.Begin(model);
     }
 
     public void End()
@@ -189,6 +194,7 @@ public class GlassCutterView : MonoBehaviour
         if (currentModel == null) return;
 
         if (hud != null) hud.Hide();
+        if (cutterAudio != null) cutterAudio.End();
         currentModel.Misaligned -= OnMisaligned;
         currentModel = null;
 

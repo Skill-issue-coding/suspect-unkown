@@ -4,6 +4,7 @@ using UnityEngine;
 // Tier 1 (Normal): Smashed with the hammer (loud, slow), or quicker and muffled once the glass breaker is owned too.
 // Tier 2 (Strong): Cut with the glass cutter via the minigame.
 // Once broken/cut, enables the loot inside so it can be picked up.
+// Plays a smash or cut sound when the glass goes.
 public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
 {
     [SerializeField, Range(1, 2), Tooltip("1 = normal glass (hammer / glass breaker), 2 = strong glass (glass cutter)")]
@@ -21,6 +22,8 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     private float hammerHoldSeconds = 2.5f;
     [SerializeField, Min(0f), Tooltip("Noise alarm for hammer")]
     private float hammerAlarm = 1f;
+    [SerializeField, Range(0f, 1f), Tooltip("Smash volume with only the hammer")]
+    private float hammerVolume = 1f;
 
     [Header("Glass Breaker Specifics")]
     [SerializeField, Min(0f), Tooltip("Noise radius for glass breaker")]
@@ -29,6 +32,16 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     private float breakerHoldSeconds = 1.5f;
     [SerializeField, Min(0f), Tooltip("Noise alarm for glass breaker")]
     private float glassBreakerAlarm = 1f;
+    [SerializeField, Range(0f, 1f), Tooltip("Smash volume with the glass breaker, quieter")]
+    private float glassBreakerVolume = 0.5f;
+
+    [Header("Audio")]
+    [SerializeField, Tooltip("Plays glass breaking sound.")]
+    private AudioSource audioSource;
+    [SerializeField, Tooltip("Played when normal glass is smashed (hammer or glass breaker)")]
+    private AudioClip smashClip;
+    [SerializeField, Tooltip("Played when strong glass is cut with the glass cutter")]
+    private AudioClip cutClip;
 
     private GameObject cachedInteractor;
     private PlayerSkills cachedSkills;
@@ -43,6 +56,8 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
         interactable = GetComponent<Interactable>();
         if (interactable != null)
             interactable.SetHoldSeconds(glassTier == 1 ? hammerHoldSeconds : 0f);
+        if (audioSource == null)
+            Debug.LogWarning($"{name} has no AudioSource, glass will break silently", this);
         // Keep the loot inside unreachable while the glass barrier is intact
         SetLootReachable(false);
     }
@@ -111,10 +126,12 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
             bool hasBreaker = SkillsOf(interactor).HasGlassBreaker;
             float radius = hasBreaker ? glassBreakerRadius : hammerRadius;
             float alarm = hasBreaker ? glassBreakerAlarm : hammerAlarm;
+            float volume = hasBreaker ? glassBreakerVolume : hammerVolume;
 
             // From the player's feet, not the glass: the case sits a metre up inside its own carved hole in the
             // NavMesh, too far from walkable floor for NpcHearing to place the sound, so nobody would hear it
             NoiseBus.Publish(new NoiseEvent(interactor.transform.position, radius, alarm));
+            PlaySound(smashClip, volume);
             OnCut(); // removes the glass => loot available
         }
         else if (glassTier == 2)
@@ -130,13 +147,23 @@ public class GlassCutterInteraction : MonoBehaviour, IInteractionBehaviour
     {
         // Turn off the interactable first so it cannot be cut again. SetReachable(false) raises
         // Withdrawn, which clears the player's reach even when the pane below is this very object
-        Interactable interactable = GetComponent<Interactable>();
         if (interactable != null)
             interactable.SetReachable(false);
 
         if (glassPane != null)
             glassPane.SetActive(false);
 
+        if (glassTier == 2)
+        {
+            PlaySound(cutClip, 1f);
+        }
+
         SetLootReachable(true);
+    }
+
+    private void PlaySound(AudioClip clip, float volume)
+    {
+        if (audioSource != null && clip != null)
+            audioSource.PlayOneShot(clip, volume);
     }
 }
