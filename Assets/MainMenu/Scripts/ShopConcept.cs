@@ -75,12 +75,17 @@ public class ShopConcept : MonoBehaviour
         detailBody.text = "<color=#9A9A9A>Hover an item for details.</color>";
     }
 
-    // A locked item names what it needs, since its price label only says LOCKED
+    // A locked item names what it needs, since its price label only says LOCKED. A coming-soon item says
+    // so instead, and is checked first: it may have no prerequisite to name
     public void ShowDetail(ShopItem item)
     {
-        detailTitle.text = item.IsLocked
-            ? $"{item.Title.ToUpperInvariant()}  <color=#7A7A7A>NEEDS {item.Requires.Title.ToUpperInvariant()}</color>"
-            : item.Title.ToUpperInvariant();
+        string title = item.Title.ToUpperInvariant();
+        if (item.IsComingSoon)
+            detailTitle.text = $"{title}  <color=#7A7A7A>COMING SOON</color>";
+        else if (item.IsLocked)
+            detailTitle.text = $"{title}  <color=#7A7A7A>NEEDS {item.Requires.Title.ToUpperInvariant()}</color>";
+        else
+            detailTitle.text = title;
         detailBody.text = item.Description;
     }
 

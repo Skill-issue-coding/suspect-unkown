@@ -16,6 +16,10 @@ public class ProgressSave
     public bool debriefPending;
     // One entry per completed run, by scene name, so the count per level is how often it appears
     public List<string> completedJobs = new();
+    // Outfit parts bought in the wardrobe, by part name (Chest_002_Red). Free parts are never listed
+    public List<string> ownedOutfitParts = new();
+
+    public bool OwnsOutfitPart(string partName) => ownedOutfitParts.Contains(partName);
 
     public int TimesCompleted(string job)
     {

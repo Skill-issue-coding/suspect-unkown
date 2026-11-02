@@ -30,6 +30,18 @@ public class JobObjectives : MonoBehaviour
     public LootItem RequiredItem(int index) => required[index];
     public bool IsTaken(int index) => taken[index] || previouslyUnlocked[index];
 
+    // Every listed item is ticked: taken this run, or a story item an earlier run already unlocked. Not the
+    // same as IsComplete, which is also true from the start when the van may leave anytime
+    public bool AllTaken
+    {
+        get
+        {
+            for (int i = 0; i < Required; i++)
+                if (!IsTaken(i)) return false;
+            return true;
+        }
+    }
+
     private void Awake()
     {
         taken = new bool[Required];
