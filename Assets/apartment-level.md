@@ -52,8 +52,8 @@ Starting values, to be tuned in playtests:
 | `lockpicking`        | 1.0                  | 1.0              | Same everywhere (decision 22)                                                                                                                                             |
 | `stealing`           | —                    | 1.0              | Taking the laptop in view is the worst thing to be seen doing                                                                                                             |
 | `sprinting`          | 0.1                  | 0.4              | Running indoors is odd                                                                                                                                                    |
-| `hearingSensitivity` | 0.6                  | 12               | A sprint step (9 m radius) carries 108 m of NavMesh path; closed doors still block it (decision 10)                                                                       |
-| `hearingSuspicion`   | 0.4                  | 0.85             | A sprint (alarm 0.3) sets up to 0.26, past Curious out to about 23 m of path: a sprint in the bathroom or kitchen wakes them. Under `alertedAt`, so no sound alone alerts |
+| `hearingSensitivity` | 0.6                  | 8                | A sprint step (9 m radius) carries 72 m of NavMesh path; closed doors still block it (decision 10)                                                                        |
+| `hearingSuspicion`   | 0.4                  | 0.85             | A sprint (alarm 0.3) sets up to 0.26, past Curious (0.2) out to about 15.5 m of path: a sprint in the bathroom or kitchen wakes them. Under `alertedAt`, so no sound alone alerts |
 
 ### 2.2 The routine: dozing in the armchair, the snack run, and the semi-dynamic cone
 
