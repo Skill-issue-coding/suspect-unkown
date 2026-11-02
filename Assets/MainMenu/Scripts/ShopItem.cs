@@ -26,6 +26,8 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
     [SerializeField] private bool owned;
     [Tooltip("If above zero, buying this raises the fence rate to this value")]
     [SerializeField] private float fenceRate;
+    [Tooltip("Not for sale yet: shows COMING SOON, looks locked and cannot be bought")]
+    [SerializeField] private bool comingSoon;
 
     [Header("Presentation")]
     [SerializeField] private Wallet wallet;
@@ -42,6 +44,7 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
     public string Description => description;
     public ShopItem Requires => requires;
     public bool IsLocked => requires != null && !requires.Owned;
+    public bool IsComingSoon => comingSoon;
 
     private void Awake()
     {
@@ -91,7 +94,7 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
 
     private void Buy()
     {
-        if (owned || IsLocked || !wallet.CanAfford(currency, price)) return;
+        if (owned || comingSoon || IsLocked || !wallet.CanAfford(currency, price)) return;
 
         // Owned before paying: TrySpend raises the wallet's Changed, and items that require this one
         // refresh their LOCKED state from it, also when this item has no unlock flag to save
@@ -113,11 +116,13 @@ public class ShopItem : MonoBehaviour, IPointerEnterHandler
     {
         string cost = currency == Wallet.Currency.Clean ? Wallet.Money(price) : $"{price} SP";
         Color tint;
-        if (owned) { priceLabel.text = "<color=#8FD18B>OWNED</color>"; tint = new Color(0.56f, 0.82f, 0.55f, 0.9f); }
+        // Coming soon wins over everything, owned included: the item does not exist in the game yet
+        if (comingSoon) { priceLabel.text = "<color=#7A7A7A>COMING SOON</color>"; tint = new Color(1f, 1f, 1f, 0.12f); }
+        else if (owned) { priceLabel.text = "<color=#8FD18B>OWNED</color>"; tint = new Color(0.56f, 0.82f, 0.55f, 0.9f); }
         else if (IsLocked) { priceLabel.text = $"<color=#7A7A7A>LOCKED</color>"; tint = new Color(1f, 1f, 1f, 0.12f); }
         else if (!wallet.CanAfford(currency, price)) { priceLabel.text = $"<color=#FF6B5B>{cost}</color>"; tint = new Color(1f, 1f, 1f, 0.28f); }
         else { priceLabel.text = $"<color=#F2B33D>{cost}</color>"; tint = new Color(0.95f, 0.7f, 0.24f, 0.75f); }
         if (border != null) border.color = tint;
-        button.interactable = !owned && !IsLocked;
+        button.interactable = !owned && !IsLocked && !comingSoon;
     }
 }

@@ -606,6 +606,7 @@ MonoBehaviour:
   requires: {fileID: 1365531918}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 602957637}
@@ -935,6 +936,7 @@ MonoBehaviour:
   requires: {fileID: 1885189395}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 149101976}
@@ -7303,6 +7305,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 568756538}
@@ -7640,6 +7643,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 461047239}
@@ -16592,6 +16596,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 237811777}
@@ -20198,6 +20203,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 1376979093}
@@ -23366,6 +23372,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 543329685}
@@ -25594,6 +25601,7 @@ MonoBehaviour:
   requires: {fileID: 1615250880}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 1679452502}
@@ -28244,6 +28252,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 876405644}
@@ -28738,6 +28747,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 1
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 1893240631}
@@ -29589,6 +29599,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 1
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 989066328}
@@ -30228,6 +30239,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 1
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 715834084}
@@ -36129,6 +36141,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 654647599}
@@ -41196,6 +41209,7 @@ MonoBehaviour:
   requires: {fileID: 977813310}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 1687284428}
@@ -44485,6 +44499,7 @@ MonoBehaviour:
   requires: {fileID: 236516834}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 1453143575}
@@ -47538,6 +47553,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 679288449}
@@ -49253,6 +49269,7 @@ MonoBehaviour:
   requires: {fileID: 581209263}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 867408294}
@@ -56354,6 +56371,7 @@ MonoBehaviour:
   requires: {fileID: 0}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 446346881}
@@ -58089,6 +58107,7 @@ MonoBehaviour:
   requires: {fileID: 1508045419}
   owned: 0
   fenceRate: 0
+  comingSoon: 0
   wallet: {fileID: 412953600}
   shop: {fileID: 1827542566}
   priceLabel: {fileID: 794886770}
