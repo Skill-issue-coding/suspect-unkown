@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
 // Decides whether a published sound reached this NPC, measuring distance along the NavMesh so sound
 // travels around corners and through open doors, never through walls or closed doors (decision 10): the
 // path leaves out the Door area, the NavMeshLinks guards cross closed doors by. Cheap straight-line
-// rejection first; a path is only calculated for sounds that could be in range.
+// rejection first; a path is only calculated for sounds that could be in range. Every enabled listener is
+// also kept in a static list, so NoiseRings can show how far the best ear in the level hears.
 [RequireComponent(typeof(NpcPerception))]
 public class NpcHearing : MonoBehaviour
 {
@@ -18,6 +20,10 @@ public class NpcHearing : MonoBehaviour
     private const float SampleDistance = 1f;
 
     public event Action<HeardNoise> Heard;
+
+    // Every enabled listener. Holds the components, not their sensitivities: a spawner may swap the
+    // archetype after OnEnable (NpcPerception.AssignArchetype), so the value is read when it is asked for
+    private static readonly List<NpcHearing> listening = new List<NpcHearing>();
 
     private NpcPerception perception;
     private NavMeshPath path;
@@ -65,8 +71,31 @@ public class NpcHearing : MonoBehaviour
         else areaMask = NavMesh.AllAreas & ~(1 << door);
     }
 
-    private void OnEnable() => NoiseBus.Published += OnNoise;
-    private void OnDisable() => NoiseBus.Published -= OnNoise;
+    private void OnEnable()
+    {
+        NoiseBus.Published += OnNoise;
+        listening.Add(this);
+    }
+
+    private void OnDisable()
+    {
+        NoiseBus.Published -= OnNoise;
+        listening.Remove(this);
+    }
+
+    // The highest hearing sensitivity among enabled listeners, 0 when there are none. Loops a handful of
+    // NPCs per call, so it is asked once per noise, never per frame
+    public static float HighestSensitivity()
+    {
+        float highest = 0f;
+        for (int i = 0; i < listening.Count; i++)
+        {
+            NpcArchetype archetype = listening[i].perception.Archetype;
+            if (archetype != null && archetype.HearingSensitivity > highest)
+                highest = archetype.HearingSensitivity;
+        }
+        return highest;
+    }
 
     private void OnNoise(NoiseEvent noise)
     {

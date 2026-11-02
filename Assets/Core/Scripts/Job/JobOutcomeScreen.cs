@@ -104,6 +104,16 @@ public class JobOutcomeScreen : MonoBehaviour
     [SerializeField, Tooltip("Caption when nobody saw the player")]
     private string noWitnessCaption = "No witnesses came forward.";
 
+    [Header("Audio")]
+    [SerializeField, Tooltip("Optional. Plays the paper's sound; on this always-active object or beside it")]
+    private AudioSource sfxSource;
+
+    [SerializeField, Tooltip("Played as the paper comes in when the job failed (caught or police called)")]
+    private AudioClip failedSound;
+
+    [SerializeField, Tooltip("Played as the paper comes in when the job succeeded")]
+    private AudioClip completedSound;
+
     private Tween greyTween;
     private Tween timeTween;
     private Sequence entry;
@@ -183,12 +193,21 @@ public class JobOutcomeScreen : MonoBehaviour
 
         entry = Sequence.Create(useUnscaledTime: true)
             .ChainDelay(paperDelay)
+            .ChainCallback(this, self => self.PlayPaperSound())
             .Chain(Tween.Alpha(backdrop, 1f, 0.3f))
             .Group(Tween.UIAnchoredPosition(paper, Vector2.zero, paperDuration, Ease.OutCubic))
             .Group(Tween.Scale(paper, 1f, paperDuration, Ease.OutBack))
             .Group(Tween.LocalEulerAngles(paper, startAngles, restAngles, paperDuration, Ease.OutCubic))
             .Chain(Tween.Alpha(buttons, 1f, 0.25f))
             .ChainCallback(this, self => self.buttons.interactable = true);
+    }
+
+    // Played when the paper starts to come in, after paperDelay. Time scale does not slow an AudioSource,
+    // so the failure sound plays at normal speed while the world is slowed
+    private void PlayPaperSound()
+    {
+        AudioClip clip = failed ? failedSound : completedSound;
+        if (sfxSource != null && clip != null) sfxSource.PlayOneShot(clip);
     }
 
     // The photo box: the witness sketch with a title for how the job ended, or the "?" when nobody saw the
