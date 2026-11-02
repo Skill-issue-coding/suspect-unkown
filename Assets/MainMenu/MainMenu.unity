@@ -22070,7 +22070,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ABILITIES
+  m_text: ABILITIES <size=40%>(COMING SOON)</size>
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: f76c5714379d4124ba6c1019c04d5335, type: 2}
   m_sharedMaterial: {fileID: 8013311138831792474, guid: f76c5714379d4124ba6c1019c04d5335, type: 2}
@@ -54770,6 +54770,7 @@ MonoBehaviour:
   sfxSource: {fileID: 1827542568}
   purchaseSound: {fileID: 8300000, guid: aab77f7866e71b545aae93ee037224f6, type: 3}
   launderSound: {fileID: 8300000, guid: 967c54e81e5c3a64d8979d6741a5b36d, type: 3}
+  comingSoonTab: {fileID: 616048898}
 --- !u!4 &1827542567
 Transform:
   m_ObjectHideFlags: 0

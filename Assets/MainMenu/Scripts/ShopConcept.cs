@@ -24,6 +24,8 @@ public class ShopConcept : MonoBehaviour
     [SerializeField] private AudioClip purchaseSound;
     [Tooltip("Played when dirty money is laundered")]
     [SerializeField] private AudioClip launderSound;
+    [Tooltip("Tab locked as coming soon. Its page is kept but cannot be opened. Empty: every tab is open")]
+    [SerializeField] private MenuButtonFx comingSoonTab;
 
     private void Awake()
     {
@@ -58,6 +60,7 @@ public class ShopConcept : MonoBehaviour
             int index = i;
             tabs[i].Button.onClick.AddListener(() => ShowTab(index));
         }
+        if (comingSoonTab != null) comingSoonTab.SetLocked(true);
         ShowTab(0);
     }
 
