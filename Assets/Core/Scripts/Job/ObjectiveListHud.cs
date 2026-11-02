@@ -80,7 +80,9 @@ public class ObjectiveListHud : MonoBehaviour
             rows[i].Show(label, objectives.IsTaken(i));
         }
 
-        bool readyToEscape = objectives.IsComplete;
+        // Shown once every listed item is ticked, not as soon as the van may leave: in levels where the van
+        // can leave anytime that is the first frame, and the row would sit there before anything was done
+        bool readyToEscape = objectives.AllTaken;
         if (escapeRow != null)
         {
             escapeRow.gameObject.SetActive(readyToEscape);
