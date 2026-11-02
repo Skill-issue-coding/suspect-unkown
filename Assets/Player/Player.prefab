@@ -222,7 +222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8087817241353154679
 Transform:
   m_ObjectHideFlags: 0
@@ -525,6 +525,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6453045160398009926}
   - component: {fileID: 4636605905788292689}
+  - component: {fileID: 3702010775981465249}
   m_Layer: 0
   m_Name: Chest_002_Purple
   m_TagString: Untagged
@@ -657,6 +658,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0030468106, y: 0.89547515, z: -0.009388715}
     m_Extent: {x: 0.45304576, y: 0.3768213, z: 0.31644592}
   m_DirtyAABB: 0
+--- !u!114 &3702010775981465249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652977181775179546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1500
 --- !u!1 &764252401370939008
 GameObject:
   m_ObjectHideFlags: 0
@@ -763,6 +777,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9062236534557051225}
   - component: {fileID: 8029654037393433624}
+  - component: {fileID: 7027384211270743173}
   m_Layer: 0
   m_Name: Feet_001_Brown
   m_TagString: Untagged
@@ -895,6 +910,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.000000074505806, y: 0.020375729, z: -0.04316248}
     m_Extent: {x: 0.16788384, y: 0.11910285, z: 0.36192757}
   m_DirtyAABB: 0
+--- !u!114 &7027384211270743173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 828657976471541390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 250
 --- !u!1 &912880315481493616
 GameObject:
   m_ObjectHideFlags: 0
@@ -1550,6 +1578,8 @@ MonoBehaviour:
   hasForgettable: 0
   forgettableEvidence: 0.8
   hasQuickHands: 0
+  hasBetterCutter: 0
+  hasAppraiser: 0
   hasHammer: 0
   hasGlassBreaker: 0
   hasGlassCutter: 0
@@ -1678,6 +1708,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2573580173085096328}
   - component: {fileID: 2213379345690922683}
+  - component: {fileID: 962472564658088456}
   m_Layer: 0
   m_Name: Head_002_Blue
   m_TagString: Untagged
@@ -1810,6 +1841,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0047819912, y: 1.4137652, z: 0.03562796}
     m_Extent: {x: 0.14945935, y: 0.14658046, z: 0.15249433}
   m_DirtyAABB: 0
+--- !u!114 &962472564658088456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1404615381978604233}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &1416269501030864637
 GameObject:
   m_ObjectHideFlags: 0
@@ -1820,6 +1864,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4604968997858350686}
   - component: {fileID: 7168893951772225612}
+  - component: {fileID: 2929539198707415329}
   m_Layer: 0
   m_Name: Feet_003_Grey
   m_TagString: Untagged
@@ -1952,6 +1997,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.00012053549, y: 0.014762908, z: -0.04448828}
     m_Extent: {x: 0.17146353, y: 0.11349289, z: 0.360603}
   m_DirtyAABB: 0
+--- !u!114 &2929539198707415329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416269501030864637}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 250
 --- !u!1 &1425785760462982814
 GameObject:
   m_ObjectHideFlags: 0
@@ -2061,6 +2119,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5059762226182607729}
   - component: {fileID: 1600335485863804006}
+  - component: {fileID: 6073862317379828680}
   m_Layer: 0
   m_Name: Feet_003_Black
   m_TagString: Untagged
@@ -2193,6 +2252,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.00012053549, y: 0.014762908, z: -0.04448828}
     m_Extent: {x: 0.17146353, y: 0.11349289, z: 0.360603}
   m_DirtyAABB: 0
+--- !u!114 &6073862317379828680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1604392506144106531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &1897637215245649753
 GameObject:
   m_ObjectHideFlags: 0
@@ -2610,6 +2682,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2938466548428106184}
   - component: {fileID: 3577260630504888790}
+  - component: {fileID: 1276070577508009687}
   m_Layer: 0
   m_Name: Head_003_Green
   m_TagString: Untagged
@@ -2742,6 +2815,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.005951464, y: 1.5949446, z: 0.04100299}
     m_Extent: {x: 0.21627727, y: 0.15337503, z: 0.20260467}
   m_DirtyAABB: 0
+--- !u!114 &1276070577508009687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2334829900905921822}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1000
 --- !u!1 &2382724739453684152
 GameObject:
   m_ObjectHideFlags: 0
@@ -2752,6 +2838,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4743521955666268108}
   - component: {fileID: 2589909697892238562}
+  - component: {fileID: 8405653740235463836}
   m_Layer: 0
   m_Name: Head_002_Red
   m_TagString: Untagged
@@ -2884,6 +2971,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0047819912, y: 1.4137652, z: 0.03562796}
     m_Extent: {x: 0.14945935, y: 0.14658046, z: 0.15249433}
   m_DirtyAABB: 0
+--- !u!114 &8405653740235463836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2382724739453684152}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &2385111284623659163
 GameObject:
   m_ObjectHideFlags: 0
@@ -2926,6 +3026,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4340981123361918458}
   - component: {fileID: 5021749818437598742}
+  - component: {fileID: 6903318105745293773}
   m_Layer: 0
   m_Name: Feet_001_Black
   m_TagString: Untagged
@@ -3058,6 +3159,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.000000074505806, y: 0.020375729, z: -0.04316248}
     m_Extent: {x: 0.16788384, y: 0.11910285, z: 0.36192757}
   m_DirtyAABB: 0
+--- !u!114 &6903318105745293773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2722218090625281797}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &2791170031788146677
 GameObject:
   m_ObjectHideFlags: 0
@@ -3310,6 +3424,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3290059180287787274}
   - component: {fileID: 921895691351455186}
+  - component: {fileID: 7701169532417836648}
   m_Layer: 0
   m_Name: Head_002_Brown
   m_TagString: Untagged
@@ -3442,6 +3557,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0047819912, y: 1.4137652, z: 0.03562796}
     m_Extent: {x: 0.14945935, y: 0.14658046, z: 0.15249433}
   m_DirtyAABB: 0
+--- !u!114 &7701169532417836648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3141852439778431802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 250
 --- !u!1 &3166804685481486288
 GameObject:
   m_ObjectHideFlags: 0
@@ -3768,6 +3896,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8216755221059487786}
   - component: {fileID: 6779677281742619719}
+  - component: {fileID: 1898309489609039021}
   m_Layer: 0
   m_Name: Head_002_Purple
   m_TagString: Untagged
@@ -3900,6 +4029,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0047819912, y: 1.4137652, z: 0.03562796}
     m_Extent: {x: 0.14945935, y: 0.14658046, z: 0.15249433}
   m_DirtyAABB: 0
+--- !u!114 &1898309489609039021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3420695267976048597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 750
 --- !u!1 &3582484665445886767
 GameObject:
   m_ObjectHideFlags: 0
@@ -3963,6 +4105,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8043875836392075901}
   - component: {fileID: 41302684485037086}
+  - component: {fileID: 3713220531504158479}
   m_Layer: 0
   m_Name: Feet_002_Red
   m_TagString: Untagged
@@ -4095,6 +4238,19 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000001758337, y: 0.019348666, z: -0.0424093}
     m_Extent: {x: 0.16788384, y: 0.11809848, z: 0.3626908}
   m_DirtyAABB: 0
+--- !u!114 &3713220531504158479
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3678651312249005891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &3690729137363733591
 GameObject:
   m_ObjectHideFlags: 0
@@ -4205,6 +4361,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7956874445233772872}
   - component: {fileID: 3162895618216544246}
+  - component: {fileID: 3189402390017581430}
   m_Layer: 0
   m_Name: Chest_002_Green
   m_TagString: Untagged
@@ -4337,6 +4494,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0030468106, y: 0.89547515, z: -0.009388715}
     m_Extent: {x: 0.45304576, y: 0.3768213, z: 0.31644592}
   m_DirtyAABB: 0
+--- !u!114 &3189402390017581430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3859955487975101628}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 750
 --- !u!1 &3954080389777308293
 GameObject:
   m_ObjectHideFlags: 0
@@ -4347,6 +4517,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7354748421111763807}
   - component: {fileID: 5976355284374974245}
+  - component: {fileID: 217489667806044988}
   m_Layer: 0
   m_Name: Chest_001_Black
   m_TagString: Untagged
@@ -4479,6 +4650,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.006385848, y: 0.8698814, z: 0.002082631}
     m_Extent: {x: 0.4813794, y: 0.4214971, z: 0.31292015}
   m_DirtyAABB: 0
+--- !u!114 &217489667806044988
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3954080389777308293}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1000
 --- !u!1 &3971001186195647306
 GameObject:
   m_ObjectHideFlags: 0
@@ -4673,6 +4857,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1609915538397383621}
   - component: {fileID: 1896988843593542993}
+  - component: {fileID: 6829496929395128293}
   m_Layer: 0
   m_Name: Head_003_Yellow
   m_TagString: Untagged
@@ -4805,6 +4990,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.005951464, y: 1.5949446, z: 0.04100299}
     m_Extent: {x: 0.21627727, y: 0.15337503, z: 0.20260467}
   m_DirtyAABB: 0
+--- !u!114 &6829496929395128293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4122988080389043784}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1000
 --- !u!1 &4207701466520223737
 GameObject:
   m_ObjectHideFlags: 0
@@ -5015,6 +5213,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9209524837753748052}
   - component: {fileID: 2920205438659250938}
+  - component: {fileID: 5067314684490903428}
   m_Layer: 0
   m_Name: Chest_001_Blue
   m_TagString: Untagged
@@ -5147,6 +5346,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.006385848, y: 0.8698814, z: 0.002082631}
     m_Extent: {x: 0.4813794, y: 0.4214971, z: 0.31292015}
   m_DirtyAABB: 0
+--- !u!114 &5067314684490903428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4387752498062312258}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &4403672332650070063
 GameObject:
   m_ObjectHideFlags: 0
@@ -5157,6 +5369,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4379739579051343060}
   - component: {fileID: 773366181077694187}
+  - component: {fileID: 6274038126600540894}
   m_Layer: 0
   m_Name: Feet_002_Blue
   m_TagString: Untagged
@@ -5289,6 +5502,19 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000001758337, y: 0.019348666, z: -0.0424093}
     m_Extent: {x: 0.16788384, y: 0.11809848, z: 0.3626908}
   m_DirtyAABB: 0
+--- !u!114 &6274038126600540894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4403672332650070063}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &4521542658655926394
 GameObject:
   m_ObjectHideFlags: 0
@@ -5395,6 +5621,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1111933821394155168}
   - component: {fileID: 267880847812526252}
+  - component: {fileID: 1470517591269433811}
   m_Layer: 0
   m_Name: Head_002_Yellow
   m_TagString: Untagged
@@ -5527,6 +5754,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0047819912, y: 1.4137652, z: 0.03562796}
     m_Extent: {x: 0.14945935, y: 0.14658046, z: 0.15249433}
   m_DirtyAABB: 0
+--- !u!114 &1470517591269433811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4850767861821341332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 100
 --- !u!1 &4866762826693131169
 GameObject:
   m_ObjectHideFlags: 0
@@ -5601,6 +5841,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6854585407494117584}
   - component: {fileID: 3570082868179022284}
+  - component: {fileID: 7631012118958159151}
   m_Layer: 0
   m_Name: Feet_001_White
   m_TagString: Untagged
@@ -5733,6 +5974,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.000000074505806, y: 0.020375729, z: -0.04316248}
     m_Extent: {x: 0.16788384, y: 0.11910285, z: 0.36192757}
   m_DirtyAABB: 0
+--- !u!114 &7631012118958159151
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5044316147530759230}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &5242863225215265183
 GameObject:
   m_ObjectHideFlags: 0
@@ -5743,13 +5997,14 @@ GameObject:
   m_Component:
   - component: {fileID: 3098065807538238999}
   - component: {fileID: 6460809900574243538}
+  - component: {fileID: 7384694924292527750}
   m_Layer: 0
   m_Name: Chest_002_Black
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3098065807538238999
 Transform:
   m_ObjectHideFlags: 0
@@ -5875,6 +6130,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0030468106, y: 0.89547515, z: -0.009388715}
     m_Extent: {x: 0.45304576, y: 0.3768213, z: 0.31644592}
   m_DirtyAABB: 0
+--- !u!114 &7384694924292527750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5242863225215265183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1000
 --- !u!1 &5350177569031781596
 GameObject:
   m_ObjectHideFlags: 0
@@ -5948,6 +6216,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4291587168076972461}
   - component: {fileID: 8041789365025895055}
+  - component: {fileID: 4728902734518126717}
   m_Layer: 0
   m_Name: Feet_002_Brown
   m_TagString: Untagged
@@ -6080,6 +6349,19 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000001758337, y: 0.019348666, z: -0.0424093}
     m_Extent: {x: 0.16788384, y: 0.11809848, z: 0.3626908}
   m_DirtyAABB: 0
+--- !u!114 &4728902734518126717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5409349864518433212}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &5416341920998762156
 GameObject:
   m_ObjectHideFlags: 0
@@ -6397,6 +6679,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4525314969750680343}
   - component: {fileID: 1537615894204459800}
+  - component: {fileID: 7969932637473136294}
   m_Layer: 0
   m_Name: Head_003_Blue
   m_TagString: Untagged
@@ -6529,6 +6812,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.005951464, y: 1.5949446, z: 0.04100299}
     m_Extent: {x: 0.21627727, y: 0.15337503, z: 0.20260467}
   m_DirtyAABB: 0
+--- !u!114 &7969932637473136294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5716718782617469344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1000
 --- !u!1 &5732657581119246338
 GameObject:
   m_ObjectHideFlags: 0
@@ -6603,6 +6899,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1974572046061012318}
   - component: {fileID: 4117643382695392087}
+  - component: {fileID: 8196310515657298325}
   m_Layer: 0
   m_Name: Feet_002_White
   m_TagString: Untagged
@@ -6735,6 +7032,19 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000001758337, y: 0.019348666, z: -0.0424093}
     m_Extent: {x: 0.16788384, y: 0.11809848, z: 0.3626908}
   m_DirtyAABB: 0
+--- !u!114 &8196310515657298325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5826585020702912684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 750
 --- !u!1 &6008110275561396206
 GameObject:
   m_ObjectHideFlags: 0
@@ -6745,6 +7055,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5947611855217267666}
   - component: {fileID: 7995671844023560513}
+  - component: {fileID: 4549946564852921219}
   m_Layer: 0
   m_Name: Feet_001_Red
   m_TagString: Untagged
@@ -6877,6 +7188,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.000000074505806, y: 0.020375729, z: -0.04316248}
     m_Extent: {x: 0.16788384, y: 0.11910285, z: 0.36192757}
   m_DirtyAABB: 0
+--- !u!114 &4549946564852921219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6008110275561396206}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 250
 --- !u!1 &6054902352907924142
 GameObject:
   m_ObjectHideFlags: 0
@@ -6953,6 +7277,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8063381899561096552}
   - component: {fileID: 2805419250320186699}
+  - component: {fileID: 8204108570885941111}
   m_Layer: 0
   m_Name: Head_003_White
   m_TagString: Untagged
@@ -7085,6 +7410,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.005951464, y: 1.5949446, z: 0.04100299}
     m_Extent: {x: 0.21627727, y: 0.15337503, z: 0.20260467}
   m_DirtyAABB: 0
+--- !u!114 &8204108570885941111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6088898036370376899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1000
 --- !u!1 &6105753307939437700
 GameObject:
   m_ObjectHideFlags: 0
@@ -7126,6 +7464,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1840101213872978574}
   - component: {fileID: 7389109501011286419}
+  - component: {fileID: 3190380039747956716}
   m_Layer: 0
   m_Name: Chest_001_Red
   m_TagString: Untagged
@@ -7258,6 +7597,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.006385848, y: 0.8698814, z: 0.002082631}
     m_Extent: {x: 0.4813794, y: 0.4214971, z: 0.31292015}
   m_DirtyAABB: 0
+--- !u!114 &3190380039747956716
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6398429441368620433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &6468338465273181227
 GameObject:
   m_ObjectHideFlags: 0
@@ -7268,6 +7620,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8774555268960673208}
   - component: {fileID: 5746412556603631558}
+  - component: {fileID: 9009970031258227574}
   m_Layer: 0
   m_Name: Feet_002_Black
   m_TagString: Untagged
@@ -7400,6 +7753,19 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.000001758337, y: 0.019348666, z: -0.0424093}
     m_Extent: {x: 0.16788384, y: 0.11809848, z: 0.3626908}
   m_DirtyAABB: 0
+--- !u!114 &9009970031258227574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6468338465273181227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &6485207728177891941
 GameObject:
   m_ObjectHideFlags: 0
@@ -7511,6 +7877,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3946363534675736828}
   - component: {fileID: 4915407404433971952}
+  - component: {fileID: 6655917081584524628}
   m_Layer: 0
   m_Name: Head_003_Red
   m_TagString: Untagged
@@ -7643,6 +8010,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.005951464, y: 1.5949446, z: 0.04100299}
     m_Extent: {x: 0.21627727, y: 0.15337503, z: 0.20260467}
   m_DirtyAABB: 0
+--- !u!114 &6655917081584524628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6592072840868705566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1000
 --- !u!1 &6602113522750049070
 GameObject:
   m_ObjectHideFlags: 0
@@ -7653,6 +8033,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4095028263333697152}
   - component: {fileID: 7118923547202441812}
+  - component: {fileID: 9092078774484341858}
   m_Layer: 0
   m_Name: Head_002_White
   m_TagString: Untagged
@@ -7785,6 +8166,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0047819912, y: 1.4137652, z: 0.03562796}
     m_Extent: {x: 0.14945935, y: 0.14658046, z: 0.15249433}
   m_DirtyAABB: 0
+--- !u!114 &9092078774484341858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6602113522750049070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 750
 --- !u!1 &6681153122478016074
 GameObject:
   m_ObjectHideFlags: 0
@@ -7937,6 +8331,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1901857412681845328}
   - component: {fileID: 4349121101446775105}
+  - component: {fileID: 8841178938399862337}
   m_Layer: 0
   m_Name: Feet_001_Yellow
   m_TagString: Untagged
@@ -8069,6 +8464,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.000000074505806, y: 0.020375729, z: -0.04316248}
     m_Extent: {x: 0.16788384, y: 0.11910285, z: 0.36192757}
   m_DirtyAABB: 0
+--- !u!114 &8841178938399862337
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6697874105474774775}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 100
 --- !u!1 &6869728322521184987
 GameObject:
   m_ObjectHideFlags: 0
@@ -8079,6 +8487,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6047840774452860035}
   - component: {fileID: 5655572303770406916}
+  - component: {fileID: 7344851825642749488}
   m_Layer: 0
   m_Name: Legs_001_Blue
   m_TagString: Untagged
@@ -8211,6 +8620,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0002560094, y: 0.36702165, z: -0.017012894}
     m_Extent: {x: 0.1866296, y: 0.36407736, z: 0.48003167}
   m_DirtyAABB: 0
+--- !u!114 &7344851825642749488
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6869728322521184987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 250
 --- !u!1 &6952730629469489209
 GameObject:
   m_ObjectHideFlags: 0
@@ -8221,6 +8643,7 @@ GameObject:
   m_Component:
   - component: {fileID: 159975270813463165}
   - component: {fileID: 1802860250600260856}
+  - component: {fileID: 5561191925457863935}
   m_Layer: 0
   m_Name: Chest_002_Red
   m_TagString: Untagged
@@ -8353,6 +8776,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0030468106, y: 0.89547515, z: -0.009388715}
     m_Extent: {x: 0.45304576, y: 0.3768213, z: 0.31644592}
   m_DirtyAABB: 0
+--- !u!114 &5561191925457863935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6952730629469489209}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 750
 --- !u!1 &7127957515886587250
 GameObject:
   m_ObjectHideFlags: 0
@@ -8363,6 +8799,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6661570635849144230}
   - component: {fileID: 5146627373281655449}
+  - component: {fileID: 4841476026392163869}
   m_Layer: 0
   m_Name: Head_003_Purple
   m_TagString: Untagged
@@ -8495,6 +8932,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.005951464, y: 1.5949446, z: 0.04100299}
     m_Extent: {x: 0.21627727, y: 0.15337503, z: 0.20260467}
   m_DirtyAABB: 0
+--- !u!114 &4841476026392163869
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7127957515886587250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1000
 --- !u!1 &7247913201350265234
 GameObject:
   m_ObjectHideFlags: 0
@@ -8748,6 +9198,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2567722753669871210}
   - component: {fileID: 1457271658815210876}
+  - component: {fileID: 6976706566207372274}
   m_Layer: 0
   m_Name: Legs_001_Black
   m_TagString: Untagged
@@ -8880,6 +9331,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0002560094, y: 0.36702165, z: -0.017012894}
     m_Extent: {x: 0.1866296, y: 0.36407736, z: 0.48003167}
   m_DirtyAABB: 0
+--- !u!114 &6976706566207372274
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7676580474889430027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 1500
 --- !u!1 &7881536892198759823
 GameObject:
   m_ObjectHideFlags: 0
@@ -9169,7 +9633,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2267038816172738453
 Transform:
   m_ObjectHideFlags: 0
@@ -9369,6 +9833,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2860734424000536991}
   - component: {fileID: 8849567379852763109}
+  - component: {fileID: 979682727854258715}
   m_Layer: 0
   m_Name: Head_002_Green
   m_TagString: Untagged
@@ -9501,6 +9966,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0047819912, y: 1.4137652, z: 0.03562796}
     m_Extent: {x: 0.14945935, y: 0.14658046, z: 0.15249433}
   m_DirtyAABB: 0
+--- !u!114 &979682727854258715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8380984244565605113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 250
 --- !u!1 &8395954909367345861
 GameObject:
   m_ObjectHideFlags: 0
@@ -9543,6 +10021,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8843620579580762162}
   - component: {fileID: 3233094505047986057}
+  - component: {fileID: 3294640687666567633}
   m_Layer: 0
   m_Name: Head_002_Black
   m_TagString: Untagged
@@ -9675,6 +10154,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0047819912, y: 1.4137652, z: 0.03562796}
     m_Extent: {x: 0.14945935, y: 0.14658046, z: 0.15249433}
   m_DirtyAABB: 0
+--- !u!114 &3294640687666567633
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8467584910766753061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 750
 --- !u!1 &8518675262650397592
 GameObject:
   m_ObjectHideFlags: 0
@@ -9784,6 +10276,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5000075568351752710}
   - component: {fileID: 1911063292972641176}
+  - component: {fileID: 8839538904817367332}
   m_Layer: 0
   m_Name: Legs_001_Green
   m_TagString: Untagged
@@ -9916,6 +10409,19 @@ SkinnedMeshRenderer:
     m_Center: {x: -0.0002560094, y: 0.36702165, z: -0.017012894}
     m_Extent: {x: 0.1866296, y: 0.36407736, z: 0.48003167}
   m_DirtyAABB: 0
+--- !u!114 &8839538904817367332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8764366445455393646}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 206a86ff6e9c65f45824302059f650a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::OutfitPart
+  price: 500
 --- !u!1 &8790035748604801498
 GameObject:
   m_ObjectHideFlags: 0
@@ -9964,7 +10470,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4041383398092592761
 Transform:
   m_ObjectHideFlags: 0

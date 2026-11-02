@@ -1,8 +1,13 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+// The wardrobe station: arrows per outfit slot, the police profile beside it, the identity reset, and buying
+// outfit parts. Parts with an OutfitPart price can be previewed with the arrows; their row shows the price,
+// and the buy button pays for every unowned part of the shown outfit at once. Leaving the wardrobe puts the
+// last owned outfit back on, so a preview is never carried into a job
 public class WardrobeConcept : MonoBehaviour
 {
     [Serializable]
@@ -37,14 +42,29 @@ public class WardrobeConcept : MonoBehaviour
     [Tooltip("Shows the player's clean money above the reset button")]
     [SerializeField] private TMP_Text moneyLabel;
 
+    [Header("Outfit Purchase")]
+    [Tooltip("Shows the player's clean money on the wardrobe canvas, above the buy button")]
+    [SerializeField] private TMP_Text outfitMoneyLabel;
+    [Tooltip("Buys every part of the shown outfit the player does not own yet")]
+    [SerializeField] private Button buyButton;
+    [Tooltip("Text on the buy button: the total price, or OWNED when there is nothing to buy")]
+    [SerializeField] private TMP_Text buyLabel;
+    [Tooltip("The menu, so the last owned outfit goes back on when the player leaves the wardrobe")]
+    [SerializeField] private MainMenuConcept menu;
+
     [Header("Audio")]
     [Tooltip("Plays the purchase sound")]
     [SerializeField] private AudioSource sfxSource;
-    [Tooltip("Played when a reset is bought")]
+    [Tooltip("Played when a reset or an outfit is bought")]
     [SerializeField] private AudioClip purchaseSound;
 
     private WitnessReport record;
     private MenuButtonFx resetFx;
+    private MenuButtonFx buyFx;
+
+    // Names and total price of the shown parts the player does not own, rebuilt by Refresh
+    private readonly List<string> unowned = new List<string>();
+    private int unownedTotal;
 
     private void Awake()
     {
@@ -70,6 +90,12 @@ public class WardrobeConcept : MonoBehaviour
             resetFx = identityResetButton.GetComponent<MenuButtonFx>();
         }
 
+        if (buyButton != null)
+        {
+            buyButton.onClick.AddListener(BuyOutfit);
+            buyFx = buyButton.GetComponent<MenuButtonFx>();
+        }
+
         // Load directly from police.json
         record = PoliceStore.Load();
         Refresh();
@@ -79,11 +105,34 @@ public class WardrobeConcept : MonoBehaviour
     private void OnEnable()
     {
         if (wallet != null) wallet.Changed += RefreshMoney;
+        if (menu != null) menu.StationShown += OnStationShown;
     }
 
     private void OnDisable()
     {
         if (wallet != null) wallet.Changed -= RefreshMoney;
+        if (menu != null) menu.StationShown -= OnStationShown;
+    }
+
+    // Leaving the wardrobe while previewing a part not bought: put the saved, owned outfit back on
+    private void OnStationShown(MenuStation station, float duration)
+    {
+        if (station == MenuStation.Wardrobe || unownedTotal == 0) return;
+
+        customization.LoadAppearance();
+        Refresh();
+    }
+
+    // Pays for every unowned part of the shown outfit at once, then saves the outfit, which is now owned
+    public void BuyOutfit()
+    {
+        if (wallet == null || unownedTotal == 0 || !wallet.TrySpend(Wallet.Currency.Clean, unownedTotal)) return;
+
+        wallet.OwnOutfitParts(unowned);
+        customization.SaveAppearance();
+        Refresh();
+        if (sfxSource != null && purchaseSound != null)
+            sfxSource.PlayOneShot(purchaseSound);
     }
 
     // Paid from clean money like a shop item: nothing is wiped unless the wallet takes the payment
@@ -102,14 +151,41 @@ public class WardrobeConcept : MonoBehaviour
     private void RefreshMoney()
     {
         if (wallet == null) return;
-        if (moneyLabel != null)
-            moneyLabel.text = $"CLEAN MONEY  <color=#F2B33D>{Wallet.Money(wallet.Clean)}</color>";
+        string money = $"CLEAN MONEY  <color=#F2B33D>{Wallet.Money(wallet.Clean)}</color>";
+        if (moneyLabel != null) moneyLabel.text = money;
+        if (outfitMoneyLabel != null) outfitMoneyLabel.text = money;
         if (resetFx != null) resetFx.SetLocked(!wallet.CanAfford(Wallet.Currency.Clean, resetPrice));
+        RefreshBuy();
+    }
+
+    // The buy button: the total for the unowned parts shown, red and locked when the player cannot afford it,
+    // OWNED and locked when the whole outfit is owned
+    private void RefreshBuy()
+    {
+        if (buyButton == null) return;
+
+        bool affordable = wallet != null && wallet.CanAfford(Wallet.Currency.Clean, unownedTotal);
+        if (buyLabel != null)
+        {
+            string total = Wallet.Money(unownedTotal);
+            buyLabel.text = unownedTotal == 0 ? "OWNED"
+                : affordable ? $"BUY  <color=#F2B33D>{total}</color>"
+                : $"BUY  <color=#FF6B5B>{total}</color>";
+        }
+
+        bool canBuy = unownedTotal > 0 && affordable;
+        if (buyFx != null) buyFx.SetLocked(!canBuy);
+        else buyButton.interactable = canBuy;
     }
 
     private void Refresh()
     {
         if (record == null) record = PoliceStore.Load();
+
+        // Read once per refresh (a click), never per frame
+        ProgressSave save = ProgressStore.Load();
+        unowned.Clear();
+        unownedTotal = 0;
 
         int burnedCount = 0;
 
@@ -126,7 +202,16 @@ public class WardrobeConcept : MonoBehaviour
             bool burned = OutfitFeature.TryParse(partName, out _, out OutfitFeature equipped) && record.IsBurned(row.slot, equipped);
             if (burned) burnedCount++;
 
-            row.partLabel.text = burned ? $"{Pretty(partName)}  <color=#FF6B5B>BURNED</color>" : Pretty(partName);
+            // The price tag: a part not owned yet shows what it costs, and is added to the buy button's total
+            string label = burned ? $"{Pretty(partName)}  <color=#FF6B5B>BURNED</color>" : Pretty(partName);
+            if (part != null && !PlayerCustomization.IsOwned(part, save))
+            {
+                int price = PlayerCustomization.PriceOf(part);
+                unowned.Add(partName);
+                unownedTotal += price;
+                label += $"  <color=#F2B33D>{Wallet.Money(price)}</color>";
+            }
+            row.partLabel.text = label;
             row.countLabel.text = $"{category.currentIndex + 1} / {category.parts.Length}";
 
             // What the police believe about this slot: the leading part, with color and style confidence apart,
@@ -149,6 +234,8 @@ public class WardrobeConcept : MonoBehaviour
                     ? $"<color=#FF6B5B>{burnedCount} burned pieces. You will be recognised on sight.</color>"
                     : $"<color=#FF6B5B>{burnedCount} burned piece{(burnedCount > 1 ? "s" : "")}. {toKnow - burnedCount} more and you will be recognised on sight.</color>";
         }
+
+        RefreshBuy();
     }
 
     private PlayerCustomization.CustomizationCategory Find(string categoryName)

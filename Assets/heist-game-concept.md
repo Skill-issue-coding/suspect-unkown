@@ -232,6 +232,7 @@ These systems are worthless to both courses if the player cannot perceive them.
 - **Intel change log** — what changed at this location and why, generated from the placement step.
 - **Post-job witness report** — the newspaper screen. Each witness, what they saw, how confident. This teaches the entire witness system without a tutorial and is a headline feature for the game course.
 - **In-world telegraphing** — vision cones drawn on the floor as light, like a torch beam, cut by walls and shaded behind low cover where crouching hides you; suspicion indicator above the NPC, audible cue on state change, a clear visual for how lit you are.
+- **Noise rings** — every sound (footsteps, a smash, a slammed door) draws a thin ring on the floor that grows to how far the best ear in the level hears it, then fades. The ring is straight-line reach and ignores walls, so it reads as loudness; real hearing still goes around corners along the NavMesh.
 
 ### 6.6 Poisoning the model — the core counterplay
 
@@ -350,6 +351,7 @@ Clothing is functional, not cosmetic. Each piece occupies a feature slot the wit
 - Expensive pieces carry a functional benefit. A work uniform lets you stand in staff areas without generating suspicion; a long coat conceals tools; quiet shoes reduce noise radius.
 - **Decoy pieces** — cheap, loud, distinctive items that exist to be confirmed into the profile on purpose. Mark them as such in the shop so the strategy is discoverable.
 - A wardrobe screen shows each piece's burn status and whether the burn was intentional.
+- Pieces are bought with clean money. A few pieces per slot are free from the start; the rest carry a price tag. The wardrobe previews any piece, and one button buys every unowned piece of the shown outfit. Only owned pieces are ever worn on a job.
 
 ### 7.3 Tools and gear
 

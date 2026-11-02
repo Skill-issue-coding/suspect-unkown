@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 
@@ -62,6 +63,18 @@ public class Wallet : MonoBehaviour
         ProgressStore.Save(save);
 
         fenceRate = Mathf.Max(fenceRate, FenceRateFor(save));
+        Changed?.Invoke();
+    }
+
+    // Writes the bought outfit parts and nothing else, like Unlock. Called after TrySpend has taken the money
+    public void OwnOutfitParts(IReadOnlyList<string> partNames)
+    {
+        if (partNames == null || partNames.Count == 0) return;
+
+        ProgressSave save = ProgressStore.Load();
+        for (int i = 0; i < partNames.Count; i++)
+            if (!save.OwnsOutfitPart(partNames[i])) save.ownedOutfitParts.Add(partNames[i]);
+        ProgressStore.Save(save);
         Changed?.Invoke();
     }
 
