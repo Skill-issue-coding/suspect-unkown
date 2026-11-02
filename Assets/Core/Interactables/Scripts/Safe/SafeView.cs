@@ -78,6 +78,10 @@ public class SafeView : MonoBehaviour
     [SerializeField, Tooltip("The safe HUD beside this view in Minigames.prefab. Kept outside this object so it can fade out after the view hides")]
     private SafeHud hud;
 
+    [Header("Audio")]
+    [SerializeField, Tooltip("The dial, number-set and open sounds")]
+    private SafeAudio safeAudio;
+
     private const string FaceName = "DialFace";
 
     private SafeModel currentModel;
@@ -125,6 +129,7 @@ public class SafeView : MonoBehaviour
         handle.localRotation = initialHandleRotation;
 
         if (hud != null) hud.Show(model);
+        if (safeAudio != null) safeAudio.Begin(model);
     }
 
     public void End()
@@ -134,6 +139,7 @@ public class SafeView : MonoBehaviour
         if (currentModel == null) return;
 
         if (hud != null) hud.Hide();
+        if (safeAudio != null) safeAudio.End();
         Detach();
     }
 
