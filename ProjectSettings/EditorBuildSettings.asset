@@ -14,6 +14,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Thriftshop/Thriftshop.unity
     guid: 9ef7b9502470fc142905cb2b5bf9db7f
+  - enabled: 1
+    path: Assets/JewelryStore/JewelryStore.unity
+    guid: 4d7a2ce2d7b2f0a428bc232a6491d741
   - enabled: 0
     path: Assets/Testing/TestingScene.unity
     guid: 4c1e7c5ce22a49249a3c2c9246eddafe

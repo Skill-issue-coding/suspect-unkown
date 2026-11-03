@@ -14503,7 +14503,7 @@ MonoBehaviour:
   securityBudget: {fileID: 11400000, guid: 15862500da0a41b429ebedcf0959a314, type: 2}
   knownTake: 0
   estimatedTake: 900
-  intel: 'Perfect burn job: wear the red jacket here on purpose.'
+  intel: Perfect job to burn an outfit. Hammer is required.
   outline: {fileID: 491247769}
   lockedOutline: {fileID: 2100000, guid: e22091218f314080b4d026e94ef524b1, type: 2}
   board: {fileID: 900365489}
@@ -56380,17 +56380,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapLocation
   displayName: Jewelry Store
-  jobType: Unknown
+  jobType: Store robbery, two floors
   difficulty: 3
-  security: Unknown
-  securityBudget: {fileID: 0}
+  security: 2-3 Guards
+  securityBudget: {fileID: 11400000, guid: e1f255d6e9e662c41934d0ed446b7044, type: 2}
   knownTake: 0
-  estimatedTake: 0
-  intel: Unkown
+  estimatedTake: 4000
+  intel: The owner of the thrift store planned this job himself. His sketch marks the exits. Lockpick level 2 required.
   outline: {fileID: 1846509383}
   lockedOutline: {fileID: 2100000, guid: e22091218f314080b4d026e94ef524b1, type: 2}
   board: {fileID: 900365489}
-  sceneName: 
+  sceneName: JewelryStore
   requires: 8192
   storyItem: {fileID: 3212440117113394634}
   lockedHint: Steal the intel from the thrift store
@@ -60276,7 +60276,7 @@ MonoBehaviour:
   security: Unkown
   securityBudget: {fileID: 0}
   knownTake: 0
-  estimatedTake: 0
+  estimatedTake: 10000
   intel: 'Security has adapted: patrols now favour the vault corridor.'
   outline: {fileID: 1998851488}
   lockedOutline: {fileID: 2100000, guid: e22091218f314080b4d026e94ef524b1, type: 2}

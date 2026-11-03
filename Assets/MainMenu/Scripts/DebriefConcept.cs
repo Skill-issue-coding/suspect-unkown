@@ -8,8 +8,9 @@ using UnityEngine.UI;
 // The debrief on the safehouse wall, shown after a completed job from the save's lastJob (apartment-level.md
 // 3.7): first THE TAKE (each item line slides in, the list scrolling to keep the newest in view, then the total
 // counts up), then REPUTATION (where the XP came from, from XpRules, then the bar filling from the XP before the
-// job to after it, each level worth a skill point). Continue skips a running animation or moves on; once both
-// views have played, their tabs open so the player can flip between them
+// job to after it, each level worth a skill point). Continue skips a running animation or moves on. The tabs
+// are open from the start: leaving a view mid-animation jumps it to its end first, and the first visit to
+// REPUTATION plays it, so each view is always either playing or finished
 public class DebriefConcept : MonoBehaviour
 {
     [Header("Menu")]
@@ -23,10 +24,10 @@ public class DebriefConcept : MonoBehaviour
     [SerializeField, Tooltip("REPUTATION: XP sources and the level bar")]
     private CanvasGroup repView;
 
-    [SerializeField, Tooltip("Tab that shows THE TAKE. Locked until both views have played")]
+    [SerializeField, Tooltip("Tab that shows THE TAKE")]
     private MenuButtonFx takeTab;
 
-    [SerializeField, Tooltip("Tab that shows REPUTATION. Locked until both views have played")]
+    [SerializeField, Tooltip("Tab that shows REPUTATION, playing it on the first visit")]
     private MenuButtonFx repTab;
 
     [SerializeField, Tooltip("Label of the Continue button: says what the next press does")]
@@ -138,7 +139,6 @@ public class DebriefConcept : MonoBehaviour
         FillRep(save);
 
         repPlayed = false;
-        SetTabsLocked(true);
         ShowView(View.Take);
         HideLine(takeTotalLine);
         takeTotal.text = Wallet.Money(0);
@@ -155,19 +155,37 @@ public class DebriefConcept : MonoBehaviour
         }
         if (view == View.Take && !repPlayed)
         {
-            ShowView(View.Rep);
-            foreach (DebriefRow row in repRows) if (row != null) row.Hide();
-            SetBar(startLevel, startXp);
-            HideLine(levelUp);
-            Run(PlayRep());
+            StartRep();
             return;
         }
         menu.OpenMain();
     }
 
-    // Connected to the tabs; they only open once both views have played, so these show final states
-    public void ShowTake() => ShowView(View.Take);
-    public void ShowRep() => ShowView(View.Rep);
+    // Connected to the tabs. Finish first, so the view being left is complete when the player comes back
+    public void ShowTake()
+    {
+        if (view == View.Take) return;
+        if (animating) Finish();
+        ShowView(View.Take);
+    }
+
+    public void ShowRep()
+    {
+        if (view == View.Rep) return;
+        if (animating) Finish();
+        if (repPlayed) ShowView(View.Rep);
+        else StartRep();
+    }
+
+    // Resets REPUTATION to the XP before the job and plays it from there
+    private void StartRep()
+    {
+        ShowView(View.Rep);
+        foreach (DebriefRow row in repRows) if (row != null) row.Hide();
+        SetBar(startLevel, startXp);
+        HideLine(levelUp);
+        Run(PlayRep());
+    }
 
     // "APARTMENT  |  CLEAN GETAWAY  |  01:14"
     private void FillHeader(JobResult job)
@@ -328,7 +346,6 @@ public class DebriefConcept : MonoBehaviour
         repPlayed = true;
         animating = false;
         routine = null;
-        SetTabsLocked(false);
         UpdateContinueLabel();
     }
 
@@ -361,12 +378,6 @@ public class DebriefConcept : MonoBehaviour
     {
         if (continueLabel == null) return;
         continueLabel.text = animating ? "SKIP" : view == View.Take && !repPlayed ? "REPUTATION" : "DONE";
-    }
-
-    private void SetTabsLocked(bool locked)
-    {
-        if (takeTab != null) takeTab.SetLocked(locked);
-        if (repTab != null) repTab.SetLocked(locked);
     }
 
     private void Run(IEnumerator sequence)

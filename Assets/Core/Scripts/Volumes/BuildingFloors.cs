@@ -136,7 +136,7 @@ public class BuildingFloors : MonoBehaviour
     }
 
     // How far something standing on floor is faded: 0 when the player views that floor, 1 a floor away
-    public float HideOnFloor(int floor) => Mathf.Clamp01(Mathf.Abs(level - floor));
+    public float HideOnFloor(int floor) => inside * Mathf.Clamp01(Mathf.Abs(level - floor));
 
     public void Register(FloorHideable hideable)
     {
