@@ -36,7 +36,9 @@ This project is also a learning project. The default is **guidance**: the develo
 - Debug tools alongside the system, not after. A system you cannot see is a system you cannot tune.
 - Name the done-when test before writing the code that passes it.
 
-**When something breaks,** investigate before answering: read the code, the scene or prefab YAML, and `Logs/Editor.log`. Give the cause, the evidence, and the fix. Do not guess.
+**When something breaks,** investigate before answering: read the code, the scene or prefab YAML, and the editor log (`%LOCALAPPDATA%\Unity\Editor\Editor.log` on Windows; the project has no `Logs/Editor.log`). Give the cause, the evidence, and the fix. Do not guess.
+
+**Inspect the live editor when it is open.** The Unity CLI (`unity status`, `unity command console`, `unity command eval '<C#>'`) reads the scene as Unity sees it: world positions, real collider bounds, which objects a list references. Prefer it over decoding scene YAML, where model children are stripped prefab references and local axes hide the real layout. Keep it read-only unless asked: to test behaviour, build a temporary object with `HideFlags.HideAndDontSave` and destroy it in the same call. In Windows PowerShell 5.1, flatten the code to one line and escape every `"` as `\"`, or the arguments split. `unity command recompile` then `recompile_status` confirms a script change compiles.
 
 ---
 
@@ -111,7 +113,7 @@ Aim for a practical industry standard: code another developer could pick up, ext
 | Occluder | 10 | Walls and cover. The only layer perception rays test against |
 | Player | 14 | The player and its bone perception colliders |
 | NPC | 15 | NPC bodies |
-| Volume | 16 | `Zone` volumes. Collides with Player only |
+| Volume | 16 | Player-only triggers: `Zone`, `FloorVolume`, `FloorStairs`, the metal detector's scan zone. Collides with Player only |
 | Sketch | 17 | The witness sketch booth. Only `SketchCamera` and `SketchLight` see it |
 | UI | 5 | HUD canvases |
 
@@ -156,6 +158,9 @@ Assume nothing from older Unity tutorials. If you are not certain an API exists 
 - **Prefabs:** add components in prefab mode, not on a scene instance, or they become scene overrides.
 - **Assets:** move and rename assets inside Unity, never in the file explorer, so the `.meta` file and its GUID move with them. A lost GUID breaks every reference to the asset.
 - **Enums in C#** support arithmetic (`state + 1`, `state++`) and ordering comparisons. Code relying on this depends on declaration order.
+- **Trigger callbacks run on disabled components.** `OnTriggerEnter` still fires when the MonoBehaviour is unticked, so check `enabled` first. Filter the player with `TryGetComponent(out CharacterController _)`: only the root has one, so the bone colliders do not fire it again, and Core stays free of Player types.
+- **The player's CharacterController needs headroom above its height.** Each grounded move first lifts the capsule by Step Offset (0.3 m) to try a step, so anything solid lower than height + Skin Width + Step Offset (1.9 + 0.08 + 0.3 = 2.28 m) over a walkway blocks walking, though the standing capsule never touches it and jumping gets through. Keep overhead colliders (gate beams, low ceilings) above about 2.35 m, or leave them out.
+- **`renderer.material` changes the first slot only** and makes an instance Unity does not free; destroy it in `OnDestroy`. Use `materials` for a multi-slot renderer. Static batching can stop runtime colour changes from showing, so untick Static on anything recoloured at runtime.
 
 ### Animation
 
@@ -172,6 +177,14 @@ Assume nothing from older Unity tutorials. If you are not certain an API exists 
 - FBX export: Selected Objects, Armature and Mesh only, **Apply Scalings: FBX Units Scale**, **Apply Transform** on, **Add Leaf Bones** off, Only Deform Bones on, Bake Animation off.
 - In Unity the imported `Armature` must be at scale 1, and `Hips` at a local height of about 0.9. A scale of 100 anywhere means the export settings were wrong.
 - Keep `.blend` source files outside `Assets/`. Unity re-imports them through Blender on every save.
+- **Level models carry their Blender transforms.** Objects inside a level FBX (`JewelryStore.fbx`) can import rotated and negatively scaled (the metal detector: rotation (0, 90, 90), scale (−0.51, −0.31, −1)). A collider's size and centre are in the object's local axes, so its Y is not necessarily up; read world bounds before judging where a box is. BoxColliders do not support negative scale (Unity forces it positive and warns), so apply transforms in Blender before export.
+
+### Levels and the main menu
+
+- **Props that must fade with their floor** (decision 26) sit under one of `BuildingFloors`' prop roots (`Interactables`, `ShopLamps`, `Props` in the jewelry store) and use an OccluderWall material such as `OccluderPropMaterial`. `RendererFade` skips URP Lit, so a prop on `BaseMaterial` never fades.
+- **A playable level must be in the build scene list** (File → Build Profiles → Scene List). `SceneTransition.Load` refuses anything else and only logs a warning. A `MapLocation` with an empty Scene Name shows as "Coming soon".
+- **A level's story item** is set in three places that must agree: the `LootPickup`'s `LootItem`, the `JobObjectives` required list on `Job`, and the `Safe`'s Story Unlock (the item's unlock, so replays drop it).
+- **Main menu text is plain ASCII.** The map font (Electrolize) is a static ASCII atlas: no curly quotes, dashes or accented letters.
 
 ---
 
