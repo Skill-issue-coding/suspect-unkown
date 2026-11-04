@@ -1081,7 +1081,7 @@ MonoBehaviour:
   loopSource: {fileID: 8987761144928042652}
   oneShotSource: {fileID: 4243499913890642580}
   slipClip: {fileID: 8300000, guid: f664e18399344f6419aea591a588fe7c, type: 3}
-  openClip: {fileID: 8300000, guid: e15f8cf96c34b004989676434a8e9156, type: 3}
+  openClip: {fileID: 8300000, guid: 1dd57995de2a72f4db28bdc7fd091b20, type: 3}
   stopDelay: 0.1
 --- !u!1 &6408202954722066683
 GameObject:
