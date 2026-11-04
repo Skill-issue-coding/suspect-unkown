@@ -178,6 +178,9 @@ public class GlassCutterView : MonoBehaviour
         // Restore initial rotation
         cutterMesh.localRotation = initialCutterRotation;
 
+        // The guide ring is hidden when a cut completes, and this view is shared by every glass in the level
+        lineRenderer.enabled = true;
+
         if (cutLineRenderer != null)
         {
             cutLineRenderer.positionCount = 0;

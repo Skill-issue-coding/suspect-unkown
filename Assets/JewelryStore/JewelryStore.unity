@@ -15383,15 +15383,15 @@ PrefabInstance:
     - target: {fileID: 3859236490651845987, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
       propertyPath: caught
       value: 
-      objectReference: {fileID: 11400000, guid: b16acceeb2893f3429afd7407a7c57f2, type: 2}
+      objectReference: {fileID: 11400000, guid: bdeef6d6103eda4499bbedb3f6c1b1c9, type: 2}
     - target: {fileID: 3859236490651845987, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
       propertyPath: completed
       value: 
-      objectReference: {fileID: 11400000, guid: 41b841b87ff0cc14083b14954962fd5a, type: 2}
+      objectReference: {fileID: 11400000, guid: 0f2ddff964952484685c5b4d237c18a0, type: 2}
     - target: {fileID: 3859236490651845987, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
       propertyPath: policeCalled
       value: 
-      objectReference: {fileID: 11400000, guid: 0c85cba3410a07b4993613e7b3956743, type: 2}
+      objectReference: {fileID: 11400000, guid: 4dc7621b19b46e346b8fe8e08e6780fe, type: 2}
     - target: {fileID: 3948819181308473995, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
       propertyPath: objectives
       value: 
@@ -15426,11 +15426,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6643624357512090820, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
       propertyPath: address
-      value: 212 Harbor Ave, Thrift Store
+      value: 88 Crown Square, Jewelry Store
       objectReference: {fileID: 0}
     - target: {fileID: 6643624357512090820, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
       propertyPath: jobName
-      value: Thrift Store
+      value: Jewelry Store
       objectReference: {fileID: 0}
     - target: {fileID: 6801168452842925363, guid: cbd20f7edf5169b4db29587e12692228, type: 3}
       propertyPath: m_fontColor32.rgba
@@ -64991,6 +64991,14 @@ PrefabInstance:
     - target: {fileID: 17152450209928325, guid: 5be50ad65e9c68d478de0effaf6137d0, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 404777655263545339, guid: 5be50ad65e9c68d478de0effaf6137d0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3307769135283935714, guid: 5be50ad65e9c68d478de0effaf6137d0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4506947158784130782, guid: 5be50ad65e9c68d478de0effaf6137d0, type: 3}
       propertyPath: m_LocalPosition.x
