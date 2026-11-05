@@ -2696,6 +2696,7 @@ MonoBehaviour:
   chaseInterval: 8
   suspiciousInterval: 6
   intervalJitter: 1
+  suspiciousVolume: 0.5
 --- !u!1 &7060616932561885397
 GameObject:
   m_ObjectHideFlags: 0

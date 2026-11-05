@@ -28,6 +28,10 @@ public class GuardAudio : MonoBehaviour
     [SerializeField, Min(0f), Tooltip("Seconds of random variation per interval, so two guards don't speak in step")]
     private float intervalJitter = 1f;
 
+    [Header("Volume")]
+    [SerializeField, Range(0f, 1f), Tooltip("Volume of the suspicious clips")]
+    private float suspiciousVolume = 0.6f;
+
     private GuardBehaviour guard;
     private AudioSource source;
     private bool chasing;
@@ -114,12 +118,12 @@ public class GuardAudio : MonoBehaviour
             index = (index + 1) % suspiciousClips.Length;
 
         lastSuspiciousIndex = index;
-        Play(suspiciousClips[index]);
+        Play(suspiciousClips[index], suspiciousVolume);
     }
 
     // Null-safe, since an array slot can be left empty in the Inspector
-    private void Play(AudioClip clip)
+    private void Play(AudioClip clip, float volume = 1f)
     {
-        if (clip != null) source.PlayOneShot(clip);
+        if (clip != null) source.PlayOneShot(clip, volume);
     }
 }

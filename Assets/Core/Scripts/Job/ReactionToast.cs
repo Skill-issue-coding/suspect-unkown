@@ -67,11 +67,11 @@ public class ReactionToast : MonoBehaviour
         label.color = ColorFor(reaction);
 
         show.Stop();
-        show = callShown
-            ? Sequence.Create().Chain(Tween.Alpha(group, 1f, fadeDuration, Ease.OutQuad))
-            : Sequence.Create()
-                .Chain(Tween.Alpha(group, 1f, fadeDuration, Ease.OutQuad))
-                .ChainDelay(holdSeconds)
+        show = Sequence.Create();
+        if (group.alpha < 1f)
+            show.Chain(Tween.Alpha(group, 1f, fadeDuration, Ease.OutQuad));
+        if (!callShown)
+            show.ChainDelay(holdSeconds)
                 .Chain(Tween.Alpha(group, 0f, fadeDuration, Ease.InQuad));
     }
 

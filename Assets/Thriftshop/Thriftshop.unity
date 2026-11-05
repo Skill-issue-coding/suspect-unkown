@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: babc67b72a83f184e8592680fc29d551, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: 2d796ced94d61438fbab81b194038162, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -5541,6 +5541,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2.2062511, y: 2.0268464, z: 1.691533}
   m_Center: {x: 0.42120802, y: -0.5134232, z: 0.85470027}
+--- !u!114 &460596271 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2080952319394986878, guid: 7829df83e74e68f41b69e43201e1f72b, type: 3}
+  m_PrefabInstance: {fileID: 460596261}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 689254}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c14241f5672a0f344ad1e21b108643f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Safe
 --- !u!1 &461819920
 GameObject:
   m_ObjectHideFlags: 0
@@ -20832,7 +20843,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc4d76f733087744991913c9d19d5274, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_LensFlareData: {fileID: 11400000, guid: 69ffd98bf7a2a4bf9a1217c6d30c381d, type: 2}
+  m_LensFlareData: {fileID: 11400000, guid: bd7eaf3bd49c39f4cb77bd809459aa72, type: 2}
   version: 0
   intensity: 1
   maxAttenuationDistance: 100
@@ -23786,7 +23797,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f755d144e261417a92a792e2f59322e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PoiSafeAlarm
-  safe: {fileID: 0}
+  safe: {fileID: 460596271}
   alarmFactor: 1.5
 --- !u!1001 &1543606586
 PrefabInstance:
