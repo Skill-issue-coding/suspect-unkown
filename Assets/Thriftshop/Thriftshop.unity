@@ -26300,6 +26300,38 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasHammer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasAppraiser
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasSoftSteps
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasQuickHands
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasForgettable
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasGlassCutter
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasBetterCutter
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -818215352608075208, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
+      propertyPath: hasGlassBreaker
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1495546535423314, guid: 69790b10b0fa65b4e92911fb6785aedd, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
@@ -34685,7 +34717,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2022732742536074164, guid: d61ebc792d5f3b74794f0053cc4d2ea6, type: 3}
       propertyPath: m_Volume
-      value: 0.1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 8660611546901321382, guid: d61ebc792d5f3b74794f0053cc4d2ea6, type: 3}
       propertyPath: m_Name

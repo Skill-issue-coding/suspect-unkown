@@ -2235,7 +2235,7 @@ MonoBehaviour:
   glassBreakerRadius: 6
   breakerHoldSeconds: 1.5
   glassBreakerAlarm: 1
-  glassBreakerVolume: 0.5
+  glassBreakerVolume: 0.3
   audioSource: {fileID: 5081987243984703232}
   smashClip: {fileID: 8300000, guid: 977dd962bf29f904986b7eecf8308753, type: 3}
   cutClip: {fileID: 0}

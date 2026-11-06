@@ -111,7 +111,7 @@ public class SceneTransitionView : MonoBehaviour
         if (scanLine != null) scanRoutine = StartCoroutine(Scan());
 
         // The listener volume is the master volume setting: restored exactly once the new scene shows
-        float volume = AudioListener.volume;
+        float volume = MasterVolume.Value;
         yield return Fade(0f, 1f, coverSeconds, volume);
 
         float shownAt = Time.unscaledTime;

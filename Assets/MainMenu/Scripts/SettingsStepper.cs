@@ -7,7 +7,7 @@ using TMPro;
 // Applies the real setting so the board is not a dead mock-up.
 public class SettingsStepper : MonoBehaviour
 {
-    public enum Setting { MasterVolume, Fullscreen, Quality }
+    public enum Setting { MasterVolume, Fullscreen }
 
     [Tooltip("Which setting this row changes")]
     [SerializeField] private Setting setting;
@@ -31,9 +31,8 @@ public class SettingsStepper : MonoBehaviour
 
         value = setting switch
         {
-            Setting.MasterVolume => Mathf.RoundToInt(AudioListener.volume * 10f),
-            Setting.Fullscreen => Screen.fullScreen ? 1 : 0,
-            _ => QualitySettings.GetQualityLevel()
+            Setting.MasterVolume => Mathf.RoundToInt(MasterVolume.Value * 10f),
+            _ => Screen.fullScreen ? 1 : 0,
         };
         Refresh();
     }
@@ -44,15 +43,14 @@ public class SettingsStepper : MonoBehaviour
         {
             case Setting.MasterVolume:
                 value = Mathf.Clamp(value + direction, 0, 10);
-                AudioListener.volume = value / 10f;
+                MasterVolume.Set(value / 10f);
                 break;
             case Setting.Fullscreen:
                 value = 1 - value;
-                Screen.fullScreen = value == 1;
-                break;
-            case Setting.Quality:
-                value = (int)Mathf.Repeat(value + direction, QualitySettings.names.Length);
-                QualitySettings.SetQualityLevel(value, true);
+                if (value == 1)
+                    Screen.SetResolution(Display.main.systemWidth, Display.main.systemHeight, FullScreenMode.FullScreenWindow);
+                else
+                    Screen.SetResolution(1600, 900, FullScreenMode.Windowed);
                 break;
         }
         Refresh();
@@ -63,8 +61,7 @@ public class SettingsStepper : MonoBehaviour
         valueLabel.text = setting switch
         {
             Setting.MasterVolume => $"{value * 10}%",
-            Setting.Fullscreen => value == 1 ? "ON" : "OFF",
-            _ => QualitySettings.names[value].ToUpperInvariant()
+            _ => value == 1 ? "ON" : "OFF",
         };
     }
 }

@@ -105,12 +105,13 @@ public class NpcPerceptionDebug : MonoBehaviour
         }
     }
 
+#if UNITY_EDITOR
     private void OnGUI()
     {
         if (!readouts || !TryGetSuspicionAndPerception()) return;
-#if UNITY_EDITOR
+
         if (!IsSelected()) return;
-#endif
+
 
         GUILayout.BeginArea(readoutRect, GUI.skin.box);
         GUILayout.Label(name);
@@ -158,7 +159,6 @@ public class NpcPerceptionDebug : MonoBehaviour
             GUILayout.Label($"state       {suspicion.State}");
         }
 
-#if UNITY_EDITOR
         if (hearing != null && Time.time - hearing.DebugTime < 3f)
         {
             string result = hearing.DebugVerdict == NpcHearing.Verdict.Heard
@@ -169,7 +169,6 @@ public class NpcPerceptionDebug : MonoBehaviour
 
         if (anomalySight != null && Time.time - anomalySight.DebugTime < 1f && anomalySight.DebugLastNoticed != null)
             GUILayout.Label($"anomaly {anomalySight.DebugLastNoticed.Kind}");
-#endif
 
         if (witness != null)
         {
@@ -189,6 +188,7 @@ public class NpcPerceptionDebug : MonoBehaviour
 
         GUILayout.EndArea();
     }
+#endif
 
     // Test hooks until ResidentBehaviour drives the scale (B4): the dozing values from apartment-level.md 2.2
     [ContextMenu("Test: Dozing View")]

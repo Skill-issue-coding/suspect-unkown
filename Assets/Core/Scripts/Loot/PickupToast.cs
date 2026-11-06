@@ -66,9 +66,10 @@ public class PickupToast : MonoBehaviour
         label.color = color;
 
         show.Stop();
-        show = Sequence.Create()
-            .Chain(Tween.Alpha(group, 1f, fadeDuration, Ease.OutQuad))
-            .ChainDelay(holdSeconds)
-            .Chain(Tween.Alpha(group, 0f, fadeDuration, Ease.InQuad));
+        show = Sequence.Create();
+        if (group.alpha < 1f)
+            show = show.Chain(Tween.Alpha(group, 1f, fadeDuration * (1f - group.alpha), Ease.OutQuad));
+        show = show.ChainDelay(holdSeconds)
+                   .Chain(Tween.Alpha(group, 0f, fadeDuration, Ease.InQuad));
     }
 }

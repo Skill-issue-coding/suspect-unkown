@@ -6,19 +6,25 @@ using UnityEngine;
 public class DoorInteraction : MonoBehaviour, IInteractionBehaviour
 {
     private Door door;
+    private string blockedReason;
+    public string BlockedText => blockedReason;
 
     private void Awake()
     {
         door = GetComponent<Door>();
     }
 
-    // Blocked if locked and the lock level exceeds the player's lockpicking level
+    // Blocked if locked and the lock level exceeds the player's lockpicking level, a message will be displayed
     public bool IsBlockedFor(GameObject interactor)
     {
+        blockedReason = null;
         if (!door.IsLocked) return false;
 
         PlayerSkills skills = interactor.GetComponent<PlayerSkills>();
-        return skills == null || door.LockLevel > skills.LockpickingLevel;
+        if (skills != null && door.LockLevel <= skills.LockpickingLevel) return false;
+
+        blockedReason = $"Lockpicking level {door.LockLevel} needed";
+        return true;
     }
 
     // Called on press (HoldSeconds is 0)

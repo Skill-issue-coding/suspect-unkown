@@ -43,6 +43,9 @@ public class GuardBehaviour : MonoBehaviour
     [SerializeField, Range(0.1f, 3f), Tooltip("Horizontal metres at which a pursuing guard catches a visible player")]
     private float catchRadius = 1.2f;
 
+    [SerializeField, Range(0.1f, 3f), Tooltip("Vertical metres between the guard's and the player's feet within which a catch counts.")]
+    private float catchHeight = 1f;
+
     [SerializeField, Tooltip("Degrees left and right the guard sweeps while searching")]
     private float searchSweepAngle = 66f;
 
@@ -393,8 +396,10 @@ public class GuardBehaviour : MonoBehaviour
             if (seesPlayer)
             {
                 Vector3 offset = lastKnownPosition - transform.position;
+                // check height first of all
+                bool closeInHeight = Mathf.Abs(offset.y) <= catchHeight;
                 offset.y = 0f;
-                if (offset.sqrMagnitude <= catchRadius * catchRadius)
+                if (closeInHeight && offset.sqrMagnitude <= catchRadius * catchRadius)
                     Catch();
             }
             return;
